@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "categorical-polytope"
+version = "0.1.0"
+description = "Fisher-controlled extremal probes and coproduct factorization (standalone lecture toolkit)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Traveler" }]
+keywords = ["Fisher information", "category theory", "optimization", "vertex localization"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Mathematics",
+]
+
+[project.optional-dependencies]
+dev = ["matplotlib>=3.7", "pytest>=7.0"]
+notebook = ["matplotlib>=3.7", "jupyter>=1.0"]
+
+[project.scripts]
+categorical-polytope = "categorical_polytope.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["categorical_polytope*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

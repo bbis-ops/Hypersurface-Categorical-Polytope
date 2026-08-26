@@ -1,0 +1,217 @@
+72h cycle 49: V.7, in-scope=108, corpus=190, focus=False, batch=10
+V.7 batch 1: returned 10/10, fresh 10, corpus 200/190, in-scope 117/109, verified 117, counterexamples 0
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 50: V.11, in-scope=109, corpus=191, focus=False, batch=10
+V.11 batch 1: returned 0/10, fresh 0, corpus 191/191, in-scope 109/110, verified 109, counterexamples 0
+V.11: stopped after 1 attempts with corpus 191/191, in-scope 109/110
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 51: V.11, in-scope=109, corpus=191, focus=False, batch=5
+V.11 batch 1: returned 0/5, fresh 0, corpus 191/191, in-scope 109/110, verified 109, counterexamples 0
+V.11: stopped after 1 attempts with corpus 191/191, in-scope 109/110
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 52: V.11, in-scope=109, corpus=191, focus=False, batch=4
+V.11 batch 1: returned 0/4, fresh 0, corpus 191/191, in-scope 109/110, verified 109, counterexamples 0
+V.11: stopped after 1 attempts with corpus 191/191, in-scope 109/110
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 53: V.11, in-scope=109, corpus=191, focus=False, batch=4
+V.11 batch 1: returned 0/4, fresh 0, corpus 191/191, in-scope 109/110, verified 109, counterexamples 0
+V.11: stopped after 1 attempts with corpus 191/191, in-scope 109/110
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 54: V.11, in-scope=109, corpus=191, focus=False, batch=4
+V.11 batch 1: returned 3/4, fresh 3, corpus 194/191, in-scope 112/110, verified 112, counterexamples 0
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 55: V.12, in-scope=140, corpus=151, focus=False, batch=4
+V.12 batch 1: returned 0/4, fresh 0, corpus 151/151, in-scope 140/141, verified 140, counterexamples 0
+V.12: stopped after 1 attempts with corpus 151/151, in-scope 140/141
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 56: V.11, in-scope=112, corpus=194, focus=False, batch=4
+V.11 batch 1: returned 4/4, fresh 4, corpus 198/194, in-scope 114/113, verified 114, counterexamples 0
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 57: V.11, in-scope=114, corpus=198, focus=False, batch=4
+V.11 batch 1: returned 0/4, fresh 0, corpus 198/198, in-scope 114/115, verified 114, counterexamples 0
+V.11: stopped after 1 attempts with corpus 198/198, in-scope 114/115
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 58: V.11, in-scope=114, corpus=198, focus=False, batch=4
+V.11 batch 1: returned 0/4, fresh 0, corpus 198/198, in-scope 114/115, verified 114, counterexamples 0
+V.11: stopped after 1 attempts with corpus 198/198, in-scope 114/115
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 59: V.13, in-scope=123, corpus=156, focus=False, batch=4
+72h cycle 59: watchdog killed child 12212 after 900.3s
+72h cycle 60: V.11, in-scope=114, corpus=198, focus=False, batch=4
+V.11 batch 1: returned 4/4, fresh 4, corpus 202/198, in-scope 115/115, verified 115, counterexamples 0
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 61: V.11, in-scope=115, corpus=202, focus=False, batch=4
+V.11 batch 1: returned 0/4, fresh 0, corpus 202/202, in-scope 115/116, verified 115, counterexamples 0
+V.11: stopped after 1 attempts with corpus 202/202, in-scope 115/116
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 62: V.11, in-scope=115, corpus=202, focus=False, batch=4
+V.11 batch 1: returned 4/4, fresh 4, corpus 206/202, in-scope 117/116, verified 117, counterexamples 0
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 63: V.14, in-scope=118, corpus=213, focus=False, batch=4
+V.14 batch 1: returned 0/4, fresh 0, corpus 213/213, in-scope 118/119, verified 118, counterexamples 0
+V.14: stopped after 1 attempts with corpus 213/213, in-scope 118/119
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 64: V.8, in-scope=116, corpus=191, focus=False, batch=4
+V.8 batch 1: returned 4/4, fresh 4, corpus 195/191, in-scope 116/117, verified 116, counterexamples 0
+V.8: stopped after 1 attempts with corpus 195/191, in-scope 116/117
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 65: V.8, in-scope=116, corpus=195, focus=False, batch=4
+V.8 batch 1: returned 4/4, fresh 4, corpus 199/195, in-scope 119/117, verified 119, counterexamples 0
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 66: V.7, in-scope=117, corpus=200, focus=False, batch=4
+V.7 batch 1: returned 4/4, fresh 4, corpus 204/200, in-scope 121/118, verified 121, counterexamples 0
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 67: V.7, in-scope=121, corpus=204, focus=False, batch=4
+V.7 batch 1: returned 4/4, fresh 4, corpus 208/204, in-scope 125/122, verified 125, counterexamples 0
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 68: V.11, in-scope=117, corpus=206, focus=False, batch=4
+V.11 batch 1: returned 0/4, fresh 0, corpus 206/206, in-scope 117/118, verified 117, counterexamples 0
+V.11: stopped after 1 attempts with corpus 206/206, in-scope 117/118
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 69: V.11, in-scope=117, corpus=206, focus=False, batch=4
+V.11 batch 1: returned 0/4, fresh 0, corpus 206/206, in-scope 117/118, verified 117, counterexamples 0
+V.11: stopped after 1 attempts with corpus 206/206, in-scope 117/118
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 70: V.11, in-scope=117, corpus=206, focus=False, batch=4
+V.11 batch 1: returned 0/4, fresh 0, corpus 206/206, in-scope 117/118, verified 117, counterexamples 0
+V.11: stopped after 1 attempts with corpus 206/206, in-scope 117/118
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 71: V.8, in-scope=119, corpus=199, focus=False, batch=4
+V.8 batch 1: returned 4/4, fresh 4, corpus 203/199, in-scope 121/120, verified 121, counterexamples 0
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 72: V.11, in-scope=117, corpus=206, focus=False, batch=4
+V.11 batch 1: returned 4/4, fresh 4, corpus 210/206, in-scope 117/118, verified 117, counterexamples 0
+V.11: stopped after 1 attempts with corpus 210/206, in-scope 117/118
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 73: V.11, in-scope=117, corpus=210, focus=False, batch=4
+V.11 batch 1: returned 4/4, fresh 4, corpus 214/210, in-scope 117/118, verified 117, counterexamples 0
+V.11: stopped after 1 attempts with corpus 214/210, in-scope 117/118
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 74: V.11, in-scope=117, corpus=214, focus=False, batch=4
+V.11 batch 1: returned 0/4, fresh 0, corpus 214/214, in-scope 117/118, verified 117, counterexamples 0
+V.11: stopped after 1 attempts with corpus 214/214, in-scope 117/118
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 75: V.9, in-scope=123, corpus=214, focus=False, batch=4
+V.9 batch 1: returned 0/4, fresh 0, corpus 214/214, in-scope 123/124, verified 123, counterexamples 0
+V.9: stopped after 1 attempts with corpus 214/214, in-scope 123/124
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 76: V.11, in-scope=117, corpus=214, focus=False, batch=4
+V.11 batch 1: returned 4/4, fresh 4, corpus 218/214, in-scope 117/118, verified 117, counterexamples 0
+V.11: stopped after 1 attempts with corpus 218/214, in-scope 117/118
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 77: V.11, in-scope=117, corpus=218, focus=False, batch=4
+V.11 batch 1: returned 0/4, fresh 0, corpus 218/218, in-scope 117/118, verified 117, counterexamples 0
+V.11: stopped after 1 attempts with corpus 218/218, in-scope 117/118
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 78: V.11, in-scope=117, corpus=218, focus=False, batch=4
+V.11 batch 1: returned 0/4, fresh 0, corpus 218/218, in-scope 117/118, verified 117, counterexamples 0
+V.11: stopped after 1 attempts with corpus 218/218, in-scope 117/118
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 79: V.10, in-scope=141, corpus=271, focus=False, batch=4
+V.10 batch 1: returned 0/4, fresh 0, corpus 271/271, in-scope 141/142, verified 141, counterexamples 0
+V.10: stopped after 1 attempts with corpus 271/271, in-scope 141/142
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 80: V.11, in-scope=117, corpus=218, focus=False, batch=4
+V.11 batch 1: returned 4/4, fresh 4, corpus 222/218, in-scope 118/118, verified 118, counterexamples 0
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 81: V.14, in-scope=118, corpus=213, focus=False, batch=4
+V.14 batch 1: returned 0/4, fresh 0, corpus 213/213, in-scope 118/119, verified 118, counterexamples 0
+V.14: stopped after 1 attempts with corpus 213/213, in-scope 118/119
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 82: V.14, in-scope=118, corpus=213, focus=False, batch=4
+V.14 batch 1: returned 4/4, fresh 4, corpus 217/213, in-scope 119/119, verified 119, counterexamples 0
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 83: V.11, in-scope=118, corpus=222, focus=False, batch=4
+V.11 batch 1: returned 0/4, fresh 0, corpus 222/222, in-scope 118/119, verified 118, counterexamples 0
+V.11: stopped after 1 attempts with corpus 222/222, in-scope 118/119
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 84: V.11, in-scope=118, corpus=222, focus=False, batch=4
+V.11 batch 1: returned 4/4, fresh 4, corpus 226/222, in-scope 121/119, verified 121, counterexamples 0
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 85: V.14, in-scope=119, corpus=217, focus=False, batch=4
+V.14 batch 1: returned 0/4, fresh 0, corpus 217/217, in-scope 119/120, verified 119, counterexamples 0
+V.14: stopped after 1 attempts with corpus 217/217, in-scope 119/120
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 86: V.14, in-scope=119, corpus=217, focus=False, batch=4
+V.14 batch 1: returned 4/4, fresh 4, corpus 221/217, in-scope 119/120, verified 119, counterexamples 0
+V.14: stopped after 1 attempts with corpus 221/217, in-scope 119/120
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 87: V.12, in-scope=140, corpus=151, focus=False, batch=4
+V.12 batch 1: returned 3/4, fresh 2, corpus 153/151, in-scope 141/141, verified 141, counterexamples 0
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md

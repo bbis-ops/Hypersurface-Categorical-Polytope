@@ -1,0 +1,166 @@
+{
+  "backend": "builtin (incl. frontier finds)",
+  "n": 8,
+  "results": [
+    {
+      "name": "interior_max",
+      "expr": "-((1-lam)-0.25)**2 - (sigma-0.35)**2",
+      "source": "model",
+      "note": "V.13 base self-fails: maximiser interior at (0.75,0.35), not a corner",
+      "ok": true,
+      "corner": [
+        1.0,
+        0.0,
+        2.0,
+        3.0
+      ],
+      "flat_axis": "",
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "breaks": true,
+      "law_holds": false
+    },
+    {
+      "name": "quadratic",
+      "expr": "-(1-lam)**2 - sigma**2",
+      "source": "builtin",
+      "note": "the repo default r shape (2m=2)",
+      "ok": true,
+      "corner": [
+        1.0,
+        0.0,
+        2.0,
+        3.0
+      ],
+      "flat_axis": "lam",
+      "flatness_order": 1.9999999999996156,
+      "predicted_exponent": 2.0000000000003846,
+      "measured_exponent": 1.9999999999421403,
+      "base_self_fails": false,
+      "breaks": true,
+      "law_holds": true
+    },
+    {
+      "name": "odd_cubic",
+      "expr": "-(abs(1-lam))**3 - (abs(sigma))**3",
+      "source": "model",
+      "note": "V.12 odd order beta=3: even-order assumption not needed, p=1.5",
+      "ok": true,
+      "corner": [
+        1.0,
+        0.0,
+        2.0,
+        3.0
+      ],
+      "flat_axis": "lam",
+      "flatness_order": 3.000000000017298,
+      "predicted_exponent": 1.4999999999956755,
+      "measured_exponent": 1.5000037843869127,
+      "base_self_fails": false,
+      "breaks": true,
+      "law_holds": true
+    },
+    {
+      "name": "quartic",
+      "expr": "-(1-lam)**4 - sigma**4",
+      "source": "builtin",
+      "note": "flatter corner (2m=4)",
+      "ok": true,
+      "corner": [
+        1.0,
+        0.0,
+        2.0,
+        3.0
+      ],
+      "flat_axis": "lam",
+      "flatness_order": 4.000000000179392,
+      "predicted_exponent": 1.333333333313401,
+      "measured_exponent": 1.333335318372686,
+      "base_self_fails": false,
+      "breaks": true,
+      "law_holds": true
+    },
+    {
+      "name": "mixed_24",
+      "expr": "-(1-lam)**2 - sigma**4",
+      "source": "builtin",
+      "note": "anisotropic flatness",
+      "ok": true,
+      "corner": [
+        1.0,
+        0.0,
+        2.0,
+        3.0
+      ],
+      "flat_axis": "sigma",
+      "flatness_order": 4.000000000179392,
+      "predicted_exponent": 1.333333333313401,
+      "measured_exponent": 1.333335318372686,
+      "base_self_fails": false,
+      "breaks": true,
+      "law_holds": true
+    },
+    {
+      "name": "sextic",
+      "expr": "-(1-lam)**6 - sigma**6",
+      "source": "builtin",
+      "note": "very flat (2m=6)",
+      "ok": true,
+      "corner": [
+        1.0,
+        0.0,
+        2.0,
+        3.0
+      ],
+      "flat_axis": "lam",
+      "flatness_order": 5.999999755898942,
+      "predicted_exponent": 1.2000000097640429,
+      "measured_exponent": 1.2000003151554912,
+      "base_self_fails": false,
+      "breaks": true,
+      "law_holds": true
+    },
+    {
+      "name": "strict",
+      "expr": "lam - sigma",
+      "source": "builtin",
+      "note": "strict corner: slope != 0, threshold > 0",
+      "ok": true,
+      "corner": [
+        1.0,
+        0.0,
+        2.0,
+        3.0
+      ],
+      "flat_axis": "(none)",
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": false,
+      "breaks": false,
+      "law_holds": false
+    },
+    {
+      "name": "strict_curved",
+      "expr": "-(1-lam)**2 - sigma**2 + 0.3*lam - 0.3*sigma",
+      "source": "builtin",
+      "note": "quadratic bowl plus a linear tilt: strict corner",
+      "ok": true,
+      "corner": [
+        1.0,
+        0.0,
+        2.0,
+        3.0
+      ],
+      "flat_axis": "(none)",
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": false,
+      "breaks": false,
+      "law_holds": false
+    }
+  ]
+}

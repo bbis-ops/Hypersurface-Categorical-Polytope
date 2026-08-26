@@ -1,0 +1,59 @@
+  API HTTP 429; retry 3/8 in 10.8s
+  pacing API request for 63.1s
+  API HTTP 429; retry 2/8 in 5.2s
+  pacing API request for 68.7s
+  API HTTP 429; retry 3/8 in 10.8s
+  pacing API request for 63.2s
+  API HTTP 429; retry 4/8 in 20.9s
+  pacing API request for 52.9s
+  API KeyError: 'choices'; retry 2/8 in 5.4s
+  API KeyError: 'choices'; retry 3/8 in 11.0s
+  pacing API request for 72.8s
+  API HTTP 429; retry 2/8 in 5.5s
+  pacing API request for 68.4s
+  API HTTP 429; retry 3/8 in 10.9s
+  pacing API request for 63.2s
+  API HTTP 429; retry 4/8 in 20.5s
+  pacing API request for 53.4s
+  API HTTP 429; retry 2/8 in 5.4s
+  pacing API request for 68.4s
+  API HTTP 429; retry 3/8 in 10.4s
+  pacing API request for 63.4s
+  API HTTP 429; retry 2/8 in 5.6s
+  pacing API request for 67.9s
+  API HTTP 429; retry 3/8 in 10.5s
+  pacing API request for 63.4s
+  API HTTP 429; retry 2/8 in 5.7s
+  pacing API request for 67.3s
+  API HTTP 429; retry 3/8 in 10.3s
+  pacing API request for 63.4s
+  API HTTP 429; retry 2/8 in 5.4s
+  pacing API request for 68.4s
+  API HTTP 429; retry 4/8 in 20.4s
+  pacing API request for 53.3s
+  API HTTP 429; retry 2/8 in 5.2s
+  pacing API request for 68.3s
+  API HTTP 429; retry 2/8 in 5.6s
+  pacing API request for 67.7s
+  API HTTP 429; retry 2/8 in 6.0s
+  pacing API request for 67.3s
+  API HTTP 429; retry 3/8 in 11.0s
+  pacing API request for 62.4s
+  API HTTP 429; retry 4/8 in 20.7s
+  pacing API request for 52.7s
+  API HTTP 429; retry 5/8 in 40.1s
+  pacing API request for 33.2s
+  API HTTP 429; retry 6/8 in 80.5s
+  API HTTP 429; retry 7/8 in 120.6s
+  API HTTP 429; retry 2/8 in 5.4s
+  pacing API request for 61.4s
+  API HTTP 429; retry 3/8 in 10.9s
+  pacing API request for 62.2s
+  API HTTP 429; retry 2/8 in 5.1s
+  pacing API request for 66.8s
+  API HTTP 429; retry 2/8 in 5.6s
+  pacing API request for 67.3s
+  API HTTP 429; retry 2/8 in 5.5s
+  pacing API request for 67.5s
+  API HTTP 429; retry 2/8 in 5.2s
+  pacing API request for 67.8s

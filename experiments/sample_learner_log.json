@@ -1,0 +1,149 @@
+{
+  "interaction": "face_bowl",
+  "steps": [
+    {
+      "step": 0,
+      "lam": 0.992380728561571,
+      "sigma": 0.00956358177287936,
+      "b": 2.0,
+      "k": 2.989695021029932,
+      "interaction_strength": 0.0,
+      "epsilon": 0.0,
+      "gap_vertex_grid": 0.0,
+      "mode": "CORNER_HUNTING",
+      "reason": "low leakage and vertex localization \u2014 separable corner probe OK"
+    },
+    {
+      "step": 1,
+      "lam": 0.9936353322515343,
+      "sigma": 0.02354515438886287,
+      "b": 1.9369320687709752,
+      "k": 2.9932676127424735,
+      "interaction_strength": 0.08,
+      "epsilon": 0.0,
+      "gap_vertex_grid": 0.0,
+      "mode": "CORNER_HUNTING",
+      "reason": "low leakage and vertex localization \u2014 separable corner probe OK"
+    },
+    {
+      "step": 2,
+      "lam": 1.0,
+      "sigma": 0.07042145399205528,
+      "b": 1.855756760016819,
+      "k": 2.934287991529831,
+      "interaction_strength": 0.16,
+      "epsilon": 0.0,
+      "gap_vertex_grid": 0.0,
+      "mode": "CORNER_HUNTING",
+      "reason": "low leakage and vertex localization \u2014 separable corner probe OK"
+    },
+    {
+      "step": 3,
+      "lam": 0.9345072859986943,
+      "sigma": 0.11996457949080369,
+      "b": 1.8944444565250669,
+      "k": 2.7968520924407847,
+      "interaction_strength": 0.24,
+      "epsilon": 0.0,
+      "gap_vertex_grid": 0.010996093750000213,
+      "mode": "INTERIOR_SEARCH",
+      "reason": "grid beats vertex by 0.0110 \u2014 abandon corner-hunting"
+    },
+    {
+      "step": 4,
+      "lam": 1.0,
+      "sigma": 0.19432582447089436,
+      "b": 1.925228963231835,
+      "k": 2.831520903814356,
+      "interaction_strength": 0.32,
+      "epsilon": 0.0,
+      "gap_vertex_grid": 0.025078125000000284,
+      "mode": "INTERIOR_SEARCH",
+      "reason": "grid beats vertex by 0.0251 \u2014 abandon corner-hunting"
+    },
+    {
+      "step": 5,
+      "lam": 0.945199055222426,
+      "sigma": 0.11672594238283114,
+      "b": 1.9309052164659306,
+      "k": 2.6993862353650124,
+      "interaction_strength": 0.4,
+      "epsilon": 0.0,
+      "gap_vertex_grid": 0.039160156250000355,
+      "mode": "INTERIOR_SEARCH",
+      "reason": "grid beats vertex by 0.0392 \u2014 abandon corner-hunting"
+    },
+    {
+      "step": 6,
+      "lam": 0.8956323772700946,
+      "sigma": 0.07543682456926551,
+      "b": 1.8369217343108883,
+      "k": 2.6885665737319977,
+      "interaction_strength": 0.48,
+      "epsilon": 0.0,
+      "gap_vertex_grid": 0.053242187500000426,
+      "mode": "INTERIOR_SEARCH",
+      "reason": "grid beats vertex by 0.0532 \u2014 abandon corner-hunting"
+    },
+    {
+      "step": 7,
+      "lam": 0.8861173559351597,
+      "sigma": 0.13022516513223065,
+      "b": 1.8407465572637036,
+      "k": 2.7306540861077506,
+      "interaction_strength": 0.56,
+      "epsilon": 0.0,
+      "gap_vertex_grid": 0.06732421874999961,
+      "mode": "INTERIOR_SEARCH",
+      "reason": "grid beats vertex by 0.0673 \u2014 abandon corner-hunting"
+    },
+    {
+      "step": 8,
+      "lam": 0.8860810602882464,
+      "sigma": 0.15621709023468955,
+      "b": 1.8322125335836152,
+      "k": 2.6641029560069165,
+      "interaction_strength": 0.64,
+      "epsilon": 0.0,
+      "gap_vertex_grid": 0.08140624999999968,
+      "mode": "INTERIOR_SEARCH",
+      "reason": "grid beats vertex by 0.0814 \u2014 abandon corner-hunting"
+    },
+    {
+      "step": 9,
+      "lam": 0.9657060523623399,
+      "sigma": 0.23552775289968142,
+      "b": 1.9002556434821876,
+      "k": 2.726445842456301,
+      "interaction_strength": 0.72,
+      "epsilon": 0.0,
+      "gap_vertex_grid": 0.10281249999999975,
+      "mode": "INTERIOR_SEARCH",
+      "reason": "grid beats vertex by 0.1028 \u2014 abandon corner-hunting"
+    },
+    {
+      "step": 10,
+      "lam": 0.9361504070848279,
+      "sigma": 0.1922742971569463,
+      "b": 1.858063632945028,
+      "k": 2.597512892324279,
+      "interaction_strength": 0.8,
+      "epsilon": 0.0,
+      "gap_vertex_grid": 0.12812499999999982,
+      "mode": "INTERIOR_SEARCH",
+      "reason": "grid beats vertex by 0.1281 \u2014 abandon corner-hunting"
+    },
+    {
+      "step": 11,
+      "lam": 0.9787564689104931,
+      "sigma": 0.17633826594390486,
+      "b": 1.9273803573212638,
+      "k": 2.5634669518360593,
+      "interaction_strength": 0.88,
+      "epsilon": 0.0,
+      "gap_vertex_grid": 0.1534374999999999,
+      "mode": "INTERIOR_SEARCH",
+      "reason": "grid beats vertex by 0.1534 \u2014 abandon corner-hunting"
+    }
+  ]
+}

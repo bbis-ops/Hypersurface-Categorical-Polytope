@@ -1,0 +1,137 @@
+{
+  "theorem": {
+    "space": "[0,1]^d with Euclidean metric",
+    "arbitrary_sample_radius_lower_bound": "(1/(n*v_d))^(1/d)",
+    "cartesian_grid_radius": "sqrt(d)/(2*(m-1)), n=m^d",
+    "delta": 0.05,
+    "sample_table": [
+      {
+        "dimension": 1,
+        "arbitrary_volume_lower_bound": 10,
+        "cartesian_grid_sufficient": 11
+      },
+      {
+        "dimension": 2,
+        "arbitrary_volume_lower_bound": 128,
+        "cartesian_grid_sufficient": 256
+      },
+      {
+        "dimension": 3,
+        "arbitrary_volume_lower_bound": 1910,
+        "cartesian_grid_sufficient": 6859
+      },
+      {
+        "dimension": 5,
+        "arbitrary_volume_lower_bound": 607928,
+        "cartesian_grid_sufficient": 7962624
+      },
+      {
+        "dimension": 10,
+        "arbitrary_volume_lower_bound": 4015427964584,
+        "cartesian_grid_sufficient": 1531578985264449
+      },
+      {
+        "dimension": 20,
+        "arbitrary_volume_lower_bound": 4063162758168324687102214144,
+        "cartesian_grid_sufficient": 1799519816997495209117766334283776
+      }
+    ]
+  },
+  "combined_law": {
+    "screened_rows": 12,
+    "breaking_pairs": 9,
+    "base_self_fail": 2,
+    "flagged_exponent_mismatches": 0,
+    "source_expression_provenance_available": true
+  },
+  "safety_instances": {
+    "screened": 36,
+    "regimes": {
+      "quadratic": 8,
+      "coupled": 1,
+      "fractional": 4,
+      "saturating": 1,
+      "finite-scale": 1,
+      "safe": 21
+    },
+    "asymptotic_law_violations": 0
+  },
+  "registered_candidate_coverage": {
+    "registry_version": 1,
+    "phase": "exploratory calibration; freeze before confirmatory reuse",
+    "families": [
+      {
+        "law": "V.7",
+        "family": "linear-separable",
+        "dimension": 2,
+        "grid_points": 9,
+        "covering_radius": 0.3535533905932738,
+        "certificate_status": "CONDITIONAL PASS under R(rho)",
+        "unresolved": 0
+      },
+      {
+        "law": "V.8",
+        "family": "fractional-separable",
+        "dimension": 3,
+        "grid_points": 27,
+        "covering_radius": 0.4330127018922193,
+        "certificate_status": "CONDITIONAL PASS under R(rho)",
+        "unresolved": 0
+      },
+      {
+        "law": "V.9",
+        "family": "coupled-cone",
+        "dimension": 2,
+        "grid_points": 9,
+        "covering_radius": 0.3535533905932738,
+        "certificate_status": "CONDITIONAL PASS under R(rho)",
+        "unresolved": 0
+      },
+      {
+        "law": "V.10",
+        "family": "c1-fractional-separable",
+        "dimension": 3,
+        "grid_points": 27,
+        "covering_radius": 0.4330127018922193,
+        "certificate_status": "NUMERICAL SURVIVOR \u2014 adjudication required",
+        "unresolved": 1
+      },
+      {
+        "law": "V.11",
+        "family": "saturating-ridge",
+        "dimension": 3,
+        "grid_points": 27,
+        "covering_radius": 0.4330127018922193,
+        "certificate_status": "CONDITIONAL PASS under R(rho)",
+        "unresolved": 0
+      },
+      {
+        "law": "V.12",
+        "family": "anisotropic-power-base",
+        "dimension": 2,
+        "grid_points": 9,
+        "covering_radius": 0.3535533905932738,
+        "certificate_status": "CONDITIONAL PASS under R(rho)",
+        "unresolved": 0
+      },
+      {
+        "law": "V.13",
+        "family": "interior-gaussian-peak",
+        "dimension": 3,
+        "grid_points": 27,
+        "covering_radius": 0.4330127018922193,
+        "certificate_status": "CONDITIONAL PASS under R(rho)",
+        "unresolved": 0
+      },
+      {
+        "law": "V.14",
+        "family": "weighted-monomial",
+        "dimension": 4,
+        "grid_points": 81,
+        "covering_radius": 0.5,
+        "certificate_status": "NUMERICAL SURVIVOR \u2014 adjudication required",
+        "unresolved": 3
+      }
+    ]
+  }
+}

@@ -1,0 +1,1257 @@
+[
+  {
+    "law": "V.12",
+    "name": "distract_tan",
+    "expr": "-((1-lam)**5+abs(sigma)**5)+0.002*tan(2*(1-lam)**5)",
+    "base_expr": "",
+    "status": "outside_scope",
+    "reason": "base is not an in-scope flat corner",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true
+    },
+    "note": "Tiny tan lobe matches quintic order; checks series truncation",
+    "adjudication_history": [
+      {
+        "utc": "2026-08-24T13:19:19.454586+00:00",
+        "from": "verified",
+        "to": "outside_scope",
+        "reason": "base is not an in-scope flat corner"
+      }
+    ],
+    "initial_status": "verified"
+  },
+  {
+    "law": "V.13",
+    "name": "gauss_bump_31_68",
+    "expr": "exp(-6000*((lam-0.31)**2+(sigma-0.68)**2))",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 1.0,
+      "adversarial_guard_missed": false
+    },
+    "note": "Interior peak at (0.31,0.68), >0.06 from every 1/8-lattice point; grid values <3",
+    "adjudication_history": [
+      {
+        "utc": "2026-08-24T13:19:19.897387+00:00",
+        "from": "counterexample",
+        "to": "verified",
+        "reason": "adversarial guard caught independent off-vertex witness"
+      }
+    ],
+    "initial_status": "counterexample"
+  },
+  {
+    "law": "V.13",
+    "name": "gauss_bump_81_34",
+    "expr": "exp(-6500*((lam-0.81)**2+(sigma-0.34)**2))",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-33",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 1.0,
+      "adversarial_guard_missed": false
+    },
+    "note": "Interior maximum centered in cell [0.75,0.875]x[0.25,0.375].",
+    "adjudication_history": [
+      {
+        "utc": "2026-08-24T13:19:22.622571+00:00",
+        "from": "counterexample",
+        "to": "verified",
+        "reason": "adversarial guard caught independent off-vertex witness"
+      }
+    ],
+    "initial_status": "counterexample"
+  },
+  {
+    "law": "V.13",
+    "name": "tilt_bump_34_72",
+    "expr": "0.001*(lam+sigma)+exp(-6000*((lam-0.34)**2+(sigma-0.72)**2))",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.9990600000000001,
+      "adversarial_guard_missed": false
+    },
+    "note": "Tiny tilt makes grid max and vertex max agree at (1,1)=0.002 while true max ~1.0",
+    "adjudication_history": [
+      {
+        "utc": "2026-08-24T13:19:25.566399+00:00",
+        "from": "counterexample",
+        "to": "verified",
+        "reason": "adversarial guard caught independent off-vertex witness"
+      }
+    ],
+    "initial_status": "counterexample"
+  },
+  {
+    "law": "V.13",
+    "name": "tilt_bump_22_81",
+    "expr": "0.001*lam*sigma+exp(-7000*((lam-0.22)**2+(sigma-0.81)**2))",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-33",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.9991781999999994,
+      "adversarial_guard_missed": false
+    },
+    "note": "Corner-consistent 0.001*lam*sigma baseline; guard sees vertex optimum, truth is ",
+    "adjudication_history": [
+      {
+        "utc": "2026-08-24T13:19:26.165582+00:00",
+        "from": "counterexample",
+        "to": "verified",
+        "reason": "adversarial guard caught independent off-vertex witness"
+      }
+    ],
+    "initial_status": "counterexample"
+  },
+  {
+    "law": "V.13",
+    "name": "tilt_bump_tanh",
+    "expr": "0.001*tanh(lam+sigma)+exp(-8000*((lam-0.66)**2+(sigma-0.16)**2))",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-33",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.9997110422947628,
+      "adversarial_guard_missed": false
+    },
+    "note": "Monotone shell matches grid/vertex maxima at corner; 8000x larger interior peak ",
+    "adjudication_history": [
+      {
+        "utc": "2026-08-24T13:19:26.811570+00:00",
+        "from": "counterexample",
+        "to": "verified",
+        "reason": "adversarial guard caught independent off-vertex witness"
+      }
+    ],
+    "initial_status": "counterexample"
+  },
+  {
+    "law": "V.13",
+    "name": "tilt_bump_sqrt",
+    "expr": "0.002*sqrt(lam*sigma)+exp(-9000*((lam-0.09)**2+(sigma-0.53)**2))",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.9984368065933573,
+      "adversarial_guard_missed": false
+    },
+    "note": "Concave shell peaks at vertex (1,1) on both grids; hidden bump 500x taller near ",
+    "adjudication_history": [
+      {
+        "utc": "2026-08-24T13:19:28.094010+00:00",
+        "from": "counterexample",
+        "to": "verified",
+        "reason": "adversarial guard caught independent off-vertex witness"
+      }
+    ],
+    "initial_status": "counterexample"
+  },
+  {
+    "law": "V.13",
+    "name": "tilt_bump_quad",
+    "expr": "0.001*(lam**2+sigma**2)+exp(-6500*((lam-0.47)**2+(sigma-0.28)**2))",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-33",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.9982993000000002,
+      "adversarial_guard_missed": false
+    },
+    "note": "Convex tilt puts grid and vertex maxima at (1,1); interior spike dwarfs it.",
+    "adjudication_history": [
+      {
+        "utc": "2026-08-24T13:19:28.711369+00:00",
+        "from": "counterexample",
+        "to": "verified",
+        "reason": "adversarial guard caught independent off-vertex witness"
+      }
+    ],
+    "initial_status": "counterexample"
+  },
+  {
+    "law": "V.13",
+    "name": "edge_peak_top_right",
+    "expr": "0.01*lam*sigma+exp(-400*(lam-1)**2-8000*(sigma-0.46)**2)",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.9946000000000002,
+      "adversarial_guard_missed": false
+    },
+    "note": "Maximum on edge lam=1 at sigma=0.46, halfway between grid rows 0.375/0.5; corner",
+    "adjudication_history": [
+      {
+        "utc": "2026-08-24T13:19:29.240104+00:00",
+        "from": "counterexample",
+        "to": "verified",
+        "reason": "adversarial guard caught independent off-vertex witness"
+      }
+    ],
+    "initial_status": "counterexample"
+  },
+  {
+    "law": "V.13",
+    "name": "edge_peak_top_left",
+    "expr": "0.01*lam*sigma+exp(-8000*(lam-0.53)**2-400*(sigma-1)**2)",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-33",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.9953000000000003,
+      "adversarial_guard_missed": false
+    },
+    "note": "Boundary ridge on sigma=1 peaking at lam=0.53, off all vertical grid lines.",
+    "adjudication_history": [
+      {
+        "utc": "2026-08-24T13:19:29.719011+00:00",
+        "from": "counterexample",
+        "to": "verified",
+        "reason": "adversarial guard caught independent off-vertex witness"
+      }
+    ],
+    "initial_status": "counterexample"
+  },
+  {
+    "law": "V.13",
+    "name": "edge_peak_left",
+    "expr": "0.01*lam*sigma+exp(-8000*(sigma-0.59)**2-400*lam**2)",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-33",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.9900000000000002,
+      "adversarial_guard_missed": false
+    },
+    "note": "Max on edge lam=0 at sigma=0.59; nearest grid row is 0.06 away, sampled value ~1",
+    "adjudication_history": [
+      {
+        "utc": "2026-08-24T13:19:30.504517+00:00",
+        "from": "counterexample",
+        "to": "verified",
+        "reason": "adversarial guard caught independent off-vertex witness"
+      }
+    ],
+    "initial_status": "counterexample"
+  },
+  {
+    "law": "V.13",
+    "name": "edge_peak_bottom",
+    "expr": "0.01*lam*sigma+exp(-8000*(lam-0.72)**2-400*sigma**2)",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-33",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.9900000000000002,
+      "adversarial_guard_missed": false
+    },
+    "note": "Bottom-edge peak at lam=0.72 between columns 0.625/0.75; vertex maxima stay at f",
+    "adjudication_history": [
+      {
+        "utc": "2026-08-24T13:19:31.294143+00:00",
+        "from": "counterexample",
+        "to": "verified",
+        "reason": "adversarial guard caught independent off-vertex witness"
+      }
+    ],
+    "initial_status": "counterexample"
+  },
+  {
+    "law": "V.13",
+    "name": "edge_peak_right_low",
+    "expr": "0.01*lam*sigma+exp(-300*(1-lam)**2-9000*(sigma-0.09)**2)",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-33",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.9908999999999999,
+      "adversarial_guard_missed": false
+    },
+    "note": "Right-edge hot spot at sigma=0.09, far from rows 0 and 0.125; corner floor masks",
+    "adjudication_history": [
+      {
+        "utc": "2026-08-24T13:19:31.947122+00:00",
+        "from": "counterexample",
+        "to": "verified",
+        "reason": "adversarial guard caught independent off-vertex witness"
+      }
+    ],
+    "initial_status": "counterexample"
+  },
+  {
+    "law": "V.13",
+    "name": "edge_peak_top_low",
+    "expr": "0.01*lam*sigma+exp(-9000*(lam-0.16)**2-300*(1-sigma)**2)",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.9916,
+      "adversarial_guard_missed": false
+    },
+    "note": "Top-edge spike at lam=0.16, mid-cell; grid samples decay by e^-9.",
+    "adjudication_history": [
+      {
+        "utc": "2026-08-24T13:19:32.698166+00:00",
+        "from": "counterexample",
+        "to": "verified",
+        "reason": "adversarial guard caught independent off-vertex witness"
+      }
+    ],
+    "initial_status": "counterexample"
+  },
+  {
+    "law": "V.13",
+    "name": "spike_offcorner_00",
+    "expr": "0.01*lam*sigma+exp(-20000*((lam-0.04)**2+(sigma-0.04)**2))",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.9900160000000007,
+      "adversarial_guard_missed": false
+    },
+    "note": "Thin spike at (0.04,0.04), not the corner: corner and all grid points get only t",
+    "adjudication_history": [
+      {
+        "utc": "2026-08-24T13:19:33.774979+00:00",
+        "from": "counterexample",
+        "to": "verified",
+        "reason": "adversarial guard caught independent off-vertex witness"
+      }
+    ],
+    "initial_status": "counterexample"
+  },
+  {
+    "law": "V.13",
+    "name": "spike_offcorner_01",
+    "expr": "0.01*lam*sigma+exp(-20000*((lam-0.05)**2+(sigma-0.95)**2))",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.990475,
+      "adversarial_guard_missed": false
+    },
+    "note": "Spike near corner (0,1) but displaced inward; every 9x9 node samples the tail (~",
+    "adjudication_history": [
+      {
+        "utc": "2026-08-24T13:19:35.409053+00:00",
+        "from": "counterexample",
+        "to": "verified",
+        "reason": "adversarial guard caught independent off-vertex witness"
+      }
+    ],
+    "initial_status": "counterexample"
+  },
+  {
+    "law": "V.13",
+    "name": "spike_offcorner_11",
+    "expr": "0.01*lam*sigma+exp(-20000*((lam-0.95)**2+(sigma-0.95)**2))",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.9990250000000005,
+      "adversarial_guard_missed": false
+    },
+    "note": "Spike at (0.95,0.95) avoids vertex (1,1) by 0.07; grid sees floor 0.01, truth is",
+    "adjudication_history": [
+      {
+        "utc": "2026-08-24T13:19:35.882670+00:00",
+        "from": "counterexample",
+        "to": "verified",
+        "reason": "adversarial guard caught independent off-vertex witness"
+      }
+    ],
+    "initial_status": "counterexample"
+  },
+  {
+    "law": "V.13",
+    "name": "spike_ultrathin_00",
+    "expr": "0.005*(lam+sigma)+exp(-50000*((lam-0.03)**2+(sigma-0.03)**2))",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-33",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.9903000000000004,
+      "adversarial_guard_missed": false
+    },
+    "note": "Width ~0.003 spike hugging but not touching corner (0,0); completely sub-resolut",
+    "adjudication_history": [
+      {
+        "utc": "2026-08-24T13:19:36.357273+00:00",
+        "from": "counterexample",
+        "to": "verified",
+        "reason": "adversarial guard caught independent off-vertex witness"
+      }
+    ],
+    "initial_status": "counterexample"
+  },
+  {
+    "law": "V.13",
+    "name": "alias_sin16_product",
+    "expr": "sin(16*pi*lam)*sin(16*pi*sigma)",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-33",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.9960573506572397,
+      "adversarial_guard_missed": false
+    },
+    "note": "Vanishes identically on the whole 9x9 lattice (period locks to 1/8), yet true ma",
+    "adjudication_history": [
+      {
+        "utc": "2026-08-24T13:19:36.695684+00:00",
+        "from": "counterexample",
+        "to": "verified",
+        "reason": "adversarial guard caught independent off-vertex witness"
+      }
+    ],
+    "initial_status": "counterexample"
+  },
+  {
+    "law": "V.13",
+    "name": "alias_sin24_sq",
+    "expr": "sin(24*pi*lam)**2*sin(24*pi*sigma)**2",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-17",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.9921302457983199,
+      "adversarial_guard_missed": false
+    },
+    "note": "Nonnegative ripple zero at every grid node (24*pi*i/8 = 3*pi*i); interior maxima",
+    "adjudication_history": [
+      {
+        "utc": "2026-08-24T13:19:37.229894+00:00",
+        "from": "counterexample",
+        "to": "verified",
+        "reason": "adversarial guard caught independent off-vertex witness"
+      }
+    ],
+    "initial_status": "counterexample"
+  },
+  {
+    "law": "V.13",
+    "name": "alias_sin8_product",
+    "expr": "sin(8*pi*lam)*sin(8*pi*sigma)",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-17",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.9960573506572397,
+      "adversarial_guard_missed": false
+    },
+    "note": "Zeros exactly on all lattice lines; maxima at quarter-period offsets never sampl",
+    "adjudication_history": [
+      {
+        "utc": "2026-08-24T13:19:37.620039+00:00",
+        "from": "counterexample",
+        "to": "verified",
+        "reason": "adversarial guard caught independent off-vertex witness"
+      }
+    ],
+    "initial_status": "counterexample"
+  },
+  {
+    "law": "V.13",
+    "name": "alias_sin16_cos16",
+    "expr": "sin(16*pi*lam)**2*cos(16*pi*sigma)**2",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-33",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.9960573506572397,
+      "adversarial_guard_missed": false
+    },
+    "note": "Squared ripple annihilated on grid columns and rows alike; guard reads all-zeros",
+    "adjudication_history": [
+      {
+        "utc": "2026-08-24T13:19:38.059295+00:00",
+        "from": "counterexample",
+        "to": "verified",
+        "reason": "adversarial guard caught independent off-vertex witness"
+      }
+    ],
+    "initial_status": "counterexample"
+  },
+  {
+    "law": "V.12",
+    "name": "cross_subleading_quartic",
+    "expr": "1-(1-lam)**5-sigma**5+0.1*(1-lam)**2*sigma**2",
+    "base_expr": "",
+    "status": "outside_scope",
+    "reason": "base is not an in-scope flat corner",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true
+    },
+    "note": "Cross term of order 4 sits below leading 5 on the diagonal, forcing beta_eff=4 t"
+  },
+  {
+    "law": "V.12",
+    "name": "cross_dominant_bilinear",
+    "expr": "1-(1-lam)**3-sigma**3+0.1*(1-lam)*sigma",
+    "base_expr": "",
+    "status": "outside_scope",
+    "reason": "base is not an in-scope flat corner",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true
+    },
+    "note": "Bilinear term drops diagonal order to 2 while axes stay cubic; a sharp falsifica"
+  },
+  {
+    "law": "V.13",
+    "name": "offcorner_spike",
+    "expr": "exp(-1000*((lam-0.93)**2+(sigma-0.07)**2))+0.05*(lam+sigma)",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.9500000000000002,
+      "adversarial_guard_missed": false
+    },
+    "note": "Thin Gaussian hugging the SE area off-corner; coprime lattice nodes straddle but"
+  },
+  {
+    "law": "V.13",
+    "name": "corner_hugger",
+    "expr": "exp(-5000*((lam-0.97)**2+(sigma-0.97)**2))+lam*sigma",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-33",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.9407765901959131,
+      "adversarial_guard_missed": false
+    },
+    "note": "Spike displaced just inside the NE corner so corner nodes catch only the negligi"
+  },
+  {
+    "law": "V.12",
+    "name": "distract_cos",
+    "expr": "-(1-lam)**3 - abs(sigma)**3 - 0.05*cos(sigma)**2",
+    "base_expr": "",
+    "status": "outside_scope",
+    "reason": "base is not an in-scope flat corner",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-33",
+      "legacy_grid_missed": true
+    },
+    "note": "cos penalty minimized at sigma=0; distractor with nonzero curvature there"
+  },
+  {
+    "law": "V.13",
+    "name": "oblique_thin_ridge",
+    "expr": "exp(-((sigma-0.63*lam-0.21)**2)/0.00000001)",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-33",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 1.0,
+      "adversarial_guard_missed": false
+    },
+    "note": "Ridge of perpendicular width <1e-4 along an irrational-slope line; axis-aligned "
+  },
+  {
+    "law": "V.13",
+    "name": "laplacian_crosshair",
+    "expr": "exp(-abs(lam-0.44)/0.002)*exp(-abs(sigma-0.71)/0.003)",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 1.0,
+      "adversarial_guard_missed": false
+    },
+    "note": "Non-smooth Laplacian kernel sharper than any grid spacing; linear interpolation "
+  },
+  {
+    "law": "V.13",
+    "name": "curved_sin_ridge",
+    "expr": "exp(-((sigma-0.5*sin(pi*lam)-0.2)**2)/0.00000001)",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-11",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 1.0,
+      "adversarial_guard_missed": false
+    },
+    "note": "Ridge follows a curved manifold of width <1e-4; rectangular grids cannot track t"
+  },
+  {
+    "law": "V.13",
+    "name": "ultra_gauss_hidden",
+    "expr": "exp(-((lam-0.777)**2+(sigma-0.111)**2)*10000000)",
+    "base_expr": "",
+    "status": "outside_scope",
+    "reason": "independent dense grid found no off-vertex maximum",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-10",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": false,
+      "dense_grid_vertex_gap": 0.0
+    },
+    "note": "Width ~3e-4, three digits chosen to fall in inter-node gaps of every listed grid"
+  },
+  {
+    "law": "V.13",
+    "name": "separable_sharps",
+    "expr": "exp(-((lam-0.29)**2)/0.0000001)*exp(-((sigma-0.83)**2)/0.0000001)",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "V.13 witness confirmed; finite adversarial guard missed it",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": false,
+      "search_method": "",
+      "legacy_grid_missed": false,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 1.0,
+      "adversarial_guard_missed": true
+    },
+    "note": "Separable spikes force simultaneous hits in both coordinates; probability of a g",
+    "adjudication_history": [
+      {
+        "utc": "2026-08-24T18:01:30.969247+00:00",
+        "from": "counterexample",
+        "to": "verified",
+        "reason": "V.13 witness confirmed; finite adversarial guard missed it"
+      }
+    ],
+    "initial_status": "counterexample"
+  },
+  {
+    "law": "V.13",
+    "name": "sep_gauss_aniso",
+    "expr": "exp(-((lam-0.29)**2)/0.0000003)*exp(-((sigma-0.83)**2)/0.00000004)",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "V.13 witness confirmed; finite adversarial guard missed it",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": false,
+      "search_method": "",
+      "legacy_grid_missed": false,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 1.0,
+      "adversarial_guard_missed": true
+    },
+    "note": "anisotropic survivor variant: lam-width 3x wider than sigma-width so 10/11-point",
+    "adjudication_history": [
+      {
+        "utc": "2026-08-24T18:01:46.869199+00:00",
+        "from": "counterexample",
+        "to": "verified",
+        "reason": "V.13 witness confirmed; finite adversarial guard missed it"
+      }
+    ],
+    "initial_status": "counterexample"
+  },
+  {
+    "law": "V.13",
+    "name": "tanh_L1_spike",
+    "expr": "1-tanh(500000*(abs(lam-0.34)+abs(sigma-0.71)-0.000003))",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "V.13 witness confirmed; finite adversarial guard missed it",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": false,
+      "search_method": "",
+      "legacy_grid_missed": false,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 1.9051482536448665,
+      "adversarial_guard_missed": true
+    },
+    "note": "L1-ball plateau spike: flat top smaller than any grid cell, edges too steep for ",
+    "adjudication_history": [
+      {
+        "utc": "2026-08-24T18:01:47.954487+00:00",
+        "from": "counterexample",
+        "to": "verified",
+        "reason": "V.13 witness confirmed; finite adversarial guard missed it"
+      }
+    ],
+    "initial_status": "counterexample"
+  },
+  {
+    "law": "V.13",
+    "name": "diamond_exp",
+    "expr": "exp(-abs(lam-0.66)/0.00001-abs(sigma-0.33)/0.00001)",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "V.13 witness confirmed; finite adversarial guard missed it",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": false,
+      "search_method": "",
+      "legacy_grid_missed": false,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 1.0,
+      "adversarial_guard_missed": true
+    },
+    "note": "separable Laplace (diamond) spike, non-differentiable crest defeats gradient-sty",
+    "adjudication_history": [
+      {
+        "utc": "2026-08-24T18:01:48.219409+00:00",
+        "from": "counterexample",
+        "to": "verified",
+        "reason": "V.13 witness confirmed; finite adversarial guard missed it"
+      }
+    ],
+    "initial_status": "counterexample"
+  },
+  {
+    "law": "V.13",
+    "name": "edge_lam0",
+    "expr": "exp(-(lam**2+(sigma-0.7693)**2)/0.00000006)",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "V.13 witness confirmed; finite adversarial guard missed it",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": false,
+      "search_method": "",
+      "legacy_grid_missed": false,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.00028396298390287456,
+      "adversarial_guard_missed": true
+    },
+    "note": "maximum pinned exactly on lam=0 boundary; open-interval assumptions or symmetric",
+    "adjudication_history": [
+      {
+        "utc": "2026-08-24T18:01:49.552411+00:00",
+        "from": "counterexample",
+        "to": "verified",
+        "reason": "V.13 witness confirmed; finite adversarial guard missed it"
+      }
+    ],
+    "initial_status": "counterexample"
+  },
+  {
+    "law": "V.13",
+    "name": "diagonal_valley_ridge",
+    "expr": "exp(-((sigma-lam+0.1531)**2)/0.0000001)",
+    "base_expr": "",
+    "status": "outside_scope",
+    "reason": "independent dense grid found no off-vertex maximum",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": false,
+      "dense_grid_vertex_gap": 0.0
+    },
+    "note": "entire oblique line sigma=lam-0.1531 is maximal; axis-aligned grids sample the l"
+  },
+  {
+    "law": "V.13",
+    "name": "antidiagonal_ridge",
+    "expr": "exp(-((lam+sigma-1.0713)**2)/0.00000009)",
+    "base_expr": "",
+    "status": "outside_scope",
+    "reason": "independent dense grid found no off-vertex maximum",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": false,
+      "dense_grid_vertex_gap": 6.997045609580255e-09
+    },
+    "note": "anti-diagonal crest crossing both edges; uniform/coprime node counts hit the ban"
+  },
+  {
+    "law": "V.13",
+    "name": "oblique_slope_half",
+    "expr": "exp(-((sigma-2*lam+0.3417)**2)/0.00000008)",
+    "base_expr": "",
+    "status": "outside_scope",
+    "reason": "independent dense grid found no off-vertex maximum",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": false,
+      "dense_grid_vertex_gap": 0.0
+    },
+    "note": "slope-2 oblique knife passing near corners; aliased against 10x10-style tensor p"
+  },
+  {
+    "law": "V.13",
+    "name": "coprime_comb_product",
+    "expr": "(sin(7000*pi*lam)*sin(9001*pi*sigma))**2",
+    "base_expr": "",
+    "status": "outside_scope",
+    "reason": "independent dense grid found no off-vertex maximum",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-17",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": false,
+      "dense_grid_vertex_gap": 0.0
+    },
+    "note": "comb with periods 2/7000 and 2/9001: peak lattice coprime to 10,11,13,17,33 spac"
+  },
+  {
+    "law": "V.13",
+    "name": "two_point_intersect",
+    "expr": "exp(-((sigma-lam-0.21)**2)/0.00000006-((lam+sigma-0.63)**2)/0.00000006)",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "V.13 witness confirmed; finite adversarial guard missed it",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": false,
+      "search_method": "",
+      "legacy_grid_missed": false,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 1.0,
+      "adversarial_guard_missed": true
+    },
+    "note": "max at intersection of two oblique bands, i.e. a point (0.21,0.42) defined only ",
+    "adjudication_history": [
+      {
+        "utc": "2026-08-24T18:01:54.857630+00:00",
+        "from": "counterexample",
+        "to": "verified",
+        "reason": "V.13 witness confirmed; finite adversarial guard missed it"
+      }
+    ],
+    "initial_status": "counterexample"
+  },
+  {
+    "law": "V.13",
+    "name": "mixed_edge_oblique",
+    "expr": "exp(-((sigma-0.9+2*(1-lam))**2)/0.00000007)*(lam+0.5)",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-11",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 1.5,
+      "adversarial_guard_missed": false
+    },
+    "note": "oblique ridge terminating on the lam=1 edge at sigma~0.9 with linear tilt: max s"
+  },
+  {
+    "law": "V.13",
+    "name": "needle_lam",
+    "expr": "exp(-(((lam-0.4173)**2)*40000+((sigma-0.5829)**2)*40))",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-13",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.7468160319626049,
+      "adversarial_guard_missed": false
+    },
+    "note": "Anisotropic needle: width ~0.005 in lam only; coprime 1-D projections almost sur"
+  },
+  {
+    "law": "V.13",
+    "name": "needle_sigma",
+    "expr": "exp(-(((sigma-0.3391)**2)*40000+((lam-0.7042)**2)*40))",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.9674363929116341,
+      "adversarial_guard_missed": false
+    },
+    "note": "Needle oriented along lam axis: vanishes between any grid rows in sigma"
+  },
+  {
+    "law": "V.13",
+    "name": "spike_sw",
+    "expr": "exp(-((((lam-0.2319)**2)+((sigma-0.8143)**2))*15000))",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.7178461562167389,
+      "adversarial_guard_missed": false
+    },
+    "note": "Ultra-narrow Gaussian in empty quadrant; Halton points sparse at this scale"
+  },
+  {
+    "law": "V.13",
+    "name": "spike_ne",
+    "expr": "exp(-((((lam-0.6641)**2)+((sigma-0.2957)**2))*22000))",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.4599672443358287,
+      "adversarial_guard_missed": false
+    },
+    "note": "Sub-Halton-gap width; probability any of 4096 points lands inside is tiny"
+  },
+  {
+    "law": "V.13",
+    "name": "spike_diamond",
+    "expr": "exp(-((abs(lam-0.5517)+abs(sigma-0.4468))*700))",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-10",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.03238694077290827,
+      "adversarial_guard_missed": false
+    },
+    "note": "L1 (diamond) cusp spike: nondifferentiable apex that smooth surrogates misrank"
+  },
+  {
+    "law": "V.13",
+    "name": "corner_bl_off",
+    "expr": "exp(-((((lam-0.029)**2)+((sigma-0.041)**2))*15000))",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.9704455335485083,
+      "adversarial_guard_missed": false
+    },
+    "note": "Off-corner spike strictly interior but hugging (0,0); corner-biased grids miss t"
+  },
+  {
+    "law": "V.13",
+    "name": "corner_br_off",
+    "expr": "exp(-((((lam-0.967)**2)+((sigma-0.037)**2))*15000))",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.7633794943368528,
+      "adversarial_guard_missed": false
+    },
+    "note": "Near (1,0) but displaced; deterministic corner checks evaluate the wrong point"
+  },
+  {
+    "law": "V.13",
+    "name": "corner_tl_off",
+    "expr": "exp(-((((lam-0.031)**2)+((sigma-0.959)**2))*15000))",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-33",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.9704455335485083,
+      "adversarial_guard_missed": false
+    },
+    "note": "Displaced from (0,1) by ~0.03-0.04: outside any corner refinement ball"
+  },
+  {
+    "law": "V.13",
+    "name": "corner_tr_off",
+    "expr": "exp(-((((lam-0.963)**2)+((sigma-0.971)**2))*15000))",
+    "base_expr": "",
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.8607079764250534,
+      "adversarial_guard_missed": false
+    },
+    "note": "Off-corner near (1,1); tests whether guard refines around, not at, corners"
+  }
+]

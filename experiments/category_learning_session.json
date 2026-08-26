@@ -1,0 +1,122 @@
+{
+  "summary": {
+    "n_steps": 8,
+    "first_interior_step": 3,
+    "first_interior_strength": 0.35,
+    "mode_sequence": [
+      "CORNER_HUNTING",
+      "CORNER_HUNTING",
+      "CORNER_HUNTING",
+      "INTERIOR_SEARCH",
+      "INTERIOR_SEARCH",
+      "INTERIOR_SEARCH",
+      "INTERIOR_SEARCH",
+      "INTERIOR_SEARCH"
+    ],
+    "phenomenology": [
+      "Step 3 (cross_natural): Cross-naturality couples blocks. [MODE SWITCH CORNER_HUNTING -> INTERIOR_SEARCH: eps=0.0000, gap=0.0304]"
+    ],
+    "qualitative": "Typical arc: early beats use separable corner probes; confusion (face_bowl) raises grid-vertex gap; detector forces INTERIOR_SEARCH when the learner treats adjunction faces as coupled rather than corner-only."
+  },
+  "trajectory": {
+    "interaction": "face_bowl",
+    "steps": [
+      {
+        "step": 0,
+        "lam": 1.0,
+        "sigma": 0.0,
+        "b": 2.0,
+        "k": 3.0,
+        "interaction_strength": 0.05,
+        "epsilon": 0.0,
+        "gap_vertex_grid": 0.0,
+        "mode": "CORNER_HUNTING",
+        "reason": "low leakage and vertex localization \u2014 separable corner probe OK"
+      },
+      {
+        "step": 1,
+        "lam": 0.95,
+        "sigma": 0.05,
+        "b": 2.0,
+        "k": 3.0,
+        "interaction_strength": 0.12,
+        "epsilon": 0.0,
+        "gap_vertex_grid": 0.0,
+        "mode": "CORNER_HUNTING",
+        "reason": "low leakage and vertex localization \u2014 separable corner probe OK"
+      },
+      {
+        "step": 2,
+        "lam": 0.9,
+        "sigma": 0.1,
+        "b": 2.0,
+        "k": 3.0,
+        "interaction_strength": 0.22,
+        "epsilon": 0.0,
+        "gap_vertex_grid": 0.007475585937499751,
+        "mode": "CORNER_HUNTING",
+        "reason": "low leakage and vertex localization \u2014 separable corner probe OK"
+      },
+      {
+        "step": 3,
+        "lam": 0.85,
+        "sigma": 0.2,
+        "b": 2.0,
+        "k": 3.0,
+        "interaction_strength": 0.35,
+        "epsilon": 0.0,
+        "gap_vertex_grid": 0.030358886718749645,
+        "mode": "INTERIOR_SEARCH",
+        "reason": "grid beats vertex by 0.0304 \u2014 abandon corner-hunting"
+      },
+      {
+        "step": 4,
+        "lam": 0.75,
+        "sigma": 0.35,
+        "b": 2.0,
+        "k": 3.0,
+        "interaction_strength": 0.48,
+        "epsilon": 0.0,
+        "gap_vertex_grid": 0.053242187500000426,
+        "mode": "INTERIOR_SEARCH",
+        "reason": "grid beats vertex by 0.0532 \u2014 abandon corner-hunting"
+      },
+      {
+        "step": 5,
+        "lam": 0.7,
+        "sigma": 0.42,
+        "b": 2.0,
+        "k": 3.0,
+        "interaction_strength": 0.55,
+        "epsilon": 0.0,
+        "gap_vertex_grid": 0.06556396484374982,
+        "mode": "INTERIOR_SEARCH",
+        "reason": "grid beats vertex by 0.0656 \u2014 abandon corner-hunting"
+      },
+      {
+        "step": 6,
+        "lam": 0.65,
+        "sigma": 0.5,
+        "b": 2.0,
+        "k": 3.0,
+        "interaction_strength": 0.62,
+        "epsilon": 0.0,
+        "gap_vertex_grid": 0.0778857421875001,
+        "mode": "INTERIOR_SEARCH",
+        "reason": "grid beats vertex by 0.0779 \u2014 abandon corner-hunting"
+      },
+      {
+        "step": 7,
+        "lam": 0.6,
+        "sigma": 0.55,
+        "b": 2.0,
+        "k": 3.0,
+        "interaction_strength": 0.75,
+        "epsilon": 0.0,
+        "gap_vertex_grid": 0.1123046875,
+        "mode": "INTERIOR_SEARCH",
+        "reason": "grid beats vertex by 0.1123 \u2014 abandon corner-hunting"
+      }
+    ]
+  }
+}

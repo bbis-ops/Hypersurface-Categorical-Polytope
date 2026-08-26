@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+title: "Extremal Selection as an Operational Substitute for Coexponentials: Fisher-Controlled Factorization"
+message: "Software and draft theorems for Fisher-controlled extremal probes and coproduct factorization."
+authors:
+  - family-names: "Author"
+    given-names: "TBD"
+repository-code: "https://github.com/TBD/categorical-polytope"
+license: MIT
+keywords:
+  - coexponential
+  - Fisher information
+  - vertex localization
+  - category theory
+preferred-citation: "Extremal Selection as an Operational Substitute for Coexponentials (2026). Software package categorical-polytope."

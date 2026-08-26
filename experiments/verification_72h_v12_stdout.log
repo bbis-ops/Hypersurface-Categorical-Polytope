@@ -1,0 +1,17 @@
+72h cycle 46: V.10, in-scope=103, corpus=224, focus=False, batch=16
+V.10 batch 1: returned 16/16, fresh 15, corpus 239/224, in-scope 106/104, verified 106, counterexamples 0
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 47: V.10, in-scope=106, corpus=239, focus=False, batch=16
+V.10 batch 1: returned 16/16, fresh 16, corpus 255/239, in-scope 97/107, verified 95, counterexamples 2
+V.10: stopped after 1 attempts with corpus 255/239, in-scope 97/107
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 48: V.10, in-scope=97, corpus=255, focus=True, batch=16
+V.10 batch 1: returned 16/16, fresh 16, corpus 271/255, in-scope 105/98, verified 101, counterexamples 4
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 49: V.10, in-scope=105, corpus=271, focus=False, batch=20

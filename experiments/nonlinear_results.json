@@ -1,0 +1,422 @@
+[
+  {
+    "interaction": "bilinear",
+    "strength": 0.0,
+    "gap": 0.0,
+    "gap_vs_grid": null,
+    "epsilon": 0.0,
+    "certified": true,
+    "vertex_ok": true,
+    "theta_vertex": [
+      1.0,
+      0.0,
+      2.0,
+      3.0
+    ],
+    "theta_grid": null,
+    "value_vertex": 7.0,
+    "value_grid": null,
+    "certify_reason": "gap <= Phi(epsilon) and epsilon <= epsilon_0"
+  },
+  {
+    "interaction": "bilinear",
+    "strength": 0.1,
+    "gap": 0.0,
+    "gap_vs_grid": null,
+    "epsilon": 0.0,
+    "certified": true,
+    "vertex_ok": true,
+    "theta_vertex": [
+      1.0,
+      0.0,
+      2.0,
+      3.0
+    ],
+    "theta_grid": null,
+    "value_vertex": 7.6,
+    "value_grid": null,
+    "certify_reason": "gap <= Phi(epsilon) and epsilon <= epsilon_0"
+  },
+  {
+    "interaction": "bilinear",
+    "strength": 0.25,
+    "gap": 0.0,
+    "gap_vs_grid": null,
+    "epsilon": 0.0,
+    "certified": true,
+    "vertex_ok": true,
+    "theta_vertex": [
+      1.0,
+      0.0,
+      2.0,
+      3.0
+    ],
+    "theta_grid": null,
+    "value_vertex": 8.5,
+    "value_grid": null,
+    "certify_reason": "gap <= Phi(epsilon) and epsilon <= epsilon_0"
+  },
+  {
+    "interaction": "bilinear",
+    "strength": 0.5,
+    "gap": 0.0,
+    "gap_vs_grid": null,
+    "epsilon": 0.0,
+    "certified": true,
+    "vertex_ok": true,
+    "theta_vertex": [
+      1.0,
+      0.0,
+      2.0,
+      3.0
+    ],
+    "theta_grid": null,
+    "value_vertex": 10.0,
+    "value_grid": null,
+    "certify_reason": "gap <= Phi(epsilon) and epsilon <= epsilon_0"
+  },
+  {
+    "interaction": "bilinear",
+    "strength": 0.8,
+    "gap": 0.0,
+    "gap_vs_grid": null,
+    "epsilon": 0.0,
+    "certified": true,
+    "vertex_ok": true,
+    "theta_vertex": [
+      1.0,
+      0.0,
+      2.0,
+      3.0
+    ],
+    "theta_grid": null,
+    "value_vertex": 11.8,
+    "value_grid": null,
+    "certify_reason": "gap <= Phi(epsilon) and epsilon <= epsilon_0"
+  },
+  {
+    "interaction": "bilinear",
+    "strength": 1.0,
+    "gap": 0.0,
+    "gap_vs_grid": null,
+    "epsilon": 0.0,
+    "certified": true,
+    "vertex_ok": true,
+    "theta_vertex": [
+      1.0,
+      0.0,
+      2.0,
+      3.0
+    ],
+    "theta_grid": null,
+    "value_vertex": 13.0,
+    "value_grid": null,
+    "certify_reason": "gap <= Phi(epsilon) and epsilon <= epsilon_0"
+  },
+  {
+    "interaction": "triple",
+    "strength": 0.0,
+    "gap": 0.0,
+    "gap_vs_grid": null,
+    "epsilon": 0.0,
+    "certified": true,
+    "vertex_ok": true,
+    "theta_vertex": [
+      1.0,
+      0.0,
+      2.0,
+      3.0
+    ],
+    "theta_grid": null,
+    "value_vertex": 7.0,
+    "value_grid": null,
+    "certify_reason": "gap <= Phi(epsilon) and epsilon <= epsilon_0"
+  },
+  {
+    "interaction": "triple",
+    "strength": 0.1,
+    "gap": 0.0,
+    "gap_vs_grid": null,
+    "epsilon": 0.0,
+    "certified": true,
+    "vertex_ok": true,
+    "theta_vertex": [
+      1.0,
+      0.0,
+      2.0,
+      3.0
+    ],
+    "theta_grid": null,
+    "value_vertex": 7.6,
+    "value_grid": null,
+    "certify_reason": "gap <= Phi(epsilon) and epsilon <= epsilon_0"
+  },
+  {
+    "interaction": "triple",
+    "strength": 0.25,
+    "gap": 0.0,
+    "gap_vs_grid": null,
+    "epsilon": 0.0,
+    "certified": true,
+    "vertex_ok": true,
+    "theta_vertex": [
+      1.0,
+      0.0,
+      2.0,
+      3.0
+    ],
+    "theta_grid": null,
+    "value_vertex": 8.5,
+    "value_grid": null,
+    "certify_reason": "gap <= Phi(epsilon) and epsilon <= epsilon_0"
+  },
+  {
+    "interaction": "triple",
+    "strength": 0.5,
+    "gap": 0.0,
+    "gap_vs_grid": null,
+    "epsilon": 0.0,
+    "certified": true,
+    "vertex_ok": true,
+    "theta_vertex": [
+      1.0,
+      0.0,
+      2.0,
+      3.0
+    ],
+    "theta_grid": null,
+    "value_vertex": 10.0,
+    "value_grid": null,
+    "certify_reason": "gap <= Phi(epsilon) and epsilon <= epsilon_0"
+  },
+  {
+    "interaction": "triple",
+    "strength": 0.8,
+    "gap": 0.0,
+    "gap_vs_grid": null,
+    "epsilon": 0.0,
+    "certified": true,
+    "vertex_ok": true,
+    "theta_vertex": [
+      1.0,
+      0.0,
+      2.0,
+      3.0
+    ],
+    "theta_grid": null,
+    "value_vertex": 11.8,
+    "value_grid": null,
+    "certify_reason": "gap <= Phi(epsilon) and epsilon <= epsilon_0"
+  },
+  {
+    "interaction": "triple",
+    "strength": 1.0,
+    "gap": 0.0,
+    "gap_vs_grid": null,
+    "epsilon": 0.0,
+    "certified": true,
+    "vertex_ok": true,
+    "theta_vertex": [
+      1.0,
+      0.0,
+      2.0,
+      3.0
+    ],
+    "theta_grid": null,
+    "value_vertex": 13.0,
+    "value_grid": null,
+    "certify_reason": "gap <= Phi(epsilon) and epsilon <= epsilon_0"
+  },
+  {
+    "interaction": "face_bowl",
+    "strength": 0.0,
+    "gap": 0.0,
+    "gap_vs_grid": 0.0,
+    "epsilon": 0.0,
+    "certified": true,
+    "vertex_ok": true,
+    "theta_vertex": [
+      1.0,
+      0.0,
+      2.0,
+      3.0
+    ],
+    "theta_grid": [
+      1.0,
+      0.0,
+      2.0,
+      3.0
+    ],
+    "value_vertex": 7.0,
+    "value_grid": 7.0,
+    "certify_reason": "gap <= Phi(epsilon) and epsilon <= epsilon_0"
+  },
+  {
+    "interaction": "face_bowl",
+    "strength": 0.1,
+    "gap": 0.0,
+    "gap_vs_grid": 0.0,
+    "epsilon": 0.0,
+    "certified": true,
+    "vertex_ok": true,
+    "theta_vertex": [
+      1.0,
+      0.0,
+      2.0,
+      3.0
+    ],
+    "theta_grid": [
+      1.0,
+      0.0,
+      2.0,
+      3.0
+    ],
+    "value_vertex": 7.05625,
+    "value_grid": 7.05625,
+    "certify_reason": "gap <= Phi(epsilon) and epsilon <= epsilon_0"
+  },
+  {
+    "interaction": "face_bowl",
+    "strength": 0.25,
+    "gap": 0.0,
+    "gap_vs_grid": 0.001350308641975495,
+    "epsilon": 0.0,
+    "certified": true,
+    "vertex_ok": true,
+    "theta_vertex": [
+      1.0,
+      0.0,
+      2.0,
+      3.0
+    ],
+    "theta_grid": [
+      0.8333333333333334,
+      0.16666666666666666,
+      2.0,
+      3.0
+    ],
+    "value_vertex": 7.140625,
+    "value_grid": 7.1419753086419755,
+    "certify_reason": "gap <= Phi(epsilon) and epsilon <= epsilon_0"
+  },
+  {
+    "interaction": "face_bowl",
+    "strength": 0.5,
+    "gap": 0.0,
+    "gap_vs_grid": 0.05825617283950635,
+    "epsilon": 0.0,
+    "certified": true,
+    "vertex_ok": false,
+    "theta_vertex": [
+      1.0,
+      0.0,
+      2.0,
+      3.0
+    ],
+    "theta_grid": [
+      0.8333333333333334,
+      0.16666666666666666,
+      2.0,
+      3.0
+    ],
+    "value_vertex": 7.28125,
+    "value_grid": 7.339506172839506,
+    "certify_reason": "gap <= Phi(epsilon) and epsilon <= epsilon_0"
+  },
+  {
+    "interaction": "face_bowl",
+    "strength": 0.8,
+    "gap": 0.0,
+    "gap_vs_grid": 0.12654320987654355,
+    "epsilon": 0.0,
+    "certified": true,
+    "vertex_ok": false,
+    "theta_vertex": [
+      1.0,
+      0.0,
+      2.0,
+      3.0
+    ],
+    "theta_grid": [
+      0.8333333333333334,
+      0.16666666666666666,
+      2.0,
+      3.0
+    ],
+    "value_vertex": 7.45,
+    "value_grid": 7.576543209876544,
+    "certify_reason": "gap <= Phi(epsilon) and epsilon <= epsilon_0"
+  },
+  {
+    "interaction": "face_bowl",
+    "strength": 1.0,
+    "gap": 0.0,
+    "gap_vs_grid": 0.17206790123456805,
+    "epsilon": 0.0,
+    "certified": true,
+    "vertex_ok": false,
+    "theta_vertex": [
+      1.0,
+      0.0,
+      2.0,
+      3.0
+    ],
+    "theta_grid": [
+      0.8333333333333334,
+      0.16666666666666666,
+      2.0,
+      3.0
+    ],
+    "value_vertex": 7.5625,
+    "value_grid": 7.734567901234568,
+    "certify_reason": "gap <= Phi(epsilon) and epsilon <= epsilon_0"
+  },
+  {
+    "interaction": "face_bowl",
+    "strength": 1.5,
+    "gap": 0.0,
+    "gap_vs_grid": 0.3518518518518512,
+    "epsilon": 0.0,
+    "certified": true,
+    "vertex_ok": false,
+    "theta_vertex": [
+      1.0,
+      0.0,
+      2.0,
+      3.0
+    ],
+    "theta_grid": [
+      0.6666666666666666,
+      0.3333333333333333,
+      2.0,
+      3.0
+    ],
+    "value_vertex": 7.84375,
+    "value_grid": 8.195601851851851,
+    "certify_reason": "gap <= Phi(epsilon) and epsilon <= epsilon_0"
+  },
+  {
+    "interaction": "face_bowl",
+    "strength": 2.0,
+    "gap": 0.0,
+    "gap_vs_grid": 0.5432098765432087,
+    "epsilon": 0.0,
+    "certified": true,
+    "vertex_ok": false,
+    "theta_vertex": [
+      1.0,
+      0.0,
+      2.0,
+      3.0
+    ],
+    "theta_grid": [
+      0.6666666666666666,
+      0.3333333333333333,
+      2.0,
+      3.0
+    ],
+    "value_vertex": 8.125,
+    "value_grid": 8.668209876543209,
+    "certify_reason": "gap <= Phi(epsilon) and epsilon <= epsilon_0"
+  }
+]

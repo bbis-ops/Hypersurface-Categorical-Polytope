@@ -1,0 +1,19 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+.pytest_cache/
+pytest-cache-files-*/
+.pytest_tmp/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+# PDFs are build artifacts - rebuild from docs/*.tex (see docs/BUILD_PDF.md)
+*.pdf
+
+# secrets - never commit an API key
+.env
+*.key

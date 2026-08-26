@@ -1,0 +1,218 @@
+{
+  "toy_2block": [
+    {
+      "experiment": "toy_2block",
+      "fisher_coupling": 0.0,
+      "epsilon": 0.0,
+      "gap_joint_sep": 0.0,
+      "objective_joint": 7.125,
+      "objective_separable": 7.125,
+      "vertex_theta": [
+        1.0,
+        0.0,
+        2.0,
+        3.0
+      ],
+      "vertex_value": 7.0,
+      "pruned_value": 7.0,
+      "pruned_gap_vs_full": 0.0024710784313715095,
+      "phi_bound": 0.0028,
+      "phi_theorem": 0.0,
+      "certified_pruned": true,
+      "certified_strict": true,
+      "certify_reason": "gap <= Phi(epsilon) and epsilon <= epsilon_0",
+      "pairs_checked": 16,
+      "global_is_vertex": true
+    },
+    {
+      "experiment": "toy_2block",
+      "fisher_coupling": 0.01,
+      "epsilon": 0.01414213562373095,
+      "gap_joint_sep": 0.0024710784313715095,
+      "objective_joint": 7.052696078431373,
+      "objective_separable": 7.050225000000001,
+      "vertex_theta": [
+        1.0,
+        0.0,
+        2.0,
+        3.0
+      ],
+      "vertex_value": 7.0,
+      "pruned_value": 7.0,
+      "pruned_gap_vs_full": 0.0024710784313715095,
+      "phi_bound": 0.0028,
+      "phi_theorem": 0.002793224152406061,
+      "certified_pruned": true,
+      "certified_strict": true,
+      "certify_reason": "gap <= Phi(epsilon) and epsilon <= epsilon_0",
+      "pairs_checked": 16,
+      "global_is_vertex": true
+    },
+    {
+      "experiment": "toy_2block",
+      "fisher_coupling": 0.05,
+      "epsilon": 0.07071067811865477,
+      "gap_joint_sep": 0.059400252525251496,
+      "objective_joint": 6.815025252525251,
+      "objective_separable": 6.755624999999999,
+      "vertex_theta": [
+        1.0,
+        0.0,
+        2.0,
+        3.0
+      ],
+      "vertex_value": 7.0,
+      "pruned_value": 7.0,
+      "pruned_gap_vs_full": 0.059400252525251496,
+      "phi_bound": 0.07000000000000002,
+      "phi_theorem": 0.06567601520253037,
+      "certified_pruned": true,
+      "certified_strict": true,
+      "certify_reason": "gap <= Phi(epsilon) and epsilon <= epsilon_0",
+      "pairs_checked": 16,
+      "global_is_vertex": true
+    },
+    {
+      "experiment": "toy_2block",
+      "fisher_coupling": 0.1,
+      "epsilon": 0.14142135623730953,
+      "gap_joint_sep": 0.230104166666667,
+      "objective_joint": 6.627604166666667,
+      "objective_separable": 6.3975,
+      "vertex_theta": [
+        1.0,
+        0.0,
+        2.0,
+        3.0
+      ],
+      "vertex_value": 7.0,
+      "pruned_value": 7.0,
+      "pruned_gap_vs_full": 0.230104166666667,
+      "phi_bound": 0.2800000000000001,
+      "phi_theorem": 0.2549045138888891,
+      "certified_pruned": true,
+      "certified_strict": true,
+      "certify_reason": "gap <= Phi(epsilon) and epsilon <= epsilon_0",
+      "pairs_checked": 16,
+      "global_is_vertex": true
+    },
+    {
+      "experiment": "toy_2block",
+      "fisher_coupling": 0.25,
+      "epsilon": 0.3535533905932738,
+      "gap_joint_sep": 1.505208333333333,
+      "objective_joint": 6.895833333333333,
+      "objective_separable": 5.390625,
+      "vertex_theta": [
+        1.0,
+        0.0,
+        2.0,
+        3.0
+      ],
+      "vertex_value": 7.0,
+      "pruned_value": 7.0,
+      "pruned_gap_vs_full": 1.505208333333333,
+      "phi_bound": 1.7500000000000004,
+      "phi_theorem": 2.1961805555555562,
+      "certified_pruned": false,
+      "certified_strict": false,
+      "certify_reason": "epsilon=0.3536 > epsilon_0=0.2500",
+      "pairs_checked": 16,
+      "global_is_vertex": true
+    },
+    {
+      "experiment": "toy_2block",
+      "fisher_coupling": 0.35,
+      "epsilon": 0.49497474683058323,
+      "gap_joint_sep": 3.7476593137254905,
+      "objective_joint": 8.52328431372549,
+      "objective_separable": 4.775625,
+      "vertex_theta": [
+        1.0,
+        0.0,
+        2.0,
+        3.0
+      ],
+      "vertex_value": 7.0,
+      "pruned_value": 7.0,
+      "pruned_gap_vs_full": 3.7476593137254905,
+      "phi_bound": 3.4299999999999997,
+      "phi_theorem": 9.38536740676662,
+      "certified_pruned": false,
+      "certified_strict": false,
+      "certify_reason": "epsilon=0.4950 > epsilon_0=0.2500",
+      "pairs_checked": 16,
+      "global_is_vertex": true
+    }
+  ],
+  "toy_3block": [
+    {
+      "experiment": "toy_3block",
+      "fisher_coupling": 0.0,
+      "epsilon": 0.0,
+      "gap": 0.0,
+      "robust": true,
+      "failure_mode": false
+    },
+    {
+      "experiment": "toy_3block",
+      "fisher_coupling": 0.1,
+      "epsilon": 0.14142135623730953,
+      "gap": 4.2225521035277325e-07,
+      "robust": true,
+      "failure_mode": false
+    },
+    {
+      "experiment": "toy_3block",
+      "fisher_coupling": 0.4,
+      "epsilon": 0.5656854249492381,
+      "gap": 0.002838444061490364,
+      "robust": true,
+      "failure_mode": true
+    }
+  ],
+  "robustness_sweep": [
+    {
+      "epsilon": 0.0,
+      "gap": 0.0,
+      "bound": 0.0,
+      "robust": true,
+      "strategy": "SEPARABLE_PROBE"
+    },
+    {
+      "epsilon": 0.07071067811865477,
+      "gap": 0.059400252525251496,
+      "bound": 0.06567601520253037,
+      "robust": false,
+      "strategy": "BLOCK_COORDINATE_ASCENT"
+    },
+    {
+      "epsilon": 0.14142135623730953,
+      "gap": 0.230104166666667,
+      "bound": 0.254904513888889,
+      "robust": false,
+      "strategy": "BLOCK_COORDINATE_ASCENT"
+    },
+    {
+      "epsilon": 0.21213203435596426,
+      "gap": 0.511874999999999,
+      "bound": 0.5906249999999998,
+      "robust": false,
+      "strategy": "BLOCK_COORDINATE_ASCENT"
+    },
+    {
+      "epsilon": 0.3535533905932738,
+      "gap": 1.505208333333333,
+      "bound": 2.1961805555555562,
+      "robust": false,
+      "strategy": "JOINT_SOLVE"
+    },
+    {
+      "epsilon": 0.49497474683058323,
+      "gap": 3.7476593137254905,
+      "bound": 9.38536740676662,
+      "robust": false,
+      "strategy": "JOINT_SOLVE"
+    }
+  ]
+}

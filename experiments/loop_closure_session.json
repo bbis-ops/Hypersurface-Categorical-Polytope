@@ -1,0 +1,234 @@
+{
+  "summary": {
+    "backend": "scripted",
+    "api_fallbacks": [],
+    "n_turns": 8,
+    "closure_turn": 3,
+    "closure_quote": "Cross-naturality mixes my lambda-sigma face \u2014 corners feel wrong.",
+    "modes": [
+      "CORNER_HUNTING",
+      "CORNER_HUNTING",
+      "CORNER_HUNTING",
+      "INTERIOR_SEARCH",
+      "INTERIOR_SEARCH",
+      "INTERIOR_SEARCH",
+      "INTERIOR_SEARCH",
+      "INTERIOR_SEARCH"
+    ],
+    "epsilons": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "gaps": [
+      0.0,
+      0.0,
+      0.007475585937499751,
+      0.030358886718749645,
+      0.053242187500000426,
+      0.06556396484374982,
+      0.0778857421875001,
+      0.09648437500000018
+    ],
+    "narrative": "Coexp absent in Set (cardinality) -> learner raises confusion on the (lam,sigma) face -> live probe sees grid beating vertices -> INTERIOR_SEARCH closes the operational substitute loop."
+  },
+  "turns": [
+    {
+      "turn": 0,
+      "facilitator_prompt": "Turn 0: Where do you place product and curry on the diagram?",
+      "learner": {
+        "lam": 1.0,
+        "sigma": 0.0,
+        "b": 2.0,
+        "k": 3.0,
+        "confusion": 0.05,
+        "topic": "product_exp",
+        "quote": "Curry lives at the product corner \u2014 I'm comfortable there."
+      },
+      "probe": {
+        "epsilon": 0.0,
+        "gap_vertex_grid": 0.0,
+        "certified_separable": true,
+        "search_mode": "CORNER_HUNTING",
+        "reason": "low leakage and vertex localization \u2014 separable corner probe OK",
+        "value_vertex": 7.028125,
+        "value_grid": 7.028125
+      },
+      "tutor_note": "Probe: corner/separable OK. Learner: \"Curry lives at the product corner \u2014 I'm comfortable there.\"",
+      "loop_event": ""
+    },
+    {
+      "turn": 1,
+      "facilitator_prompt": "Turn 1: How do you read coproduct as a block?",
+      "learner": {
+        "lam": 0.95,
+        "sigma": 0.05,
+        "b": 2.0,
+        "k": 3.0,
+        "confusion": 0.12,
+        "topic": "coproduct",
+        "quote": "Coproduct is disjoint union; I probe each block at a vertex."
+      },
+      "probe": {
+        "epsilon": 0.0,
+        "gap_vertex_grid": 0.0,
+        "certified_separable": true,
+        "search_mode": "CORNER_HUNTING",
+        "reason": "low leakage and vertex localization \u2014 separable corner probe OK",
+        "value_vertex": 7.0675,
+        "value_grid": 7.0675
+      },
+      "tutor_note": "Probe: corner/separable OK. Learner: \"Coproduct is disjoint union; I probe each block at a vertex.\"",
+      "loop_event": ""
+    },
+    {
+      "turn": 2,
+      "facilitator_prompt": "Turn 2: What goes wrong with coexponential in Set?",
+      "learner": {
+        "lam": 0.9,
+        "sigma": 0.1,
+        "b": 2.0,
+        "k": 3.0,
+        "confusion": 0.22,
+        "topic": "coexp_empty",
+        "quote": "Coexponential in Set? I can't find a representing object."
+      },
+      "probe": {
+        "epsilon": 0.0,
+        "gap_vertex_grid": 0.007475585937499751,
+        "certified_separable": true,
+        "search_mode": "CORNER_HUNTING",
+        "reason": "low leakage and vertex localization \u2014 separable corner probe OK",
+        "value_vertex": 7.12375,
+        "value_grid": 7.1312255859375
+      },
+      "tutor_note": "Probe: corner/separable OK. Learner: \"Coexponential in Set? I can't find a representing object.\"",
+      "loop_event": ""
+    },
+    {
+      "turn": 3,
+      "facilitator_prompt": "Turn 3: Does cross-naturality couple your face coordinates?",
+      "learner": {
+        "lam": 0.85,
+        "sigma": 0.2,
+        "b": 2.0,
+        "k": 3.0,
+        "confusion": 0.35,
+        "topic": "cross_natural",
+        "quote": "Cross-naturality mixes my lambda-sigma face \u2014 corners feel wrong."
+      },
+      "probe": {
+        "epsilon": 0.0,
+        "gap_vertex_grid": 0.030358886718749645,
+        "certified_separable": true,
+        "search_mode": "INTERIOR_SEARCH",
+        "reason": "grid beats vertex by 0.0304 \u2014 abandon corner-hunting",
+        "value_vertex": 7.196875,
+        "value_grid": 7.22723388671875
+      },
+      "tutor_note": "Probe: INTERIOR_SEARCH. Your report: \"Cross-naturality mixes my lambda-sigma face \u2014 corners feel wrong.\" \u2014 corner-hunting is unsound; search the face interior.",
+      "loop_event": "LOOP_CLOSURE: coexp confusion + face coupling -> interior search"
+    },
+    {
+      "turn": 4,
+      "facilitator_prompt": "Turn 4: Is your maximum still on a corner of (lam,sigma)?",
+      "learner": {
+        "lam": 0.78,
+        "sigma": 0.32,
+        "b": 2.0,
+        "k": 3.0,
+        "confusion": 0.48,
+        "topic": "face_interior",
+        "quote": "Maybe the true picture is interior on the face, not a corner."
+      },
+      "probe": {
+        "epsilon": 0.0,
+        "gap_vertex_grid": 0.053242187500000426,
+        "certified_separable": true,
+        "search_mode": "INTERIOR_SEARCH",
+        "reason": "grid beats vertex by 0.0532 \u2014 abandon corner-hunting",
+        "value_vertex": 7.27,
+        "value_grid": 7.3232421875
+      },
+      "tutor_note": "Probe: INTERIOR_SEARCH. Your report: \"Maybe the true picture is interior on the face, not a corner.\" \u2014 corner-hunting is unsound; search the face interior.",
+      "loop_event": ""
+    },
+    {
+      "turn": 5,
+      "facilitator_prompt": "Turn 5: The probe recommends a search mode \u2014 what do you do?",
+      "learner": {
+        "lam": 0.72,
+        "sigma": 0.38,
+        "b": 2.0,
+        "k": 3.0,
+        "confusion": 0.55,
+        "topic": "interior_search",
+        "quote": "I should search the interior; corner-hunting failed me."
+      },
+      "probe": {
+        "epsilon": 0.0,
+        "gap_vertex_grid": 0.06556396484374982,
+        "certified_separable": true,
+        "search_mode": "INTERIOR_SEARCH",
+        "reason": "grid beats vertex by 0.0656 \u2014 abandon corner-hunting",
+        "value_vertex": 7.309375,
+        "value_grid": 7.37493896484375
+      },
+      "tutor_note": "Probe: INTERIOR_SEARCH. Your report: \"I should search the interior; corner-hunting failed me.\" \u2014 corner-hunting is unsound; search the face interior.",
+      "loop_event": ""
+    },
+    {
+      "turn": 6,
+      "facilitator_prompt": "Turn 6: How do adjoints change your diagram position?",
+      "learner": {
+        "lam": 0.68,
+        "sigma": 0.42,
+        "b": 2.0,
+        "k": 3.0,
+        "confusion": 0.62,
+        "topic": "adjoint",
+        "quote": "Adjoints reverse arrows \u2014 factorization is only approximate."
+      },
+      "probe": {
+        "epsilon": 0.0,
+        "gap_vertex_grid": 0.0778857421875001,
+        "certified_separable": true,
+        "search_mode": "INTERIOR_SEARCH",
+        "reason": "grid beats vertex by 0.0779 \u2014 abandon corner-hunting",
+        "value_vertex": 7.34875,
+        "value_grid": 7.4266357421875
+      },
+      "tutor_note": "Probe: INTERIOR_SEARCH. Your report: \"Adjoints reverse arrows \u2014 factorization is only approximate.\" \u2014 corner-hunting is unsound; search the face interior.",
+      "loop_event": ""
+    },
+    {
+      "turn": 7,
+      "facilitator_prompt": "Turn 7: Summarize the closed loop: coexp, epsilon, corners vs interior.",
+      "learner": {
+        "lam": 0.62,
+        "sigma": 0.48,
+        "b": 2.0,
+        "k": 3.0,
+        "confusion": 0.7,
+        "topic": "closure",
+        "quote": "Coexp shadow + Fisher epsilon + interior search \u2014 the loop closes."
+      },
+      "probe": {
+        "epsilon": 0.0,
+        "gap_vertex_grid": 0.09648437500000018,
+        "certified_separable": true,
+        "search_mode": "INTERIOR_SEARCH",
+        "reason": "grid beats vertex by 0.0965 \u2014 abandon corner-hunting",
+        "value_vertex": 7.39375,
+        "value_grid": 7.490234375
+      },
+      "tutor_note": "Probe: INTERIOR_SEARCH. Your report: \"Coexp shadow + Fisher epsilon + interior search \u2014 the loop closes.\" \u2014 corner-hunting is unsound; search the face interior.",
+      "loop_event": ""
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "interval_seconds": 576.24,
+  "next_allowed_epoch": 1787621607.3206418,
+  "consecutive_throttles": 0,
+  "success_streak": 2,
+  "total_throttles": 22,
+  "recommended_batch_size": 4,
+  "failed_batch_floor": 4,
+  "recovery_batch_ceiling": 4,
+  "largest_successful_batch": 16,
+  "last_event": "success",
+  "last_reason": "",
+  "last_event_utc": "2026-08-25T01:23:51.080642+00:00",
+  "last_request_utc": "2026-08-25T01:23:03.852426+00:00",
+  "last_batch_size": 4,
+  "total_successes": 22
+}

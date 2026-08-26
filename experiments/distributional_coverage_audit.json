@@ -1,0 +1,134 @@
+{
+  "backend": "stealth/ox-alpha@openrouter.ai",
+  "theorem_checks": {
+    "iid_mu_001_q_09_alpha_005": {
+      "n": 332,
+      "miss_bound": 0.049711090369096454
+    },
+    "shift_mu_001_q_09_W_5_alpha_005": {
+      "n": 1663
+    }
+  },
+  "objections": [
+    {
+      "id": "iid_theorem_core_valid",
+      "target": "iid",
+      "objection": "The base theorem is correct as stated: fixed F, IID inputs, per-draw detection prob >= mu*q, so P(no detection) <= (1-mu*q)^n by independence of the Bernoulli indicators.",
+      "model_verdict": "valid",
+      "repair": "None needed; but note the bound requires detection events across draws to be conditionally independent given membership in F \u2014 'independently across draws' must be an explicit assumption on the detector's noise, not implied by input IID.",
+      "severity": "minor",
+      "local_status": "confirmed",
+      "local_reason": "The IID calculation is correct. The statement now explicitly requires fresh independent detector randomness in addition to IID inputs."
+    },
+    {
+      "id": "detector_noise_dependence",
+      "target": "iid",
+      "objection": "'Detects failure with probability at least q independently across draws' smuggles in detector independence. A single shared detector (same model, same prompt template) can have correlated false negatives: if it systematically misses one failure mode in F, q collapses. Input IID does not decorrelate a deterministic or stateful detector.",
+      "model_verdict": "needs-assumption",
+      "repair": "State that D_i are conditionally independent given {X_i in F}, or prove a weaker bound via Azuma/McDiarmid under bounded conditional variance.",
+      "severity": "major",
+      "local_status": "accepted clarification",
+      "local_reason": "IID inputs alone do not decorrelate a shared stateful scorer. Correlated scorer behavior must instead satisfy the uniform conditional-p hypothesis of Theorem D.3."
+    },
+    {
+      "id": "fixed_vs_adaptive_failure_set",
+      "target": "iid",
+      "objection": "The theorem silently assumes F is fixed before sampling. If F is chosen adaptively (e.g., red-teamed into existence using observed draws), mu is no longer a pre-specified property and the multiplicative bound fails; adaptive F selection inflates apparent coverage.",
+      "model_verdict": "valid",
+      "repair": "Require F measurable w.r.t. a sigma-algebra independent of the sample, or pay a union-bound/complexity penalty over the class of candidate failure sets.",
+      "severity": "major",
+      "local_status": "confirmed as already scoped",
+      "local_reason": "The report already states that F is fixed before sampling. Adaptive selection from a function class requires a separate uniform-complexity correction."
+    },
+    {
+      "id": "shift_ac_support",
+      "target": "shift",
+      "objection": "Absolute continuity plus density bound W gives P_deploy(F) = \u222b_F r dP_eval <= W\u00b7P_eval(F), so P_eval(F) >= P_deploy(F)/W >= mu_dep/W. Inequality direction is correct. However AC only guarantees r exists; it says nothing about W being finite or known, and heavy-tail deployments routinely violate finite-W.",
+      "model_verdict": "valid",
+      "repair": "Make finiteness and a certified upper bound on ||dP_deploy/dP_eval||_\u221e an explicit audited hypothesis; otherwise the corollary is vacuous.",
+      "severity": "major",
+      "local_status": "confirmed",
+      "local_reason": "The density-ratio direction is correct. The corollary now emphasizes that W must be a certified finite upper bound."
+    },
+    {
+      "id": "shift_vacuous_when_mu_eval_zero",
+      "target": "shift",
+      "objection": "If P_eval(F)=0 then AC forces P_deploy(F)=0, so the corollary cannot be applied to deployment-only failures \u2014 precisely the interesting regime. The corollary only bounds miss probability for failures already visible under eval distribution at rate >= mu_dep/W.",
+      "model_verdict": "valid",
+      "repair": "State explicitly: the shift correction covers reweighted known failure modes only; novel-mode risk needs separate support assumptions.",
+      "severity": "major",
+      "local_status": "accepted limitation",
+      "local_reason": "A finite ratio excludes deployment-only support. The report now states that the corollary covers reweighting within eval support, not novel support."
+    },
+    {
+      "id": "shift_estimation_of_w",
+      "target": "shift",
+      "objection": "W is typically estimated empirically from samples; plug-in estimates of sup density ratios are biased downward (max of noisy ratios), so (1 - mu_dep*q/W)^n computed with an estimated W understates miss probability.",
+      "model_verdict": "valid",
+      "repair": "Use a high-probability upper confidence bound on W and propagate through the exponential; do not report point-estimate guarantees.",
+      "severity": "major",
+      "local_status": "accepted",
+      "local_reason": "A plug-in maximum ratio is not a certificate. The operational bound now uses a simultaneous upper confidence bound W_U and propagates calibration failure probability."
+    },
+    {
+      "id": "adaptive_conditional_bounds_correct",
+      "target": "adaptive",
+      "objection": "The iterated conditioning argument is valid: define M_i = event of no detection through i. Then P(M_i | H_(i-1)) <= 1-p on every history, so E[1_{M_i}|H_(i-1)] <= 1{M_(i-1)}(1-p); tower property telescopes to P(M_n) <= (1-p)^n. Independence genuinely unnecessary; only a uniform supermartingale-style lower bound on conditional detection probability is required.",
+      "model_verdict": "valid",
+      "repair": "None for the math; ensure p is a.s. uniform over ALL histories realized with positive probability, including histories generated by adversarial input selection.",
+      "severity": "minor",
+      "local_status": "confirmed",
+      "local_reason": "The adaptive proof is correctly a tower-property argument and needs no independence once a uniform conditional detection lower bound holds."
+    },
+    {
+      "id": "adaptive_history_definition",
+      "target": "adaptive",
+      "objection": "The quantifier is over 'every no-detection history' but the filtration must be specified. If the evaluator adapts its probing strategy using past outcomes, H_(i-1) includes those choices; the bound holds only if the p-lower-bound survives this richer filtration. A detector whose recall degrades as the adversary learns it violates the a.s. bound on some reachable histories.",
+      "model_verdict": "needs-assumption",
+      "repair": "Define the filtration explicitly and require inf over all H_(i-1) in the filtration of P(D_i|H_(i-1)) >= p, verified against the actual (possibly adaptive) evaluation policy.",
+      "severity": "major",
+      "local_status": "accepted",
+      "local_reason": "The report now defines the filtration to include inputs, policy choices, detector state, and outcomes, with p required on every reachable no-detection history."
+    },
+    {
+      "id": "optional_stopping_not_needed_but_related",
+      "target": "adaptive",
+      "objection": "No optional stopping is invoked, correctly \u2014 the argument is a pure product of conditional bounds via the tower rule. But if anyone extends to random stopping times T (e.g., stop when confidence reached), P(M_T) <= (1-p)^T is NOT automatic; one needs P(M_T) = sum_t P(M_t, T=t)-style care or a supermartingale argument, since (1-p)^t varies with t.",
+      "model_verdict": "valid",
+      "repair": "For random stopping times use Wald-type reasoning or bound P(M_T) <= max_t P(M_t), which loses tightness; state assumptions explicitly.",
+      "severity": "minor",
+      "local_status": "confirmed scope warning",
+      "local_reason": "The fixed-n theorem is valid. Random stopping requires a separately constructed sequential guarantee; the report explicitly forbids reusing the fixed-n formula after data-dependent stopping."
+    },
+    {
+      "id": "estimation_vs_theorem_conflation",
+      "target": "interpretation",
+      "objection": "All three results are conditional on parameters (mu, q, W, p) that are unobservable population quantities. The most common referee failure is presenting (1 - mu_hat*q_hat/W_hat)^n as a guarantee: estimation error in mu, q, W compounds multiplicatively inside an exponent, and small-sample q estimates are notoriously optimistic (detectors validated on easy failures).",
+      "model_verdict": "valid",
+      "repair": "Report only high-probability statements: with probability 1-\u03b4 over calibration data, P(no detection) <= (1 - (mu_L)(q_L)/W_U)^n + \u03b4, with explicit lower/upper confidence bounds; never present point estimates as certificates.",
+      "severity": "fatal",
+      "local_status": "accepted",
+      "local_reason": "The report now gives the conservative calibrated statement (1-mu_L*q_L/W_U)^n + delta_cal rather than treating point estimates as theorem parameters."
+    },
+    {
+      "id": "q_and_mu_interaction",
+      "target": "iid",
+      "objection": "P(detect) >= mu*q assumes detection probability factors as P(X in F)*P(D|X in F). If the evaluator's detection procedure itself depends on how many failures occur (e.g., budgeted inspection), q is not constant and the product form breaks.",
+      "model_verdict": "needs-assumption",
+      "repair": "Assume per-draw unconditional detection probability directly >= mu*q, or model budgeted detection explicitly.",
+      "severity": "minor",
+      "local_status": "accepted clarification",
+      "local_reason": "The constant-q formula requires fresh per-draw detection or an unconditional/conditional lower bound. Budgeted and stateful detectors must be modeled through D.3."
+    },
+    {
+      "id": "density_ratio_two_sided",
+      "target": "shift",
+      "objection": "Only an upper bound on r is used. Fine for this direction, but note asymmetry: the reverse transfer (eval-certified safety implies deploy-safety) needs a LOWER bound on r or an upper bound on the reciprocal, which fails whenever P_eval has larger support \u2014 the typical case.",
+      "model_verdict": "valid",
+      "repair": "Do not read the corollary symmetrically; certify each transfer direction separately with the appropriate ratio bound.",
+      "severity": "minor",
+      "local_status": "rejected",
+      "local_reason": "For eval-to-deployment safety transfer, P_deploy(F)<=W*P_eval(F) follows from the same upper bound r=dP_deploy/dP_eval<=W. A lower bound on r is neither needed nor sufficient for this direction."
+    }
+  ]
+}

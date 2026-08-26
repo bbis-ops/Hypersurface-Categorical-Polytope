@@ -1,0 +1,39 @@
+Traceback (most recent call last):
+  File ".\experiments\run_verification_campaign.py", line 227, in <module>
+    state["records"].extend(fresh)
+^^
+  File ".\experiments\run_verification_campaign.py", line 148, in main
+    # Re-adjudicate only after the verifier version changes. The current legacy
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ".\categorical_polytope\verification_campaign.py", line 210, in verify_combined
+    result = combined_screen(base, pert)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ".\categorical_polytope\base_search.py", line 498, in combined_screen
+    unpenalized = tuple(a for a, order in measured_orders.items() if order <= 1.0)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ".\categorical_polytope\base_search.py", line 449, in _weighted_push_modes
+    d_hi, d_lo = rise(t_hi), rise(t_lo)
+                 ^^^^^^^^^^
+  File ".\categorical_polytope\base_search.py", line 445, in rise
+    * t ** (1.0 / orders[axis]))
+            ~~~~^~~~~~~~~~~~~~
+ZeroDivisionError: float division by zero
+Traceback (most recent call last):
+  File ".\experiments\run_verification_campaign.py", line 243, in <module>
+    if __name__ == "__main__":
+        ^^^^^^
+  File ".\experiments\run_verification_campaign.py", line 218, in main
+    records = ([verify_base(law, c) for c in proposed] if law in ("V.12", "V.13")
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ".\categorical_polytope\verification_campaign.py", line 82, in verify_interaction
+    return base(theta) + strength * perturbation(theta)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ".\categorical_polytope\interaction_search.py", line 394, in screen_candidate
+    if any(math.isnan(v) or math.isinf(v) for v in ders.values()):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File ".\categorical_polytope\interaction_search.py", line 394, in <genexpr>
+    if any(math.isnan(v) or math.isinf(v) for v in ders.values()):
+           ^^^^^^^^^^^^^
+TypeError: must be real number, not complex
+  API HTTP 429; retry 2/8 in 5.8s
+  pacing API request for 68.2s

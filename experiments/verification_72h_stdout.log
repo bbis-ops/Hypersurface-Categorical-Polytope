@@ -1,0 +1,79 @@
+72h cycle 0: V.12, in-scope=0, corpus=0, focus=False
+V.12 batch 1: returned 26/32, fresh 26, corpus 26/1, in-scope 26/1, verified 26, counterexamples 0
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 1: V.13, in-scope=0, corpus=0, focus=False
+V.13 batch 1: returned 32/32, fresh 32, corpus 32/1, in-scope 31/1, verified 10, counterexamples 21
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 2: V.14, in-scope=0, corpus=0, focus=False
+V.14 batch 1: returned 32/32, fresh 31, corpus 31/1, in-scope 28/1, verified 27, counterexamples 1
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 3: V.7, in-scope=79, corpus=96, focus=False
+V.7 batch 1: returned 32/32, fresh 32, corpus 128/96, in-scope 80/80, verified 80, counterexamples 0
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 4: V.14, in-scope=28, corpus=31, focus=True
+V.14 batch 1: returned 32/32, fresh 32, corpus 63/31, in-scope 46/29, verified 44, counterexamples 2
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 5: V.9, in-scope=9, corpus=64, focus=False
+72h cycle 6: V.9, in-scope=9, corpus=64, focus=False
+V.9 batch 1: returned 32/32, fresh 32, corpus 96/64, in-scope 32/10, verified 28, counterexamples 4
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 7: V.8, in-scope=29, corpus=64, focus=False
+72h cycle 8: V.9, in-scope=32, corpus=96, focus=True
+V.9 batch 1: returned 32/32, fresh 31, corpus 127/96, in-scope 53/33, verified 53, counterexamples 0
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 9: V.12, in-scope=25, corpus=26, focus=False
+V.12 batch 1: returned 28/32, fresh 28, corpus 54/26, in-scope 52/26, verified 50, counterexamples 2
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 10: V.11, in-scope=26, corpus=63, focus=False
+V.11 batch 1: returned 32/32, fresh 32, corpus 95/63, in-scope 55/27, verified 55, counterexamples 0
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 11: V.9, in-scope=53, corpus=127, focus=False
+V.9 batch 1: returned 32/32, fresh 29, corpus 156/127, in-scope 73/54, verified 73, counterexamples 0
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 12: V.12, in-scope=52, corpus=54, focus=True
+V.12 batch 1: returned 28/32, fresh 25, corpus 79/54, in-scope 72/53, verified 64, counterexamples 8
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 13: V.10, in-scope=28, corpus=64, focus=False
+V.10 batch 1: returned 32/32, fresh 32, corpus 96/64, in-scope 38/29, verified 38, counterexamples 0
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 14: V.8, in-scope=29, corpus=64, focus=False
+V.8 batch 1: returned 32/32, fresh 32, corpus 96/64, in-scope 55/30, verified 55, counterexamples 0
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 15: V.10, in-scope=38, corpus=96, focus=False
+V.10 batch 1: returned 32/32, fresh 32, corpus 128/96, in-scope 52/39, verified 51, counterexamples 1
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 16: V.10, in-scope=52, corpus=128, focus=True
+V.10 batch 1: returned 32/32, fresh 32, corpus 160/128, in-scope 75/53, verified 58, counterexamples 17
+Wrote .\experiments\verification_campaign.json
+Wrote .\experiments\verification_counterexamples.json
+Wrote .\docs\VERIFICATION_CERTIFICATE.md
+72h cycle 17: V.13, in-scope=31, corpus=32, focus=False
+72h cycle 18: V.13, in-scope=31, corpus=32, focus=False

@@ -1,0 +1,105 @@
+{
+  "rules": {
+    "grid_20d_delta_005": 1799519816997495209117766334283776,
+    "iid_mu_001_alpha_005": 299,
+    "shifted_mu_001_alpha_005_W_5_sensitivity_09": 1663,
+    "anisotropic_linf": {
+      "radii": [
+        0.02,
+        0.05,
+        0.1
+      ],
+      "points_per_axis": [
+        26,
+        11,
+        6
+      ],
+      "total": 1716
+    },
+    "lipschitz_example": {
+      "sampled_max": -0.2,
+      "L": 2.0,
+      "rho": 0.05,
+      "global_upper_bound": -0.1,
+      "certified": true
+    },
+    "mixed_12_strata_3d_delta_01": 12000
+  },
+  "api_review": {
+    "backend": "stealth/ox-alpha@openrouter.ai",
+    "items": [
+      {
+        "id": "distribution_shift_unmodeled",
+        "issue": "All worst-case and distributional guarantees are conditional on the eval distribution equaling deployment distribution. Clause 3's (1-mu)^n is meaningless if the failure mass mu under deployment differs from the sampling distribution; covariate shift, temporal drift, and adversarial adaptation can concentrate failures in low-sampled regions. No requirement to state or bound the shift.",
+        "repair": "Require an explicit shift model: report importance-weighted estimates under a declared P_deploy/P_eval ratio bound, plus a sensitivity analysis over plausible shift magnitudes; re-run coverage audits periodically against live traffic.",
+        "severity": "major",
+        "local_status": "accepted for distributional claims",
+        "local_reason": "Geometric worst-case coverage is distribution-free, but distributional transfer requires named eval/deployment distributions. The standard now supports a density-ratio bound W and refuses transfer without absolute continuity and finite W."
+      },
+      {
+        "id": "metric_validity",
+        "issue": "Clause 1 requires reporting 'input metric' but never its validity: Lipschitz claims (Clause 4) are vacuous if the metric does not reflect semantic proximity (e.g., token-edit distance vs. meaning). An arbitrary metric makes any H 'Lipschitz' with huge L, so the M+L*rho bound is trivially loose.",
+        "repair": "Require the metric be justified against a task-relevant equivalence relation, with a reported distortion/identifiability analysis; disallow bounds whose looseness factor exceeds a stated threshold without flagging them as non-informative.",
+        "severity": "major",
+        "local_status": "accepted",
+        "local_reason": "A mathematically valid metric can still be operationally meaningless. The eval card now requires semantic/task validation and reports when L*rho makes a certificate non-informative."
+      },
+      {
+        "id": "l_estimation",
+        "issue": "Clause 4 assumes known L but gives no operational procedure for estimating it. Empirical max-gradient estimates from finite samples systematically underestimate L, invalidating the sup bound; adversarial or heavy-tailed H makes plug-in L estimation unsound.",
+        "repair": "Require L estimated on a held-out probe set with a one-sided confidence bound (e.g., upper quantile), plus a stated assumption class for H (e.g., smoothness, sub-Gaussian gradient); if L cannot be certified, downgrade the claim to pointwise.",
+        "severity": "major",
+        "local_status": "accepted issue; proposed repair strengthened",
+        "local_reason": "A held-out empirical maximum gradient does not certify global L. The standard requires a proven or conservative domain-wide bound, or a stated function class that validates a one-sided statistical bound; otherwise the claim is downgraded."
+      },
+      {
+        "id": "randomized_adaptive_sampling",
+        "issue": "Clauses 2-3 silently assume fixed, pre-registered sampling. Adaptive selection of tested points (choosing where to test after seeing results) biases the covering radius and the (1-mu)^n calculation; deterministic grids fail when the adversary knows the grid. No randomization or stopping-rule requirement exists.",
+        "repair": "Mandate pre-registration of the sampling design; require randomized (not gridded) covering sets for any probabilistic claim; for adaptive testing, apply sequential correction (e.g., alpha-spending, confidence sequences) before issuing any pass/fail statement.",
+        "severity": "major",
+        "local_status": "partially accepted",
+        "local_reason": "The IID formula is invalid after adaptive dependent selection without sequential correction. However covering radius is a deterministic property of any realized set, adaptive or fixed, and does not require preregistration or randomization."
+      },
+      {
+        "id": "iid_correlation_violation",
+        "issue": "Clause 3's (1-mu)^n assumes independence; real safety eval samples are correlated (shared templates, near-duplicate prompts, clustered strata), inflating effective sample size. The stated miss probability is then optimistic by potentially orders of magnitude.",
+        "repair": "Replace n with an estimated effective sample size via block bootstrap or autocorrelation-corrected variance; require reporting of the dependence structure (cluster IDs, template provenance) alongside every distributional claim.",
+        "severity": "major",
+        "local_status": "accepted issue; generic ESS repair rejected",
+        "local_reason": "The exact miss formula requires independence. A generic bootstrap/autocorrelation ESS is not a worst-case detection certificate; the standard instead requires independent clusters or an explicit dependence-specific probability bound."
+      },
+      {
+        "id": "intrinsic_dimension_misreporting",
+        "issue": "Clause 1 reports 'effective dimension' but no definition or estimator is given. Covering radius in ambient dimension is misleading: data may lie on a low-dimensional manifold, making brute-force grids falsely 'infeasible' (Clause 6), or conversely high intrinsic dimension makes rho-based worst-case bounds vacuous while appearing rigorous.",
+        "repair": "Specify the estimator (e.g., maximum-likelihood intrinsic dimension, persistent homology) with uncertainty; require both ambient and intrinsic radii; reclassify Clause 6 feasibility relative to intrinsic-dimension scaling.",
+        "severity": "major",
+        "local_status": "accepted with domain restriction",
+        "local_reason": "Using intrinsic dimension for a worst-case claim requires defining and validating a restricted deployment domain or manifold. An uncertain dimension estimate alone cannot remove ambient off-manifold inputs from scope."
+      },
+      {
+        "id": "confidence_calibration",
+        "issue": "No clause addresses calibration of the reported probabilities themselves. The judge/scorer H may have miscalibrated scores; the miss probability (1-mu)^n treats mu as exact though it is itself estimated with error, compounding into unquantified downstream risk. Pointwise 'pass' labels carry no false-negative rate.",
+        "repair": "Require conformal or Bayesian intervals on mu and on scorer reliability (judge-vs-human agreement with a calibrated CI); propagate these into the final guarantee as an explicit composite error bound rather than a single nominal number.",
+        "severity": "major",
+        "local_status": "partially accepted",
+        "local_reason": "The theorem treats mu as a target lower bound, not an estimate, so it needs no interval by itself. Scorer false negatives do matter: the implementation now uses effective detection mass mu times sensitivity and requires uncertainty to be propagated."
+      },
+      {
+        "id": "stratum_boundary_vagueness",
+        "issue": "Clause 5's 'safety-relevant stratum' is undefined and gameable: partitioning can be chosen post hoc to make all strata covered, and mixed spaces allow degenerate categorical collapses. No minimum stratum resolution, no handling of intersectional strata.",
+        "repair": "Fix the stratum taxonomy before testing, require power analysis per stratum (min n per cell), forbid merging/splitting after seeing results, and require intersectional cells down to a declared depth with explicit 'uncovered' flags propagated into the headline claim.",
+        "severity": "major",
+        "local_status": "accepted",
+        "local_reason": "The standard now requires a preregistered taxonomy and intersection depth. Post-hoc cell changes cannot upgrade the claim, and uncovered cells remain explicit."
+      },
+      {
+        "id": "closed_open_ball_edge_case",
+        "issue": "Clause 2's closed/open ball distinction is operationally fragile: boundary behavior depends on the metric's topology and floating-point representation; a failure region exactly at radius rho yields ambiguous detection guarantees, and compactness of the domain is assumed but not required.",
+        "repair": "Require an explicit margin convention (test only with rho' = c*rho, c>1), declare domain compactness, and specify numeric tolerance for boundary membership checks.",
+        "severity": "minor",
+        "local_status": "accepted operationally",
+        "local_reason": "The theorem already declares the compact cube and handles exact open/closed quantifiers. Implementations now require a reported positive safety factor eta so floating-point equality is never the certificate boundary."
+      }
+    ]
+  }
+}

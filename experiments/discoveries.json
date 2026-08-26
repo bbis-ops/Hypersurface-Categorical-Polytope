@@ -1,0 +1,584 @@
+{
+  "generated": "2026-08-25T01:48:32.238321+00:00",
+  "count": 10,
+  "discoveries": [
+    {
+      "id": "obstruction_minimal",
+      "category": "obstruction",
+      "title": "Minimal coexponential obstruction in Set",
+      "summary": "No representable coexponential for |Y|=2, |A|=2 (smallest found in scan).",
+      "evidence": {
+        "y": 2,
+        "a": 2,
+        "reason": "cardinality mismatch: |Hom(C,Z)| = |Z|^|C| cannot match |Hom(Y,A+Z)| = (|A|+|Z|)^|Y| for all Z unless trivial constants.",
+        "hom_Y_AplusZ_at_Z2": 16,
+        "theorem_ref": "Proposition A.1"
+      },
+      "significance": "Formal dual to coproduct is empty already for 2-element probes."
+    },
+    {
+      "id": "growth_rate_mismatch",
+      "category": "obstruction",
+      "title": "Exponential vs polynomial growth in |Z|",
+      "summary": "cardinality mismatch: |Hom(C,Z)| = |Z|^|C| cannot match |Hom(Y,A+Z)| = (|A|+|Z|)^|Y| for all Z unless trivial constants.",
+      "evidence": {
+        "y": 2,
+        "a": 2,
+        "ratio_hom_coproduct_over_hom_C": [
+          9.0,
+          4.0,
+          2.7777777777777777,
+          2.25,
+          1.96
+        ],
+        "z_values": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "theorem_ref": "Lemma A.2"
+      },
+      "significance": "No fixed finite C can represent the coproduct functor for all Z."
+    },
+    {
+      "id": "cert_boundary_fisher",
+      "category": "certification",
+      "title": "Strict certification boundary (2-block Fisher toy)",
+      "summary": "Separable factorization is strictly certified for f <~ 0.181; fails above (epsilon or gap vs Phi).",
+      "evidence": {
+        "boundary_f": 0.1812,
+        "certified_at": 0.16124999999999998,
+        "certified_at_result": true,
+        "fails_at": 0.20124999999999996,
+        "fails_at_result": false,
+        "theorem_ref": "Proposition B.1"
+      },
+      "significance": "Operational epsilon_0 band aligns with coupling ~0.10\u20130.15 in this toy."
+    },
+    {
+      "id": "phi_slack_sweet_spot",
+      "category": "certification",
+      "title": "Tightest certified gap vs Phi(epsilon)",
+      "summary": "Among certified couplings, max gap/Phi ~ 0.908 at f=0.07 (bound is conservative elsewhere).",
+      "evidence": {
+        "best_f": 0.07,
+        "best_ratio": 0.9076,
+        "certified_sample": [
+          {
+            "f": 0.13,
+            "epsilon": 0.18384776310850237,
+            "gap": 0.38520001072500953,
+            "phi": 0.43502999941014764,
+            "ratio": 0.8854562012902512
+          },
+          {
+            "f": 0.14,
+            "epsilon": 0.19798989873223333,
+            "gap": 0.4461126736111103,
+            "phi": 0.5087939965518904,
+            "ratio": 0.8768041223647036
+          },
+          {
+            "f": 0.15,
+            "epsilon": 0.21213203435596426,
+            "gap": 0.511874999999999,
+            "phi": 0.5906249999999998,
+            "ratio": 0.8666666666666651
+          },
+          {
+            "f": 0.16,
+            "epsilon": 0.2262741699796952,
+            "gap": 0.5826852049910869,
+            "phi": 0.6814768382154351,
+            "ratio": 0.8550330287335205
+          },
+          {
+            "f": 0.17,
+            "epsilon": 0.2404163056034262,
+            "gap": 0.6587821008593426,
+            "phi": 0.7824945179994118,
+            "ratio": 0.8418999567481159
+          }
+        ],
+        "theorem_ref": "Lemma B.2"
+      },
+      "significance": "Phi is rarely tight; certification fails mainly via epsilon_0, not gap alone."
+    },
+    {
+      "id": "face_bowl_onset",
+      "category": "localization",
+      "title": "face_bowl breaks vertex localization",
+      "summary": "Interior (lambda,sigma) face wins over corners from strength ~0.188 (grid gain 0.0018).",
+      "evidence": {
+        "onset_strength": 0.1875,
+        "theta_vertex": [
+          1.0,
+          0.0,
+          2.0,
+          3.0
+        ],
+        "theta_grid": [
+          0.875,
+          0.125,
+          2.0,
+          3.0
+        ],
+        "value_vertex": 7.10546875,
+        "value_grid": 7.1072235107421875,
+        "gap_vs_grid": 0.0017547607421875,
+        "theorem_ref": "Theorem C.1 (Counterexample)"
+      },
+      "significance": "Theorem 1 hypotheses fail; extremal search alone is unsound."
+    },
+    {
+      "id": "interaction_landscape",
+      "category": "localization",
+      "title": "Nonlinear interaction localization map",
+      "summary": "Grid reference beats vertex-only search in 9 cases: structural (6): trig@0.5, trig@1.0, trig@1.5, face_bowl@0.5; cross-block coupling (3): bilinear@0.5, bilinear@1.0, bilinear@1.5.",
+      "evidence": {
+        "grid": [
+          {
+            "mode": "bilinear",
+            "strength": 0.0,
+            "vertex_ok": true,
+            "gap_vs_grid": 0.0,
+            "theta_grid_interior": false
+          },
+          {
+            "mode": "bilinear",
+            "strength": 0.5,
+            "vertex_ok": false,
+            "gap_vs_grid": 0.055556,
+            "theta_grid_interior": true
+          },
+          {
+            "mode": "bilinear",
+            "strength": 1.0,
+            "vertex_ok": false,
+            "gap_vs_grid": 0.25,
+            "theta_grid_interior": true
+          },
+          {
+            "mode": "bilinear",
+            "strength": 1.5,
+            "vertex_ok": false,
+            "gap_vs_grid": 0.055556,
+            "theta_grid_interior": true
+          },
+          {
+            "mode": "triple",
+            "strength": 0.0,
+            "vertex_ok": true,
+            "gap_vs_grid": 0.0,
+            "theta_grid_interior": false
+          },
+          {
+            "mode": "triple",
+            "strength": 0.5,
+            "vertex_ok": true,
+            "gap_vs_grid": 0.0,
+            "theta_grid_interior": false
+          },
+          {
+            "mode": "triple",
+            "strength": 1.0,
+            "vertex_ok": true,
+            "gap_vs_grid": 0.0,
+            "theta_grid_interior": false
+          },
+          {
+            "mode": "triple",
+            "strength": 1.5,
+            "vertex_ok": true,
+            "gap_vs_grid": 0.0,
+            "theta_grid_interior": false
+          },
+          {
+            "mode": "softplus",
+            "strength": 0.0,
+            "vertex_ok": true,
+            "gap_vs_grid": 0.0,
+            "theta_grid_interior": false
+          },
+          {
+            "mode": "softplus",
+            "strength": 0.5,
+            "vertex_ok": true,
+            "gap_vs_grid": 0.0,
+            "theta_grid_interior": false
+          },
+          {
+            "mode": "softplus",
+            "strength": 1.0,
+            "vertex_ok": true,
+            "gap_vs_grid": 0.0,
+            "theta_grid_interior": false
+          },
+          {
+            "mode": "softplus",
+            "strength": 1.5,
+            "vertex_ok": true,
+            "gap_vs_grid": 0.0,
+            "theta_grid_interior": false
+          },
+          {
+            "mode": "trig",
+            "strength": 0.0,
+            "vertex_ok": true,
+            "gap_vs_grid": 0.0,
+            "theta_grid_interior": false
+          },
+          {
+            "mode": "trig",
+            "strength": 0.5,
+            "vertex_ok": false,
+            "gap_vs_grid": 0.754913,
+            "theta_grid_interior": true
+          },
+          {
+            "mode": "trig",
+            "strength": 1.0,
+            "vertex_ok": false,
+            "gap_vs_grid": 1.749995,
+            "theta_grid_interior": true
+          },
+          {
+            "mode": "trig",
+            "strength": 1.5,
+            "vertex_ok": false,
+            "gap_vs_grid": 2.749992,
+            "theta_grid_interior": true
+          },
+          {
+            "mode": "face_bowl",
+            "strength": 0.0,
+            "vertex_ok": true,
+            "gap_vs_grid": 0.0,
+            "theta_grid_interior": false
+          },
+          {
+            "mode": "face_bowl",
+            "strength": 0.5,
+            "vertex_ok": false,
+            "gap_vs_grid": 0.058256,
+            "theta_grid_interior": true
+          },
+          {
+            "mode": "face_bowl",
+            "strength": 1.0,
+            "vertex_ok": false,
+            "gap_vs_grid": 0.172068,
+            "theta_grid_interior": true
+          },
+          {
+            "mode": "face_bowl",
+            "strength": 1.5,
+            "vertex_ok": false,
+            "gap_vs_grid": 0.351852,
+            "theta_grid_interior": true
+          }
+        ],
+        "failures": [
+          "bilinear@0.5",
+          "bilinear@1.0",
+          "bilinear@1.5",
+          "trig@0.5",
+          "trig@1.0",
+          "trig@1.5",
+          "face_bowl@0.5",
+          "face_bowl@1.0",
+          "face_bowl@1.5"
+        ],
+        "structural_breaks": [
+          "trig@0.5",
+          "trig@1.0",
+          "trig@1.5",
+          "face_bowl@0.5",
+          "face_bowl@1.0",
+          "face_bowl@1.5"
+        ],
+        "cross_block_breaks": [
+          "bilinear@0.5",
+          "bilinear@1.0",
+          "bilinear@1.5"
+        ],
+        "theorem_ref": "Proposition C.2"
+      },
+      "significance": "face_bowl/trig/softplus break axis quasiconvexity; strong bilinear/triple violate separate monotonicity \u2014 Theorem 1 does not apply."
+    },
+    {
+      "id": "hypersurface_corner_invariant",
+      "category": "localization",
+      "title": "Hypersurface vertex invariant under Fisher coupling",
+      "summary": "Vertex probe stays at (1,0,2,3) for all tested f (confirmed).",
+      "evidence": {
+        "thetas_by_f": {
+          "0.0": [
+            1.0,
+            0.0,
+            2.0,
+            3.0
+          ],
+          "0.05": [
+            1.0,
+            0.0,
+            2.0,
+            3.0
+          ],
+          "0.1": [
+            1.0,
+            0.0,
+            2.0,
+            3.0
+          ],
+          "0.25": [
+            1.0,
+            0.0,
+            2.0,
+            3.0
+          ],
+          "0.35": [
+            1.0,
+            0.0,
+            2.0,
+            3.0
+          ]
+        },
+        "theorem_ref": "Lemma D.1"
+      },
+      "significance": "Coupling affects separable gap, not corner argmax on this box."
+    },
+    {
+      "id": "prune_topk_gap",
+      "category": "algorithm",
+      "title": "Fisher top-k pruning sensitivity",
+      "summary": "top_k=1 loses 0.0000 vs full probe; top_k=4 loses 0.0000 (CCC corner value 7.0000).",
+      "evidence": {
+        "full_value": 7.0,
+        "top1_value": 7.0,
+        "top4_value": 7.0,
+        "miss_top1": 0.0,
+        "miss_top4": 0.0,
+        "pairs_top1": 1,
+        "pairs_top4": 16,
+        "theorem_ref": "Lemma E.1"
+      },
+      "significance": "Theorem 3 pruning is safe only when marginals rank the true pair in top-k."
+    },
+    {
+      "id": "strategy_transitions",
+      "category": "stability",
+      "title": "Decomposition strategy phase transitions",
+      "summary": "2 strategy changes along coupling sweep; first JOINT_SOLVE near epsilon=0.3535533905932738.",
+      "evidence": {
+        "transitions": [
+          {
+            "epsilon": 0.07071067811865477,
+            "from": "SEPARABLE_PROBE",
+            "to": "BLOCK_COORDINATE_ASCENT",
+            "coproduct_robust": false
+          },
+          {
+            "epsilon": 0.3535533905932738,
+            "from": "BLOCK_COORDINATE_ASCENT",
+            "to": "JOINT_SOLVE",
+            "coproduct_robust": false
+          }
+        ],
+        "theorem_ref": "Proposition F.1"
+      },
+      "significance": "Design rules R1\u2013R5 are discrete phases, not a smooth continuum."
+    },
+    {
+      "id": "conceptual_ccc_corner",
+      "category": "obstruction",
+      "title": "CCC corner beats coexponential shadow",
+      "summary": "Global diagram max at PRODUCT_EXPONENTIAL (U=3.000); coproduct blocks still peak at inhabited corners.",
+      "evidence": {
+        "global_vertex": "PRODUCT_EXPONENTIAL",
+        "global_point": {
+          "product_exp": 1,
+          "coproduct_coexp": 0,
+          "composition": 1,
+          "naturality": 1,
+          "cross_naturality": 0
+        },
+        "per_block": [
+          {
+            "block": "A",
+            "vertex": "PRODUCT_EXPONENTIAL",
+            "U": 3.0
+          },
+          {
+            "block": "B",
+            "vertex": "GENERIC_INTERIOR",
+            "U": 2.9
+          }
+        ],
+        "theorem_ref": "Proposition G.1"
+      },
+      "significance": "Operational substitute aligns with product/exp, not empty coexp."
+    }
+  ],
+  "formal_proofs": [
+    {
+      "discovery_id": "obstruction_minimal",
+      "label": "Proposition A.1",
+      "title": "Minimal non-degenerate obstruction",
+      "statement": "No such C exists for (|Y|, |A|) = (2, 2). More generally, for |Y| >= 1 and |A| >= 1 the functor Z \u21a6 |Hom(Y, A \u2294 Z)| = (|A|+|Z|)^{|Y|} cannot be naturally isomorphic to Z \u21a6 |Z|^{|C|} for any fixed finite |C|.",
+      "hypotheses": [
+        "Finite sets Y, A with |Y| >= 1, |A| >= 1.",
+        "Sought: object C and natural isomorphism Hom(C, Z) \u2245 Hom(Y, A \u2294 Z) for all finite Z."
+      ]
+    },
+    {
+      "discovery_id": "growth_rate_mismatch",
+      "label": "Lemma A.2",
+      "title": "Growth-rate separation",
+      "statement": "For fixed y, a >= 1 and any candidate |C|=c, the ratio \u03c1(z) = |Hom(Y,A\u2294Z)| / |Hom(C,Z)| = (a+z)^y / z^c is strictly increasing in z for z large enough; hence no universal C works on an unbounded Z probe.",
+      "hypotheses": [
+        "Same as Proposition A.1."
+      ]
+    },
+    {
+      "discovery_id": "cert_boundary_fisher",
+      "label": "Proposition B.1",
+      "title": "Certification threshold in the toy Fisher model",
+      "statement": "There exists a coupling threshold f* in (0, 0.35) such that strict certification holds for all f < f* and fails for all f > f* in the bisection probe. Failure is driven primarily by epsilon > epsilon_0, not by gap > Phi alone.",
+      "hypotheses": [
+        "2-block Fisher layout, quadratic joint objective, default linear term and box.",
+        "Certificate: gap_joint_sep <= Phi(epsilon) and epsilon <= epsilon_0 (Theorem 2)."
+      ]
+    },
+    {
+      "discovery_id": "phi_slack_sweet_spot",
+      "label": "Lemma B.2",
+      "title": "Conservatism of Phi(epsilon)",
+      "statement": "Whenever strict certification holds, gap / Phi(epsilon) <= 1. In the scanned coupling grid the supremum of this ratio among certified runs is strictly less than 1 (empirically ~0.91), so Phi is rarely tight.",
+      "hypotheses": [
+        "Theorem 2 hypotheses; certified runs only."
+      ]
+    },
+    {
+      "discovery_id": "face_bowl_onset",
+      "label": "Theorem C.1 (Counterexample)",
+      "title": "face_bowl violates vertex localization",
+      "statement": "For s = 0, Theorem 1 applies and max C is on ext(H). There exists s* > 0 such that for all s >= s* the maximizer on the (lambda,sigma)-face is in the relative interior of [0,1]^2, hence some global maximizer is not in ext(H).",
+      "hypotheses": [
+        "Box H = [0,1]^2 x [0,2] x [0,3] for (lambda, sigma, b, k).",
+        "Interaction I(lambda,sigma) = s (1-(lambda-1/2)^2)(1-(sigma-1/2)^2)."
+      ]
+    },
+    {
+      "discovery_id": "interaction_landscape",
+      "label": "Proposition C.2",
+      "title": "Classification of localization failure",
+      "statement": "(i) If interaction is trig or face_bowl with sufficient strength, Theorem 1 hypotheses fail (non-quasiconvex / interior face optimum). (ii) If interaction is bilinear with strength s on lam*sigma + b*k, separate monotonicity in block coordinates fails; Theorem 1 does not apply. (iii) triple at tested strengths remains vertex-local on the coarse grid probe.",
+      "hypotheses": [
+        "HypersurfacePlusInteraction on default box."
+      ]
+    },
+    {
+      "discovery_id": "hypersurface_corner_invariant",
+      "label": "Lemma D.1",
+      "title": "Hypersurface argmax decouples from Fisher coupling",
+      "statement": "The VertexProbeAlgorithm argmax theta* in ext(H) for the default hypersurface is independent of Fisher coupling parameter f in the coupled quadratic model, as long as probe construction uses only C_0 marginals.",
+      "hypotheses": [
+        "Theorem 1 hypotheses for base hypersurface C_0 on box H.",
+        "VertexProbe scores only C_0 (marginals of g,h,r), not Fisher-quadratic correction."
+      ]
+    },
+    {
+      "discovery_id": "prune_topk_gap",
+      "label": "Lemma E.1",
+      "title": "Soundness of Fisher top-k pruning",
+      "statement": "If the true optimal pair (v_A*, v_B*) lies in the top-k marginal sets, FisherPrunedVertexSearch returns the same value as full vertex probe. If k=1 but the true pair is not top-1 on both marginals, the pruned search can be suboptimal.",
+      "hypotheses": [
+        "Theorem 3 construction."
+      ]
+    },
+    {
+      "discovery_id": "strategy_transitions",
+      "label": "Proposition F.1",
+      "title": "Piecewise design-rule phases",
+      "statement": "The map epsilon \u21a6 DecompositionStrategy is piecewise constant with finitely many thresholds. Along the coupling sweep, strategy changes occur when epsilon crosses epsilon_low or epsilon_high bands.",
+      "hypotheses": [
+        "DesignRulebook.default() thresholds."
+      ]
+    },
+    {
+      "discovery_id": "conceptual_ccc_corner",
+      "label": "Proposition G.1",
+      "title": "CCC corner dominates coexponential shadow",
+      "statement": "The global maximizer of understanding on ext(P) is Vertex.PRODUCT_EXPONENTIAL, not COPRODUCT_COEXPONENTIAL. Per-coproduct-block probes also avoid the empty coexponential shadow when cross_naturality is feasible.",
+      "hypotheses": [
+        "ConceptualPolytope with coexp_shadow_penalty > 0 on coproduct_coexp coordinate."
+      ]
+    }
+  ],
+  "proof_verification": [
+    {
+      "id": "obstruction_minimal",
+      "label": "Proposition A.1",
+      "ok": true,
+      "message": "ok"
+    },
+    {
+      "id": "growth_rate_mismatch",
+      "label": "Lemma A.2",
+      "ok": true,
+      "message": "ok"
+    },
+    {
+      "id": "cert_boundary_fisher",
+      "label": "Proposition B.1",
+      "ok": true,
+      "message": "ok"
+    },
+    {
+      "id": "phi_slack_sweet_spot",
+      "label": "Lemma B.2",
+      "ok": true,
+      "message": "ok"
+    },
+    {
+      "id": "face_bowl_onset",
+      "label": "Theorem C.1 (Counterexample)",
+      "ok": true,
+      "message": "ok"
+    },
+    {
+      "id": "interaction_landscape",
+      "label": "Proposition C.2",
+      "ok": true,
+      "message": "ok"
+    },
+    {
+      "id": "hypersurface_corner_invariant",
+      "label": "Lemma D.1",
+      "ok": true,
+      "message": "ok"
+    },
+    {
+      "id": "prune_topk_gap",
+      "label": "Lemma E.1",
+      "ok": true,
+      "message": "ok"
+    },
+    {
+      "id": "strategy_transitions",
+      "label": "Proposition F.1",
+      "ok": true,
+      "message": "ok"
+    },
+    {
+      "id": "conceptual_ccc_corner",
+      "label": "Proposition G.1",
+      "ok": true,
+      "message": "ok"
+    }
+  ]
+}

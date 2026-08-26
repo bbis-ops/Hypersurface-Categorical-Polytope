@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Keep high-quality Ox Alpha verification batches running for a fixed event window."""
+"""Keep high-quality adversarial verification batches running for a fixed event window."""
 
 from __future__ import annotations
 
@@ -67,7 +67,9 @@ def main() -> None:
                     help="minimum seconds between provider requests across child processes")
     ap.add_argument("--min-batch-size", type=int, default=4)
     ap.add_argument("--api-retries", type=int, default=4)
-    ap.add_argument("--model", default="stealth/ox-alpha")
+    ap.add_argument("--model", default=None,
+                    help="any OpenAI-compatible model id; default resolves from preset/env")
+    ap.add_argument("--preset", default=None, help="named endpoint preset (openai, openrouter, ox-alpha); --model/--base-url override it")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
     if (args.hours <= 0 or args.batch_size < 1 or args.max_tokens < 1 or args.cycle_timeout < 60
@@ -75,8 +77,9 @@ def main() -> None:
         ap.error("sizes/intervals must be positive and cycle-timeout >= 60")
     if args.min_batch_size > args.batch_size:
         ap.error("min-batch-size cannot exceed batch-size")
-    if not os.environ.get("OPENROUTER_API_KEY", "").strip():
-        raise SystemExit("OPENROUTER_API_KEY is not set in this process")
+    keys = ("LOOP_API_KEY", "OPENROUTER_API_KEY", "OPENAI_API_KEY")
+    if not any(os.environ.get(k, "").strip() for k in keys):
+        raise SystemExit("no API key in this process; set one of " + ", ".join(keys))
 
     now = datetime.now(timezone.utc)
     prior = _read(EVENT, {})
@@ -133,11 +136,17 @@ def main() -> None:
         state["rate_state"] = rate_state
         _write(EVENT, state)
         command = [
-            sys.executable, str(CAMPAIGN), "--api", "--model", args.model,
+            sys.executable, str(CAMPAIGN), "--api",
             "--laws", law, "--batch-size", str(active_batch),
             "--per-law", str(max(1, corpus)), "--in-scope-per-law", str(in_scope + 1),
             "--max-attempts-per-law", "1", "--retries", str(args.api_retries),
         ]
+        # Both are optional: with neither, the child resolves model and endpoint
+        # from LOOP_API_* / LOOP_API_PRESET the same way a direct run would.
+        if args.model:
+            command += ["--model", args.model]
+        if args.preset:
+            command += ["--preset", args.preset]
         if focus:
             command.append("--focus-counterexamples")
         heartbeat = {

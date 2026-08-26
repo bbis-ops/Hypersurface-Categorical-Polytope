@@ -175,7 +175,7 @@ Scorer errors correlated across samples must be absorbed into a justified
 conditional `p`; otherwise D.3 does not apply. A budgeted or stateful detector
 does not inherit a constant `q` merely because inputs are IID.
 
-## Ox Alpha adversarial review
+## Adversarial model review
 
 Backend: `{backend}`. API output is untrusted until locally adjudicated.
 
@@ -183,7 +183,8 @@ Backend: `{backend}`. API output is untrusted until locally adjudicated.
 
 ## Reproduce
 
-`python experiments/run_distributional_coverage_audit.py --api --model stealth/ox-alpha`
+`python experiments/run_distributional_coverage_audit.py --api`
+(add `--model` / `--preset` to pick an endpoint; the backend actually used is recorded above)
 """
     OUT_MD.write_text(body, encoding="utf-8")
 

@@ -278,7 +278,8 @@ Backend: `{backend}`. Model feedback is untrusted until locally adjudicated.
 
 ## Reproduce
 
-`python experiments/run_eval_design_recommendations.py --api-review --model stealth/ox-alpha`
+`python experiments/run_eval_design_recommendations.py --api-review`
+(add `--model` / `--preset` to pick an endpoint; the backend actually used is recorded above)
 """
     OUT_MD.write_text(body, encoding="utf-8")
     print(f"Wrote {OUT_MD}")

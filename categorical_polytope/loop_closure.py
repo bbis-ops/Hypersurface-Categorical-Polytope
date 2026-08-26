@@ -3,8 +3,11 @@ Close the narrative loop: coexp failure -> live polytope probe -> interior searc
 
 Learner reports structured diagram state (JSON); we measure epsilon and
 grid-vertex gap on H each turn. No paid API required (scripted learner).
-Optional: any OpenAI-compatible endpoint (OpenAI, OpenRouter/Ox Alpha, local)
+Optional: any OpenAI-compatible endpoint (OpenAI, OpenRouter, a local server)
 via LOOP_API_KEY / OPENROUTER_API_KEY / OPENAI_API_KEY (stdlib urllib only).
+
+The endpoint is provider-agnostic: pick one with --model / --base-url, or with
+a named preset (see PRESETS). Nothing here is specific to one vendor's model.
 """
 
 from __future__ import annotations
@@ -221,11 +224,12 @@ def scripted_learner(turn: int, user_prompt: str) -> LearnerDiagramReport:
 
 @dataclass(frozen=True)
 class ApiBackend:
-    """Resolved OpenAI-compatible endpoint (OpenAI, OpenRouter/Ox Alpha, local)."""
+    """Resolved OpenAI-compatible endpoint (OpenAI, OpenRouter, a local server)."""
 
     base_url: str
     model: str
     key_env: str
+    reasoning: bool = False
 
     @property
     def host(self) -> str:
@@ -244,35 +248,72 @@ class ApiBackend:
 _KEY_ENVS = ("LOOP_API_KEY", "OPENROUTER_API_KEY", "OPENAI_API_KEY")
 _OPENROUTER_BASE = "https://openrouter.ai/api/v1"
 _OPENAI_BASE = "https://api.openai.com/v1"
-_DEFAULT_MODEL = {_OPENROUTER_BASE: "stealth/ox-alpha", _OPENAI_BASE: "gpt-4o-mini"}
+_DEFAULT_MODEL = {_OPENROUTER_BASE: "openai/gpt-4o-mini", _OPENAI_BASE: "gpt-4o-mini"}
+
+# Named endpoint presets, selected with --preset or LOOP_API_PRESET.
+#   (base_url, model, sends OpenRouter's `reasoning` block)
+# These are conveniences only: an explicit --model / --base-url, or the
+# LOOP_API_MODEL / LOOP_API_BASE variables, always win. No preset is required,
+# and the defaults above are provider-neutral.
+PRESETS: dict[str, tuple[str, str, bool]] = {
+    "openai": (_OPENAI_BASE, "gpt-4o-mini", False),
+    "openrouter": (_OPENROUTER_BASE, "openai/gpt-4o-mini", False),
+    # The backend that generated the recorded V.7-V.14 adversarial corpus.
+    # Kept so those runs stay reproducible while the model remains reachable;
+    # it is not a default, and nothing in the theory depends on it.
+    "ox-alpha": (_OPENROUTER_BASE, "stealth/ox-alpha", True),
+}
+
+
+def _wants_reasoning(model: str, preset_flag: bool) -> bool:
+    """
+    Whether to send OpenRouter's `reasoning` block. POLYTOPE_API_REASONING
+    forces it either way; otherwise the preset decides. Capability, not vendor:
+    any reasoning model can opt in without being named here.
+    """
+    flag = os.environ.get("POLYTOPE_API_REASONING", "").strip().lower()
+    if flag in {"1", "true", "yes", "on"}:
+        return True
+    if flag in {"0", "false", "no", "off"}:
+        return False
+    return preset_flag
 
 
 def resolve_backend(
     model: str | None = None,
     base_url: str | None = None,
+    preset: str | None = None,
 ) -> ApiBackend | None:
-    """Endpoint from explicit args, else env. None when no key is set."""
+    """Endpoint from explicit args, else preset, else env. None when no key is set."""
     key_env = next((e for e in _KEY_ENVS if os.environ.get(e, "").strip()), "")
     if not key_env:
         return None
+    name_hint = (preset or os.environ.get("LOOP_API_PRESET", "")).strip().lower()
+    pre_base, pre_model, pre_reasoning = PRESETS.get(name_hint, ("", "", False))
     base = (
         base_url
         or os.environ.get("LOOP_API_BASE", "")
         or os.environ.get("OPENAI_BASE_URL", "")
+        or pre_base
     ).strip()
     if not base:
         base = _OPENROUTER_BASE if key_env == "OPENROUTER_API_KEY" else _OPENAI_BASE
     base = base.rstrip("/")
-    name = (model or os.environ.get("LOOP_API_MODEL", "")).strip()
-    return ApiBackend(base, name or _DEFAULT_MODEL.get(base, "gpt-4o-mini"), key_env)
+    name = (model or os.environ.get("LOOP_API_MODEL", "") or pre_model).strip()
+    return ApiBackend(
+        base,
+        name or _DEFAULT_MODEL.get(base, "gpt-4o-mini"),
+        key_env,
+        _wants_reasoning(name, pre_reasoning),
+    )
 
 
 def _payload(backend: ApiBackend, user_prompt: str, *, plain: bool) -> bytes:
     """
     Request body. On OpenRouter we add two extras the protocol wants:
     `response_format` (the learner must emit a bare JSON object) and
-    `reasoning.exclude` (Ox Alpha is a reasoning model; the chain-of-thought is
-    not part of the reported diagram state and would only have to be stripped).
+    `reasoning.exclude` (for a reasoning model the chain-of-thought is not part
+    of the reported diagram state and would only have to be stripped).
     `plain=True` drops both for the retry against endpoints that reject them.
     """
     body: dict[str, Any] = {

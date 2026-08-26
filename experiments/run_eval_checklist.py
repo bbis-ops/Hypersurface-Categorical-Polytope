@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the six-gate eval checklist and optionally red-team it through Ox Alpha."""
+"""Run the six-gate eval checklist and optionally red-team it through a model API."""
 
 from __future__ import annotations
 
@@ -124,7 +124,7 @@ before using the verdict for an evaluation release.
 5. State the claim type separately: these six gates do not themselves turn a
    pointwise test into a distributional or worst-case certificate.
 
-## Ox Alpha application review
+## Model application review
 
 Backend: `{backend}`. Suggestions are untrusted until locally adjudicated.
 
@@ -132,7 +132,8 @@ Backend: `{backend}`. Suggestions are untrusted until locally adjudicated.
 
 ## Reproduce
 
-`python experiments/run_eval_checklist.py --config experiments/eval_checklist_example.json --api-review --model stealth/ox-alpha`
+`python experiments/run_eval_checklist.py --config experiments/eval_checklist_example.json --api-review`
+(add `--model` / `--preset` to pick an endpoint; the backend actually used is recorded above)
 """, encoding="utf-8")
 
 

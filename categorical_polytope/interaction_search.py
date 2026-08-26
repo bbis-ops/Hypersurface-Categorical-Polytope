@@ -544,6 +544,7 @@ def propose_candidates(
     *,
     model: str | None = None,
     base_url: str | None = None,
+    preset: str | None = None,
     frontier: bool = False,
     retries: int = 8,
     min_interval: float = 30.0,
@@ -573,7 +574,7 @@ def propose_candidates(
     from .loop_closure import resolve_backend
 
     proposal_model = model or os.environ.get("POLYTOPE_API_MODEL", "").strip() or None
-    backend = resolve_backend(proposal_model, base_url)
+    backend = resolve_backend(proposal_model, base_url, preset)
     if backend is None:
         return [], "no API key set"
 
@@ -622,7 +623,7 @@ def propose_candidates(
     }
     if backend.supports_extras:
         body["response_format"] = {"type": "json_object"}
-        if backend.model == "stealth/ox-alpha":
+        if backend.reasoning:
             effort = os.environ.get("POLYTOPE_API_REASONING_EFFORT", "low").strip().lower()
             if effort not in {"low", "medium", "high"}:
                 effort = "low"

@@ -758,12 +758,12 @@ def parse_pairs(text: Any) -> list[tuple[Candidate, Candidate]]:
 
 def propose_pairs(
     n: int = 16, *, model: str | None = None, base_url: str | None = None,
-    focus: str = "",
+    preset: str | None = None, focus: str = "",
 ) -> tuple[list[tuple[Candidate, Candidate]], str]:
     from . import interaction_search as isc
 
     return isc.propose_candidates(
-        n, model=model, base_url=base_url,
+        n, model=model, base_url=base_url, preset=preset,
         prompt=COMBINED_PROMPT.format(n=n) + focus, parser=parse_pairs,
     )
 

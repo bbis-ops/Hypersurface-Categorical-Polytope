@@ -4,11 +4,12 @@ Close the loop: live probe while learner internalizes coexp failure.
 
   python experiments/run_loop_closure.py                 # scripted (default)
   python experiments/run_loop_closure.py --api           # any OpenAI-compatible key
-  python experiments/run_loop_closure.py --api       --model stealth/ox-alpha --base-url https://openrouter.ai/api/v1
+  python experiments/run_loop_closure.py --api       --model MODEL_ID --base-url https://your-openai-compatible-endpoint/v1
   python experiments/plot_loop_closure.py
 
 Keys checked in order: LOOP_API_KEY, OPENROUTER_API_KEY, OPENAI_API_KEY.
-An OPENROUTER_API_KEY alone defaults to OpenRouter + stealth/ox-alpha.
+A key alone picks that provider's endpoint with a generic default model;
+use --model, or --preset / LOOP_API_PRESET, to choose another.
 """
 
 from __future__ import annotations
@@ -28,7 +29,7 @@ def main() -> None:
         action="store_true",
         help="Use a real model if an API key is set (else scripted)",
     )
-    ap.add_argument("--model", default=None, help="e.g. stealth/ox-alpha")
+    ap.add_argument("--model", default=None, help="any OpenAI-compatible model id")
     ap.add_argument(
         "--base-url",
         default=None,
@@ -60,7 +61,7 @@ def main() -> None:
     print("Loop closure session")
     print(f"  backend: {s['backend']}")
     if args.api and s["backend"] == "scripted":
-        print("  (no API key found -> scripted; set OPENROUTER_API_KEY)")
+        print("  (no API key found -> scripted; set LOOP_API_KEY, OPENROUTER_API_KEY, or OPENAI_API_KEY)")
     for fb in s.get("api_fallbacks", []):
         print(f"  ! turn {fb['turn']} fell back to scripted: {fb['error']}")
     print(f"  closure_turn: {s['closure_turn']}")

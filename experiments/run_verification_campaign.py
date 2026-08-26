@@ -132,7 +132,8 @@ def _write_certificate(state: dict[str, Any]) -> None:
     else:
         lines.append("None yet.")
     lines += ["", "## Reproduce or resume", "",
-              "`python experiments/run_verification_campaign.py --api --per-law 64 --in-scope-per-law 64 --batch-size 32 --model stealth/ox-alpha`", "",
+              "`python experiments/run_verification_campaign.py --api --per-law 64 --in-scope-per-law 64 --batch-size 32`", "",
+              "Add `--model` / `--base-url`, or `--preset`, to choose an endpoint; the backend used for this run is recorded above.", "",
               "Rerunning resumes from the JSON checkpoint and does not erase prior candidates or counterexamples."]
     CERTIFICATE.write_text("\n".join(lines), encoding="utf-8")
 
@@ -145,8 +146,10 @@ def main() -> None:
                     help="minimum verified-plus-counterexample denominator per law")
     ap.add_argument("--batch-size", type=int, default=32)
     ap.add_argument("--max-attempts-per-law", type=int, default=32)
-    ap.add_argument("--model", default="stealth/ox-alpha")
+    ap.add_argument("--model", default=None,
+                    help="any OpenAI-compatible model id; default resolves from preset/env")
     ap.add_argument("--base-url", default=None)
+    ap.add_argument("--preset", default=None, help="named endpoint preset (openai, openrouter, ox-alpha); --model/--base-url override it")
     ap.add_argument("--retries", type=int, default=8)
     ap.add_argument("--laws", nargs="+", choices=[f"V.{i}" for i in range(7, 15)],
                     help="optional theorem subset; the default is V.7 through V.14")
@@ -215,7 +218,7 @@ def main() -> None:
                         exemplar = survivors[-1]
                         focus = (f"\nA current numerical survivor uses base {exemplar['base_expr']} and perturbation {exemplar['expr']}. Generate weighted-homogeneous, coefficient, cancellation, and scale variants that preserve the corrected theorem hypotheses and try to reproduce its mismatch.")
                 proposed, backend = propose_pairs(ask, model=args.model, base_url=args.base_url,
-                                                  focus=focus)
+                                                  preset=args.preset, focus=focus)
                 records = [verify_combined(b, p) for b, p in proposed]
             else:
                 focus = ""
@@ -225,7 +228,7 @@ def main() -> None:
                         exemplar = survivors[-1]
                         focus = (f"\nA current numerical survivor is {exemplar['expr']}. Generate coefficient, scale, and functional variants that preserve the theorem hypotheses and try to reproduce its mismatch.")
                 proposed, backend = propose_candidates(
-                    ask, model=args.model, base_url=args.base_url,
+                    ask, model=args.model, base_url=args.base_url, preset=args.preset,
                     prompt=PROMPTS[law].format(n=ask) + focus + COMPACT_RULE,
                     retries=args.retries,
                 )

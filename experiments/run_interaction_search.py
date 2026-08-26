@@ -31,6 +31,7 @@ def main() -> None:
     ap.add_argument("--s", type=float, default=0.01, help="interaction strength")
     ap.add_argument("--model", default=None)
     ap.add_argument("--base-url", default=None)
+    ap.add_argument("--preset", default=None, help="named endpoint preset (openai, openrouter, ox-alpha); --model/--base-url override it")
     args = ap.parse_args()
 
     from categorical_polytope.interaction_search import (
@@ -47,7 +48,7 @@ def main() -> None:
         kept = 0
         for r in range(args.rounds):
             proposed, backend = propose_candidates(
-                args.n, model=args.model, base_url=args.base_url
+                args.n, model=args.model, base_url=args.base_url, preset=args.preset
             )
             fresh = [c for c in proposed if c.expr not in seen]
             seen.update(c.expr for c in fresh)

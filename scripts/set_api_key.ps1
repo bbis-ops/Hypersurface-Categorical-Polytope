@@ -13,8 +13,9 @@
     the experiment always agree on which endpoint and model are used.
 
 .PARAMETER Name
-    Which variable to set. Default OPENROUTER_API_KEY, which selects OpenRouter
-    plus stealth/ox-alpha automatically.
+    Which variable to set. Default OPENROUTER_API_KEY, which selects the
+    OpenRouter endpoint. The model is chosen separately, with --model or a
+    preset (LOOP_API_PRESET / --preset); no model is assumed by this script.
 
 .PARAMETER Persist
     Also save to your user environment so new terminals inherit it.

@@ -121,10 +121,25 @@ python -m categorical_polytope tutor
 **Free default:** scripted learner JSON on \(H\) — this is the reproducible run of record.
 
 **Optional real learner:** `--api` against any OpenAI-compatible endpoint. Keys are
-checked in order `LOOP_API_KEY`, `OPENROUTER_API_KEY`, `OPENAI_API_KEY`; an
-`OPENROUTER_API_KEY` alone defaults to `https://openrouter.ai/api/v1` with model
-`stealth/ox-alpha`. Override with `--model` / `--base-url` (or `LOOP_API_MODEL` /
-`LOOP_API_BASE`).
+checked in order `LOOP_API_KEY`, `OPENROUTER_API_KEY`, `OPENAI_API_KEY`; the key
+that is set selects that provider's base URL, with a generic default model
+(`gpt-4o-mini`, or `openai/gpt-4o-mini` on OpenRouter). Nothing here assumes a
+particular vendor or model.
+
+Choose the endpoint with `--model` / `--base-url` (or `LOOP_API_MODEL` /
+`LOOP_API_BASE`), or with a named preset from `loop_closure.PRESETS` via
+`--preset` / `LOOP_API_PRESET`:
+
+| preset | endpoint | model | sends `reasoning` |
+|--------|----------|-------|-------------------|
+| `openai` | `api.openai.com` | `gpt-4o-mini` | no |
+| `openrouter` | `openrouter.ai` | `openai/gpt-4o-mini` | no |
+| `ox-alpha` | `openrouter.ai` | `stealth/ox-alpha` | yes |
+
+The `ox-alpha` preset reproduces the backend that generated the recorded
+V.7--V.14 corpus. It is a preset, not a default: an explicit `--model` /
+`--base-url` always wins, and `POLYTOPE_API_REASONING=0/1` forces the
+`reasoning` block off or on for any model.
 
 Enter the key with the helper (masked input, never echoed, never written into
 the repo), which then verifies it with one round-trip:
@@ -145,9 +160,10 @@ python experiments/run_loop_closure.py --api     # full session
 ```
 
 On OpenRouter the request adds `response_format: json_object` (the learner
-protocol wants a bare JSON object) and `reasoning: {exclude: true}` (Ox Alpha is
-a reasoning model; its chain-of-thought is not part of the reported diagram
-state). Endpoints that reject either are retried once without them.
+protocol wants a bare JSON object) and, when the backend is marked as a
+reasoning model, `reasoning: {exclude: true}` (its chain-of-thought is not part
+of the reported diagram state). Endpoints that reject either are retried once
+without them.
 
 The saved summary records the backend as `model@host` and lists any turn that fell
 back to the scripted arc after an endpoint error, so an `--api` artifact cannot be

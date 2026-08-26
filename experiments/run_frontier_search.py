@@ -6,7 +6,7 @@ anything the laws fail to predict.
 
   python experiments/run_frontier_search.py --rounds 6 --n 20
 
-Needs OPENROUTER_API_KEY (see scripts/set_api_key.ps1). Writes
+Needs an API key (see scripts/set_api_key.ps1). Writes
 experiments/frontier_search.json and prints the anomalies.
 """
 

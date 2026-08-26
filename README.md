@@ -9,15 +9,15 @@ Not tied to AegisOps, Soilith, or any other repository.
 
 **Safety-evaluation capacity (conditional):** [`docs/SAFETY_CAPACITY.md`](docs/SAFETY_CAPACITY.md) — the V-theorems recast as *design warnings* for safety-evaluation methodology (separable scoring, box boundaries, finite-grid coverage, coupling, non-smooth attacks, tolerance thresholds), each a proven conditional over an optimization model of evaluation with its LLM mapping stated as an explicit assumption — plus an assumption-light coverage theorem. For arbitrary `n` samples in `[0,1]^d`, the covering radius obeys `rho >= v_d^(-1/d)n^(-1/d)`; a Cartesian grid has `rho ~ 0.5·sqrt(d)n^(-1/d)`. See the generated [`coverage × escape-search report`](docs/COVERAGE_CORRELATION.md). Module [`eval_escape.py`](categorical_polytope/eval_escape.py). Not a measurement of any deployed system.
 
-**Concrete eval-design standard:** [`docs/EVAL_DESIGN_RECOMMENDATIONS.md`](docs/EVAL_DESIGN_RECOMMENDATIONS.md) — separates pointwise, distributional, geometric worst-case, and Lipschitz-margin claims; covers anisotropic, mixed categorical/continuous, shifted-distribution, scorer-sensitivity, and adaptive designs; includes a locally adjudicated Ox Alpha referee review. Module [`eval_design.py`](categorical_polytope/eval_design.py).
+**Concrete eval-design standard:** [`docs/EVAL_DESIGN_RECOMMENDATIONS.md`](docs/EVAL_DESIGN_RECOMMENDATIONS.md) — separates pointwise, distributional, geometric worst-case, and Lipschitz-margin claims; covers anisotropic, mixed categorical/continuous, shifted-distribution, scorer-sensitivity, and adaptive designs; includes a locally adjudicated model referee review (backend of record: `stealth/ox-alpha@openrouter.ai`). Module [`eval_design.py`](categorical_polytope/eval_design.py).
 
-**Distributional coverage theorem:** [`docs/DISTRIBUTIONAL_COVERAGE_AUDIT.md`](docs/DISTRIBUTIONAL_COVERAGE_AUDIT.md) — rigorous IID, bounded deployment-shift, and adaptive conditional-detection bounds, including calibration uncertainty and the limits of support transfer; adversarially reviewed through the free Ox Alpha API and adjudicated locally.
+**Distributional coverage theorem:** [`docs/DISTRIBUTIONAL_COVERAGE_AUDIT.md`](docs/DISTRIBUTIONAL_COVERAGE_AUDIT.md) — rigorous IID, bounded deployment-shift, and adaptive conditional-detection bounds, including calibration uncertainty and the limits of support transfer; adversarially reviewed through a model API (backend of record: `stealth/ox-alpha@openrouter.ai`) and adjudicated locally.
 
 **Runnable six-condition checklist:** [`docs/EVAL_DESIGN_CHECKLIST.md`](docs/EVAL_DESIGN_CHECKLIST.md) — an executable, fail-closed eval card for separability, boundary margin, finite coverage, coupled constraints, non-smooth attacks, and tolerance handling. The included JSON is a worked schema, not real evaluation evidence.
 
 **Registered candidate-space coverage:** [`docs/CANDIDATE_COVERAGE_CERTIFICATE.md`](docs/CANDIDATE_COVERAGE_CERTIFICATE.md) — a separate, versioned normal-form layer for V.7–V.14 with an explicit parameter map, normalized metric, exact Cartesian covering radius, and a stated minimum-failure-width assumption. Registry v1 is an exploratory calibration designed after the open campaign; freezing it enables later confirmatory runs. The open API corpus remains adversarial evidence and is not misreported as a Cartesian cover.
 
-**Adversarial theorem-verification campaign:** [`docs/VERIFICATION_CERTIFICATE.md`](docs/VERIFICATION_CERTIFICATE.md) records the checkpointed V.7–V.14 corpus, honest in-scope denominators, provider token accounting, and every live or resolved numerical counterexample. [`docs/THREE_DAY_API_PLAN.md`](docs/THREE_DAY_API_PLAN.md) defines the active 72-hour high-reasoning Ox Alpha event and its heartbeat/recovery procedure.
+**Adversarial theorem-verification campaign:** [`docs/VERIFICATION_CERTIFICATE.md`](docs/VERIFICATION_CERTIFICATE.md) records the checkpointed V.7–V.14 corpus, honest in-scope denominators, provider token accounting, and every live or resolved numerical counterexample. [`docs/THREE_DAY_API_PLAN.md`](docs/THREE_DAY_API_PLAN.md) defines the 72-hour high-reasoning verification event (backend of record: `stealth/ox-alpha@openrouter.ai`) and its heartbeat/recovery procedure.
 
 **Vertex-localization threshold (V.1–V.14):** [`docs/FORMAL_VERTEX_THRESHOLD.md`](docs/FORMAL_VERTEX_THRESHOLD.md) — the interaction-strength threshold for vertex localization is exactly zero; exact displacement/gap laws; the weighted anisotropic master law `Δ ~ s^{1/(1-q)}`, where `q=Σαᵢ/βᵢ` (reducing to `β/(β-α)` isotropically); the directional law for coupled perturbations; the amplitude ceiling for saturating ridges; and base self-failure (interior/off-corner maxima). Modules: [`vertex_threshold.py`](categorical_polytope/vertex_threshold.py), [`interaction_search.py`](categorical_polytope/interaction_search.py), [`base_search.py`](categorical_polytope/base_search.py). Model proposals (`--api`) are only candidate generators; every result is verified locally with stdlib math.
 
@@ -48,6 +48,22 @@ Explicit bound: \(C(\theta^\star)-C(\theta_{\mathrm{sep}}) \le \Phi(\varepsilon)
 
 - Python 3.10+
 - Standard library only
+
+### Optional: model-backed candidate generation
+
+Every theorem, screen, and verdict runs offline on the standard library.
+The `--api` flags are candidate *generators* only: proposals are untrusted
+data, parsed under an AST whitelist and adjudicated locally, so the results
+do not depend on which model produced them.
+
+Any OpenAI-compatible endpoint works. Set one of `LOOP_API_KEY`,
+`OPENROUTER_API_KEY`, or `OPENAI_API_KEY` (see `scripts/set_api_key.ps1` /
+`.sh`), then pick a model with `--model` / `--base-url`, or a named preset
+with `--preset` / `LOOP_API_PRESET` (`openai`, `openrouter`, `ox-alpha`).
+The `ox-alpha` preset reproduces the backend that generated the recorded
+V.7-V.14 corpus; it is a preset, not a default. Presets are listed in
+`loop_closure.PRESETS` and documented in
+[`docs/RESEARCH_DIRECTIONS.md`](docs/RESEARCH_DIRECTIONS.md).
 
 ## Run
 

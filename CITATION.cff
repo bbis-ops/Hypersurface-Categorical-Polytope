@@ -1,14 +1,26 @@
 cff-version: 1.2.0
 title: "Extremal Selection as an Operational Substitute for Coexponentials: Fisher-Controlled Factorization"
-message: "Software and draft theorems for Fisher-controlled extremal probes and coproduct factorization."
+message: "If you use this software or its formal results, please cite it as below."
+type: software
 authors:
-  - family-names: "Author"
-    given-names: "TBD"
-repository-code: "https://github.com/TBD/categorical-polytope"
+  - family-names: "Koch"
+    given-names: "Brisen"
+version: "0.1.0"
+date-released: "2026-08-26"
 license: MIT
+repository-code: "https://github.com/bbis-ops/Hypersurface-Categorical-Polytope"
+url: "https://github.com/bbis-ops/Hypersurface-Categorical-Polytope"
+abstract: >-
+  Software and formal results for Fisher-controlled extremal probes and
+  coproduct factorization on a bounded box, including the V.1-V.14 series on
+  vertex localization: the interaction-strength threshold is exactly zero, with
+  exact displacement and objective-gap laws, a directional law for coupled
+  perturbations, an amplitude ceiling for saturating ridges, and a weighted
+  anisotropic master law for the gap exponent. Model-proposed candidates are
+  treated as untrusted data and adjudicated locally.
 keywords:
   - coexponential
   - Fisher information
   - vertex localization
   - category theory
-preferred-citation: "Extremal Selection as an Operational Substitute for Coexponentials (2026). Software package categorical-polytope."
+  - optimization

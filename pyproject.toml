@@ -9,7 +9,7 @@ description = "Fisher-controlled extremal probes and coproduct factorization (st
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
-authors = [{ name = "Traveler" }]
+authors = [{ name = "Brisen Koch" }]
 keywords = ["Fisher information", "category theory", "optimization", "vertex localization"]
 classifiers = [
   "Programming Language :: Python :: 3",

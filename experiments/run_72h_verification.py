@@ -36,6 +36,11 @@ def _write(path: Path, data: Any) -> None:
     tmp.replace(path)
 
 
+# --dry-run swaps this in for _write: a rehearsal must never touch campaign state.
+def _noop_write(path: Path, data: Any) -> None:
+    return None
+
+
 def _counts() -> tuple[dict[str, Counter], list[dict[str, Any]]]:
     records = _read(CORPUS, {}).get("records", [])
     out = {law: Counter() for law in LAWS}
@@ -81,6 +86,8 @@ def main() -> None:
     if not any(os.environ.get(k, "").strip() for k in keys):
         raise SystemExit("no API key in this process; set one of " + ", ".join(keys))
 
+    write = _noop_write if args.dry_run else _write
+
     now = datetime.now(timezone.utc)
     prior = _read(EVENT, {})
     if prior.get("status") == "running" and prior.get("deadline_utc"):
@@ -100,7 +107,7 @@ def main() -> None:
         "attempts_by_law": prior.get("attempts_by_law", {law: 0 for law in LAWS}),
         "last_exit_code": prior.get("last_exit_code"),
     }
-    _write(EVENT, state)
+    write(EVENT, state)
 
     env = os.environ.copy()
     env.update({
@@ -115,8 +122,8 @@ def main() -> None:
     while datetime.now(timezone.utc) < deadline:
         rate_state = _read(RATE_STATE, {})
         cooldown = max(0.0, float(rate_state.get("next_allowed_epoch", 0.0)) - time.time())
-        while cooldown > 0 and datetime.now(timezone.utc) < deadline:
-            _write(HEARTBEAT, {
+        while cooldown > 0 and not args.dry_run and datetime.now(timezone.utc) < deadline:
+            write(HEARTBEAT, {
                 "utc": datetime.now(timezone.utc).isoformat(), "cycle": state["cycle"],
                 "phase": "shared_rate_cooldown", "cooldown_seconds": round(cooldown, 1),
                 "rate_state": rate_state, "deadline_utc": deadline.isoformat(),
@@ -134,7 +141,7 @@ def main() -> None:
         active_batch = max(args.min_batch_size, min(args.batch_size, recommended))
         state["active_batch_size"] = active_batch
         state["rate_state"] = rate_state
-        _write(EVENT, state)
+        write(EVENT, state)
         command = [
             sys.executable, str(CAMPAIGN), "--api",
             "--laws", law, "--batch-size", str(active_batch),
@@ -155,19 +162,19 @@ def main() -> None:
             "corpus_before": corpus, "active_batch_size": active_batch,
             "rate_state": rate_state, "deadline_utc": deadline.isoformat(), "phase": "api_batch",
         }
-        _write(HEARTBEAT, heartbeat)
+        write(HEARTBEAT, heartbeat)
         print(f"72h cycle {state['cycle']}: {law}, in-scope={in_scope}, corpus={corpus}, focus={focus}, batch={active_batch}", flush=True)
         if args.dry_run:
+            if cooldown > 0:
+                print(f"would wait {cooldown:.1f}s for the shared rate cooldown first")
             print(" ".join(command))
-            state["status"] = "dry_run"
-            _write(EVENT, state)
             return
         child = subprocess.Popen(command, cwd=str(ROOT), env=env)
         cycle_started = time.monotonic()
         timed_out = False
         while child.poll() is None:
             elapsed = time.monotonic() - cycle_started
-            _write(HEARTBEAT, {
+            write(HEARTBEAT, {
                 **heartbeat, "utc": datetime.now(timezone.utc).isoformat(),
                 "phase": "api_or_local_work", "child_pid": child.pid,
                 "elapsed_seconds": round(elapsed, 1),
@@ -186,17 +193,17 @@ def main() -> None:
         state["last_exit_code"] = returncode
         state["cycle"] += 1
         state["attempts_by_law"][law] = int(state["attempts_by_law"].get(law, 0)) + 1
-        _write(EVENT, state)
+        write(EVENT, state)
         if returncode != 0:
-            _write(HEARTBEAT, {**heartbeat, "utc": datetime.now(timezone.utc).isoformat(),
-                               "phase": "backoff", "exit_code": returncode})
+            write(HEARTBEAT, {**heartbeat, "utc": datetime.now(timezone.utc).isoformat(),
+                              "phase": "backoff", "exit_code": returncode})
             time.sleep(30)
 
     subprocess.run([sys.executable, str(CAMPAIGN)], cwd=str(ROOT), env=env, check=False)
     state["status"] = "complete"
     state["completed_utc"] = datetime.now(timezone.utc).isoformat()
-    _write(EVENT, state)
-    _write(HEARTBEAT, {"utc": state["completed_utc"], "phase": "complete", "deadline_utc": deadline.isoformat()})
+    write(EVENT, state)
+    write(HEARTBEAT, {"utc": state["completed_utc"], "phase": "complete", "deadline_utc": deadline.isoformat()})
 
 
 if __name__ == "__main__":

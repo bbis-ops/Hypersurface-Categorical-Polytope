@@ -3,7 +3,7 @@
 Standalone codification of the "conceptual polytope" lecture: optimization metaphors,
 cartesian closed curry, and the failure of coexponential left adjoints to coproduct in `Set`.
 
-Not tied to AegisOps, Soilith, or any other repository.
+Not tied to Aegis-Ops, www.echovalidum.com, or any other repository.
 
 **Master overview:** [`categorical_polytope/Overview.md`](categorical_polytope/Overview.md) — theorems, proofs sketches, module map, notebook bridge.
 

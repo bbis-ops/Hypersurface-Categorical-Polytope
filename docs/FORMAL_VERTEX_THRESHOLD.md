@@ -1,506 +1,754 @@
-# The vertex-localization threshold is zero
+# The Vertex-Localization Threshold Is Zero
 
-Formal results V.1–V.5. Module: `categorical_polytope/vertex_threshold.py`.
-Tests: `tests/test_vertex_threshold.py` (17 tests).
+**Formal Results V.1–V.14** · 2026-08-26
 
-Theorem 1 places `theta_max` in `ext(H)`. `nonlinear_objective.demonstrate_nonlinear`
-then reports that the `face_bowl` interaction "breaks vertex localization" at some
-strength, with `localization_at_vertex` True for small `s` and False for large `s`.
-That reported transition is an artifact of grid resolution. The true critical
-strength is **zero**.
+## Abstract
 
----
+The default composite objective has a vertex maximizer at zero interaction
+strength, but that maximizer is first-order degenerate along the
+$(\lambda,\sigma)$ face. The `face_bowl` interaction introduces a positive inward
+derivative along both of these directions. Consequently, every positive
+interaction strength, however small, moves the maximizer into the interior of the
+face. The true vertex-localization threshold is therefore
 
-## Setup
+$$s^{*}=0.$$
 
-Box `H = [0,1] x [0,1] x [0,2] x [0,3]` with the default composite objective and
-the `face_bowl` interaction of strength `s >= 0`:
+The displacement from the vertex is linear in $s$, while the objective-value gap
+is quadratic:
 
-$$C_s(\theta) = b + k + \big[1-(1-\lambda)^2\big] + \big[1-\sigma^2\big]
-  + s\big(1-(\lambda-\tfrac12)^2\big)\big(1-(\sigma-\tfrac12)^2\big)$$
+$$\delta(s)=\frac{3}{8}s+O(s^2),
+\qquad
+\Delta(s)=\frac{9}{32}s^2+O(s^3).$$
 
-### Lemma V.0 (reduction to a symmetric face)
-
-`b` and `k` appear only in the separable term `b + k`, so both sit at their upper
-bounds. Substituting
-
-$$u = \lambda - \tfrac12, \qquad w = \tfrac12 - \sigma, \qquad u,w \in [-\tfrac12,\tfrac12]$$
-
-gives
-
-$$C_s = 5 + \tfrac32 + (u+w) - (u^2+w^2) + s(1-u^2)(1-w^2).$$
-
-**The sign flip on `\sigma` is the point.** In these coordinates the objective is
-symmetric under `u <-> w`, so the maximiser lies on the diagonal `u = w`.
+Coarse grid searches can miss this failure because the displacement and value gap
+become small faster than practical grid resolution can detect them.
 
 ---
 
-## Theorem V.1 (strict concavity)
+## Contents
 
-For every `s >= 0`, `C_s` is strictly concave on the face `[-1/2,1/2]^2`.
-
-**Proof.** $-\nabla^2 C_s = \begin{pmatrix} 2+2s(1-w^2) & 4suw \\ 4suw & 2+2s(1-u^2)\end{pmatrix}$.
-The diagonal entries are `>= 2`. Since `|u|,|w| <= 1/2`,
-
-$$\det \ge \left(2+\tfrac{3s}{2}\right)^2 - s^2 = 4 + 6s + \tfrac{5s^2}{4} > 0. \qquad \blacksquare$$
-
-**Consequence.** The maximiser is unique. "Vertex or interior" is a genuine
-dichotomy, not a question of which local optimum a search happens to find.
-
----
-
-## Theorem V.2 (exact maximiser)
-
-The maximiser is `u = w = t^*(s)`, the unique root in `[0,1/2]` of
-
-$$2s\,t^3 - 2(1+s)\,t + 1 = 0,$$
-
-solvable in closed form by Cardano. `t^*(0) = 1/2`, the corner itself.
-
-**Proof.** Stationarity gives `1 - 2u - 2su(1-w^2) = 0` and its `u <-> w` mirror.
-On the diagonal this is the stated cubic. By Theorem V.1 the stationary point is
-the unique maximum; symmetry plus uniqueness forces it onto the diagonal. `∎`
+1. [Executive Summary](#1-executive-summary)
+2. [Setup](#2-setup)
+3. [Reduction to a Symmetric Face](#3-reduction-to-a-symmetric-face)
+4. [Strict Concavity](#4-strict-concavity)
+5. [Exact Maximizer](#5-exact-maximizer)
+6. [The Threshold Is Zero](#6-the-threshold-is-zero)
+7. [Displacement and Objective Gap](#7-displacement-and-objective-gap)
+8. [Why Grid Searches Missed the Failure](#8-why-grid-searches-missed-the-failure)
+9. [A Corrected Local Robustness Criterion](#9-a-corrected-local-robustness-criterion)
+10. [Smooth Perturbations on a Quadratically Flat Face](#10-smooth-perturbations-on-a-quadratically-flat-face)
+11. [Fractional Perturbations](#11-fractional-perturbations)
+12. [Coupled Perturbations and Directional Optimization](#12-coupled-perturbations-and-directional-optimization)
+13. [Amplitude Ceiling and Saturation](#13-amplitude-ceiling-and-saturation)
+14. [General Flatness Law](#14-general-flatness-law)
+15. [Weighted Anisotropic Law](#15-weighted-anisotropic-law)
+16. [Base Self-Failure](#16-base-self-failure)
+17. [Implementation Implications](#17-implementation-implications)
+18. [Final Conclusions](#18-final-conclusions)
 
 ---
 
-## Theorem V.3 (the threshold is zero)
+## 1. Executive Summary
 
-$$\frac{\partial C_s}{\partial u}\Big|_{u=w=1/2} = -\frac{3s}{4}.$$
+The objective considered in this report is defined on the box
 
-Hence for every `s > 0` the inward derivative at the corner is strictly negative,
-the maximiser is interior, and **`s* = 0`**.
+$$H=[0,1]\times[0,1]\times[0,2]\times[0,3],$$
 
-**Proof.** Substitute `u = w = 1/2` into `1 - 2u - 2su(1-w^2)`:
-`1 - 1 - 2s(1/2)(3/4) = -3s/4`. `∎`
+with coordinates $(\lambda,\sigma,b,k)$.
 
-### Why it is knife-edge
+The separable variables $b$ and $k$ are always maximized at their upper bounds.
+The remaining optimization is over the $(\lambda,\sigma)$ face.
 
-At `s = 0` the derivative is exactly `0`. The unperturbed `r` is *stationary* at
-the corner `(\lambda_max, \sigma_min)`: it attains its vertex maximum with **zero
-inward margin**. Theorem 1's conclusion is true there but not stable. Any
-perturbation with an inward-increasing component moves the argmax off the vertex,
-however small its strength.
+At $s=0$, the vertex
 
-Numerically (`vertex_margin`), the inward derivatives of the unperturbed
-objective at `(1, 0, 2, 3)` are
+$$\theta_c=(1,0,2,3)$$
 
-| axis | `lam` | `sigma` | `b` | `k` |
-|------|-------|---------|-----|-----|
-| inward derivative | `0.0000` | `0.0000` | `-1.0000` | `-1.0000` |
+is a maximizer. However, the inward derivatives in the $\lambda$ and $\sigma$
+directions are both zero. The vertex is therefore not first-order robust.
 
-`b` and `k` are strictly monotone and hold firm. The `(lam, sigma)` face is flat
-to first order, and that is where localization fails.
+The `face_bowl` perturbation gives each of these directions an inward slope of
+$3s/4$. Thus, for every $s>0$, an inward move increases the objective. The vertex
+immediately ceases to be a local maximizer.
 
----
+The main conclusions are
 
-## Theorem V.4 (displacement and gap)
+$$\boxed{s^{*}=0},$$
 
-$$\delta(s) = \tfrac12 - t^*(s) = \tfrac38 s + O(s^2), \qquad
-\Delta(s) = C_s(\theta^*) - \max_{\mathrm{ext}(H)} C_s = \tfrac{9}{32}s^2 + O(s^3)$$
+$$\boxed{\delta(s)=\frac{3}{8}s+O(s^2)},$$
 
-with Padé-type approximants `delta ≈ 3s/(8+2s)` and `Delta ≈ 9s^2/(8(4+s))`.
+and
 
-**Proof.** Write `t = 1/2 - d` in the cubic and expand: `-3s/4 + d(2 + s/2) + O(d^2) = 0`,
-so `d = 3s/(8+2s) + O(s^2)`. For the gap, the corner gradient is
-`gamma = (3s/4)(1,1)` and `-∇^2` acts on `(1,1)` as `(2 + s/2)`, so the concave
-gain is `\tfrac12 \gamma^T(-\nabla^2)^{-1}\gamma = \tfrac{9s^2}{8(4+s)}`. `∎`
+$$\boxed{\Delta(s)=\frac{9}{32}s^2+O(s^3)}.$$
 
-**Verified** against the exact cubic root:
+The broader methodological conclusion is that a vertex-only optimization strategy
+is reliable only after checking both:
 
-| `s` | `delta(s)` | `3s/(8+2s)` | `Delta(s)` | `9s^2/(8(4+s))` |
-|-----|-----------|-------------|-----------|-----------------|
-| 0.01 | 0.003740 | 0.003741 | 0.000028 | 0.000028 |
-| 0.05 | 0.018493 | 0.018519 | 0.000694 | 0.000694 |
-| 0.10 | 0.036396 | 0.036585 | 0.002734 | 0.002744 |
-| 0.25 | 0.085786 | 0.088235 | 0.016229 | 0.016544 |
-| 1.00 | 0.241348 | 0.300000 | 0.191676 | 0.225000 |
+1. that the base objective is globally maximized at the candidate vertex;
+2. that the vertex has sufficient inward margin and curvature under the intended
+   perturbations.
 
 ---
 
-## Theorem V.5 (why the numerics missed it)
+## 2. Setup
 
-A uniform grid of `n` points per axis reports a positive gap iff
+Consider the objective
 
-$$n \ge 1 + \frac{1}{2\delta(s)} \sim 1 + \frac{4}{3s}.$$
+$$\begin{aligned}
+C_s(\theta)={}& b+k+\left[1-(1-\lambda)^2\right]+\left[1-\sigma^2\right]\\
+&+s\left(1-\left(\lambda-\tfrac12\right)^2\right)\left(1-\left(\sigma-\tfrac12\right)^2\right),
+\end{aligned}$$
 
-**Proof.** By Theorem V.1 the face objective is concave and symmetric about
-`t^*(s)`, so an interior point at distance `x` from the corner beats the corner
-exactly when `x < 2\delta(s)`. The nearest interior grid point is at `1/(n-1)`. `∎`
+where $s\geq 0$ and
 
-This is exact — measured against `grid_maximize`, the coarsest detecting grid is
-`n = 29` at `s = 0.05` (predicted 28.04), `n = 15` at `s = 0.1` (14.74), `n = 7`
-at `s = 0.25` (6.83).
+$$\theta=(\lambda,\sigma,b,k)\in H.$$
 
-**The trap.** `Delta(s) = Theta(s^2)` shrinks quadratically while grid spacing
-shrinks only like `1/n`, and in 4-D the cost is `n^4`. At `s = 0.05` detection
-needs about 700k evaluations; `nonlinear_objective` uses `steps=7` (2401 points)
-and `loop_closure` uses `steps=9`. Both report a gap of **exactly zero** while the
-true gap is `0.000694`. The `localization_at_vertex` flag additionally forgives
-any gap below `0.05`, so it reports success in a regime where localization has
-already failed.
+The variables $b$ and $k$ occur only in the separable term $b+k$. Therefore,
 
----
+$$b^{*}=2,\qquad k^{*}=3$$
 
-## Corollary V.6 (general criterion)
+at every maximizer.
 
-For a base objective `C_0` with vertex maximiser `theta_c` and perturbation `P`:
+The problem consequently reduces to the $(\lambda,\sigma)$ face.
 
-$$s^* = \frac{\mathrm{margin}(C_0)}{\max_i (\partial_i^{\mathrm{in}} P)(\theta_c)},
-\qquad \mathrm{margin}(C_0) = \min_i \left|(\partial_i^{\mathrm{in}} C_0)(\theta_c)\right|$$
+Introduce centered coordinates
 
-where `∂^in` is the one-sided derivative pointing into `H`. **`s* > 0` iff the base
-vertex is strict.** A degenerate vertex — any axis flat to first order — gives
-`s* = 0`.
+$$u=\lambda-\frac12,
+\qquad
+w=\frac12-\sigma.$$
 
-This is the reusable result: `vertex_margin` is a cheap, exact diagnostic that
-says whether a vertex-search strategy is safe *before* any search is run, and it
-does not depend on `face_bowl` or on this particular box.
+Then
 
-**Design rule.** Vertex-only search is trustworthy only against a *strict* vertex
-maximum. Report the margin alongside `theta_max`; a margin of zero means the
-localization claim carries no robustness at all.
+$$u,w\in\left[-\frac12,\frac12\right].$$
 
----
+The sign reversal in the definition of $w$ maps the relevant corner
 
-## Theorem V.7 (universal quadratic law)
+$$(\lambda,\sigma)=(1,0)$$
 
-Let `theta_c` be a degenerate vertex maximiser of `C_0`, flat along a set `D` of
-axes with inward curvature `c_i > 0` (convention `C_0 = C_0(theta_c) - (c_i/2)e^2`).
-Let `P` push inward with slope `gamma_i` per unit strength. Then for `C_0 + sP`:
+to
 
-$$\varepsilon_i^* = \frac{\gamma_i s}{c_i} + O(s^2), \qquad
-\Delta(s) = s^2 \sum_{i \in D} \frac{\gamma_i^2}{2c_i} + O(s^3).$$
+$$(u,w)=\left(\frac12,\frac12\right).$$
 
-**Proof.** Along axis `i`, `C_0 + sP = \mathrm{const} + \gamma_i s\varepsilon - (c_i/2)\varepsilon^2 + O(\varepsilon^3)`.
-Maximising gives `\varepsilon^* = \gamma_i s/c_i` and gain `\gamma_i^2 s^2/(2c_i)`.
-Cross terms between axes are `O(s^3)`. `∎`
+Using
 
-The default `r` has `c = 2` on both `lam` and `sigma`. Applying this to every
-interaction mode in `nonlinear_objective` (`screen_interactions`):
+$$1-(1-\lambda)^2=\frac34+u-u^2$$
 
-| mode | pushes inward on | `gamma` | `s*` | `Delta(s)` | breaks localization |
-|------|------------------|---------|------|-----------|---------------------|
-| `bilinear` | `sigma` | `1` | **0** | `s^2/4` (exact) | **yes** |
-| `trig` | `lam` | `2π` | **0** | `π^2 s^2` | **yes** |
-| `face_bowl` | `lam` and `sigma` | `3/4` each | **0** | `9s^2/32` | **yes** |
-| `triple` | — | `0` | `∞` | `0` | no |
-| `softplus` | — | `< 0` | `∞` | `0` | no |
+and
 
-Each closed form is reproduced by `universal_gap` to six significant figures;
-`bilinear` is exact because that interaction is exactly quadratic.
+$$1-\sigma^2=\frac34+w-w^2,$$
 
-### This is the stronger result
+the reduced objective becomes
 
-`face_bowl` is not special. **Three of the five interaction modes break vertex
-localization, all at `s* = 0`, all with `Delta(s) = Theta(s^2)`.** In particular
-`nonlinear_objective` documents `bilinear` as "still vertex-friendly on a box"
-and `trig` as merely something that "can break pure vertex localization". Both
-break it immediately, and `trig` is the worst of the three by a factor of
-`(2π)^2/(3/4)^2 ≈ 70` in gap.
+$$C_s=\frac{13}{2}+u+w-u^2-w^2+s(1-u^2)(1-w^2).$$
 
-What separates the two groups is not the shape of the interaction but a single
-scalar: whether it has a strictly positive inward derivative at the degenerate
-corner. `triple` (`s·λbk`) and `softplus` do not, because both are increasing in
-`lam` where `lam` is already at its upper bound, and neither involves `sigma`.
+The additive constant $13/2$ does not affect the location of the maximizer.
+Define
+
+$$f_s(u,w)=u+w-u^2-w^2+s(1-u^2)(1-w^2).$$
 
 ---
 
-## Theorem V.8 (fractional exponent law)
+## 3. Reduction to a Symmetric Face
 
-Theorem V.7 assumed the perturbation has a *finite* inward slope. Dropping that
-assumption changes the exponent. For `P = gamma * x^alpha` with `0 < alpha <= 1`
-at a degenerate vertex with inward curvature `c`:
+> **Lemma 3.1 (Reduction to the symmetric face).**
+> The variables $b$ and $k$ attain their upper bounds at every maximizer:
+> $$b^{*}=2,\qquad k^{*}=3.$$
+> The remaining objective is
+> $$f_s(u,w)=u+w-u^2-w^2+s(1-u^2)(1-w^2),$$
+> on
+> $$\left[-\frac12,\frac12\right]^2.$$
+> Moreover, $f_s$ is symmetric under the exchange $u\leftrightarrow w$.
 
-$$x^* = \left(\frac{\alpha\gamma s}{c}\right)^{\frac{1}{2-\alpha}}, \qquad
-\Delta(s) = \frac{c(2-\alpha)}{2\alpha}\left(\frac{\alpha\gamma s}{c}\right)^{\frac{2}{2-\alpha}}
-= \Theta\!\left(s^{\frac{2}{2-\alpha}}\right).$$
+**Proof.** The first claim follows because $b+k$ is strictly increasing in both
+$b$ and $k$. The symmetry follows directly from
 
-**Proof.** Maximise `gamma s x^alpha - (c/2)x^2`. Stationarity gives
-`alpha gamma s x^(alpha-1) = c x`, hence `x* = (alpha gamma s/c)^(1/(2-alpha))`.
-Writing `A = alpha gamma s/c`, both terms carry exponent `2/(2-alpha)` because
-`1 + alpha/(2-alpha) = 2/(2-alpha)`, and the difference is the stated constant. `∎`
+$$f_s(u,w)=f_s(w,u). \qquad \blacksquare$$
 
-**The exponent `p = 2/(2-alpha)` falls continuously from 2 to 1** as `alpha` goes
-from 1 to 0, recovering Theorem V.7 exactly at `alpha = 1`. Since `s` is small, a
-*smaller* exponent means a *larger* gap:
-
-| `alpha` | `p = 2/(2-alpha)` | `Delta(0.01)` predicted | measured | ratio |
-|---------|-------------------|------------------------|----------|-------|
-| 1 (smooth) | 2 | `2.500000e-05` | `2.500000e-05` | 1.0000 |
-| 3/4 | 1.6 | `2.189267e-04` | `2.189267e-04` | 1.0000 |
-| 1/2 | 4/3 | `1.017907e-03` | `1.017906e-03` | 1.0000 |
-| 1/3 | 1.2 | `2.318401e-03` | `2.318401e-03` | 1.0000 |
-| 1/4 | 8/7 | `3.367293e-03` | `3.367293e-03` | 1.0000 |
-
-**Consequence.** A `sqrt(sigma)` interaction at `s = 0.01` opens a gap 40x larger
-than `bilinear` at the same strength, and `sigma^(1/3)` 93x larger. Non-smooth
-interactions break vertex localization by an unbounded factor more than any
-smooth one, and the ratio grows as `s -> 0`. No amount of grid refinement
-tolerance calibrated on smooth cases is safe against them.
+Once uniqueness of the maximizer has been established, this symmetry will imply
+that the maximizer lies on the diagonal $u=w$.
 
 ---
 
-## How V.8 was found
+## 4. Strict Concavity
 
-`interaction_search.py` screens candidate interaction expressions with the V.7
-criterion — four derivative evaluations each, versus a grid search that provably
-cannot see the effect. Running it over a 16-candidate bank classified 13 as
-breaking and 3 as safe, confirmed the quadratic law on all 10 smooth breakers to
-within 5%, and flagged two candidates whose inward derivative fails to stabilise
-under `h -> h/100`. Those two are `sqrt(sigma)` and `sigma^(1/3)`; they head the
-ranking by measured gap, and they are what V.8 explains.
+> **Theorem 4.1 (Strict concavity).**
+> For every $s\geq 0$, the reduced objective $f_s$ is strictly concave on
+> $$\left[-\frac12,\frac12\right]^2.$$
 
-The screen deliberately refuses to fit the quadratic law to a non-smooth
-candidate (`predicted_gap` is reported as 0 with a `NON-SMOOTH` flag) rather than
-returning a plausible wrong number.
+**Proof.** The Hessian is
 
----
+$$\nabla^2 f_s(u,w)=
+\begin{pmatrix}
+-2-2s(1-w^2) & 4suw\\
+4suw & -2-2s(1-u^2)
+\end{pmatrix}.$$
 
-## Theorem V.9 (directional law; separability was hiding a factor)
+Therefore,
 
-Theorems V.7 and V.8 both silently assumed the perturbation is **separable** — a
-sum of single-axis terms. When it couples the flat axes, the additive law
-over-predicts. The correct statement maximises over inward directions.
+$$-\nabla^2 f_s(u,w)=
+\begin{pmatrix}
+2+2s(1-w^2) & -4suw\\
+-4suw & 2+2s(1-u^2)
+\end{pmatrix}.$$
 
-At a degenerate corner flat along axes `D` with inward curvatures `c_i`, for a
-perturbation `P` positively homogeneous of degree 1, the maximiser moves along a
-single ray `e = R·d`:
+The diagonal entries are at least $2$. Since
 
-$$\Delta(s) = s^2 \max_{d}\ \frac{(D_d P)^2}{2\sum_{i\in D} c_i d_i^2}, \qquad d \in \text{unit inward directions.}$$
+$$|u|,|w|\leq \frac12,$$
 
-**Proof.** On ray `e = Rd`, `C_0 + sP = \mathrm{const} - \tfrac{R^2}{2}\sum c_i d_i^2 + sR\,D_dP`.
-Maximise over `R`: `R^* = s\,D_dP / \sum c_i d_i^2`, gain `s^2 (D_dP)^2 / (2\sum c_i d_i^2)`.
-Then maximise over `d`. `∎`
+we have
 
-**Relation to V.7.** For separable `P = \sum_i \gamma_i e_i` the maximising
-direction is the gradient itself and `\max_d (D_dP)^2/(2\sum c_i d_i^2) = \sum_i \gamma_i^2/(2c_i)`
-— V.7 exactly. By Cauchy–Schwarz the additive sum is always an **upper bound**,
-with equality iff `P` is separable. So V.7 is not wrong; it is the separable
-special case, and it over-predicts precisely when the axes couple.
+$$|4suw|\leq s$$
 
-**Verified** on the two coupled terms below (isotropic `c = 2`, so both reduce to
-`\Delta = s^2\max_d (D_dP)^2/4`):
+and
 
-| `P` | additive (V.7) | directional (V.9) | measured |
-|-----|----------------|-------------------|----------|
-| `sqrt((1-λ)^2 + σ^2)` (cone) | `5.0e-5` | `2.5e-5` | `2.5e-5` |
-| `\|σ − (1−λ)\|` (crease) | `5.0e-5` | `2.5e-5` | `2.5e-5` |
-| `σ` (separable) | `2.5e-5` | `2.5e-5` | `2.5e-5` |
+$$1-u^2,\;1-w^2\geq \frac34.$$
 
-The cone has directional derivative 1 in **every** inward direction, so its push
-is `1`, not the `\sqrt2` a slope-1-on-both-axes linear term would have. The
-additive law reconstructs it as that linear term and doubles the gap.
+Consequently,
 
-The continuous campaign later proposed the harder crease
-`P=|4(1-λ)-7σ|`. A corner-seeded coordinate ascent became trapped on the
-`λ` branch and reported coefficient `4²/4`; the theorem predicts the global
-`σ` branch, `7²/4`. An independent 1,441-direction polar search with radial
-maximization recovers `7²s²/4` and exponent `2`. This is retained as a numerical
-guard failure: non-smooth coupled objectives require a global directional
-measurement, even when their scaling law is exact.
+$$\begin{aligned}
+\det(-\nabla^2 f_s)
+&\geq\left(2+\frac{3s}{2}\right)^2-s^2\\
+&=4+6s+\frac{5s^2}{4}>0.
+\end{aligned}$$
 
-### How V.9 was found
+Thus $-\nabla^2 f_s$ is positive definite, so $f_s$ is strictly concave.
+$\blacksquare$
 
-The hand-written bank in V.7/V.8 was entirely separable — single-axis terms and
-products that vanish off-axis — so the additive law looked exact. Feeding
-`interaction_search --api` real model proposals introduced `cone_dist` and
-`diag_kink`, coupled terms no human seed contained. They screened as smooth
-breakers where `measured = predicted/2`, an anomaly the separable law could not
-explain. `directional_gap` and `is_coupled` resolve it, and the screen now labels
-such candidates `COUPLED` and scores them by V.9.
+> **Corollary 4.2.** The face objective has a unique global maximizer.
+
+> **Remark 4.3.** Strict concavity rules out multiple local optima. Therefore, an
+> apparent vertex/interior transition produced by a numerical grid must be
+> distinguished from the actual optimizer obtained analytically.
 
 ---
 
-## Theorem V.10 (unified exponent law, 0 < α < 2)
+## 5. Exact Maximizer
 
-V.8 was stated only for `0 < α ≤ 1` (unbounded first derivative). The same
-derivation holds for the whole open interval `0 < α < 2`, and the exponent
-`p = 2/(2-α)` sweeps its entire range:
+> **Theorem 5.1 (Exact maximizer).**
+> The unique maximizer is
+> $$u^{*}=w^{*}=t^{*}(s),$$
+> where $t^{*}(s)$ is the unique root in $[0,1/2]$ of
+> $$2s\,t^3-2(1+s)t+1=0.$$
+> At $s=0$,
+> $$t^{*}(0)=\frac12.$$
+> For every $s>0$,
+> $$0<t^{*}(s)<\frac12.$$
 
-| `α` range | regularity of `P = γ x^α` | exponent `p = 2/(2-α)` |
-|-----------|---------------------------|------------------------|
-| `0 < α < 1` | unbounded 1st derivative | `1 < p < 2` |
-| `α = 1` | linear kink (V.7) | `2` |
-| `1 < α < 2` | `C^1` but not `C^2` (unbounded 2nd derivative) | `2 < p < ∞` |
+**Proof.** The stationarity equations are
 
-As `α → 2` the exponent diverges: the perturbation becomes quadratic and folds
-into the curvature, leaving no leading-order gap. As `α → 0` it tends to 1: the
-perturbation becomes a step and the gap becomes linear in `s`.
+$$1-2u-2su(1-w^2)=0$$
 
-**Verified exactly** (ratio of the closed-form gap to `s^p`, constant across two
-decades of `s`, so the exponent is exact):
+and
 
-| `α` | `p` | gap `/ s^p` at `s=0.02` | at `s=0.002` |
-|-----|-----|-------------------------|--------------|
-| 0.50 | 1.333 | 0.47247 | 0.47247 |
-| 1.00 | 2.000 | 0.25000 | 0.25000 |
-| 1.25 | 2.667 | 0.17133 | 0.17133 |
-| 1.50 | 4.000 | 0.10547 | 0.10547 |
-| 1.75 | 8.000 | 0.04909 | 0.04909 |
+$$1-2w-2sw(1-u^2)=0.$$
 
-### How V.10 was found
+Subtracting the two equations gives
 
-The `--frontier` prompt asked the model to escape V.7–V.9. It proposed
-`sigma**1.5` — flagged "C¹ but not C²" — which the old screen mis-filed as an
-anomaly (smooth breaker the quadratic law missed). It is not an anomaly: it is
-the `1 < α < 2` half of the fractional law, which V.8 had simply never claimed.
-The screen now estimates the homogeneity `α` of every breaker
-(`estimate_homogeneity`) and files it by regime, so the fractional law is applied
-uniformly for all `α ≠ 1`.
+$$(u-w)\bigl[2+2s(1+uw)\bigr]=0.$$
 
----
+The bracket is strictly positive on the domain, so every stationary point
+satisfies
 
-## Caveat V.11 (amplitude ceiling; saturating ridges)
+$$u=w=t.$$
 
-Every result above is a *leading-order* statement, valid only while the
-maximiser stays in the region where the corner expansion of `P` holds. A trivial
-but sharp guard bounds when it does not:
+Substituting $u=w=t$ into either stationarity equation gives
 
-$$\Delta(s) \le s\bigl(\sup_H P-P(\theta_c)\bigr)
-\le 2s\sup_H|P|.$$
+$$1-2t-2st(1-t^2)=0,$$
 
-Under the normalization `P(theta_c)=0` with `P>=0`, this reduces to
-`Delta(s) <= s sup_H |P|`.
+or equivalently
 
-If a corner-derivative law predicts more than this, it is **invalid** — the
-perturbation saturates before the maximiser reaches the predicted point.
+$$2s\,t^3-2(1+s)t+1=0.$$
 
-The model's `atan(σ / ((1-λ) + 0.002))` is the witness: an angular ridge whose
-value depends on the *approach direction* to the corner (no gradient there). Its
-finite-difference slope is ~500, so the additive law predicts `Δ ≈ 6.25`, but
-`P` is bounded by `π/2`, so `Δ ≤ s·π/2 ≈ 0.0157`. Measured gap: `0.0143`. The gap
-is set by amplitude, not curvature, and scales like `s`, not `s²`. `amplitude_bound`
-computes the ceiling and the screen flags such candidates `SATURATING` rather
-than reporting the meaningless derivative prediction.
+Strict concavity guarantees that the stationary point is the unique global
+maximizer. $\blacksquare$
+
+In the original coordinates,
+
+$$\lambda^{*}=\frac12+t^{*}(s),
+\qquad
+\sigma^{*}=\frac12-t^{*}(s),
+\qquad
+b^{*}=2,
+\qquad
+k^{*}=3.$$
+
+Hence, for every $s>0$,
+
+$$\lambda^{*}<1,
+\qquad
+\sigma^{*}>0.$$
+
+The optimizer immediately leaves the vertex $(1,0,2,3)$.
 
 ---
 
-## Theorem V.12 (master exponent law; the base flatness order)
+## 6. The Threshold Is Zero
 
-Everything up to V.11 fixes the base `r` and varies the perturbation. But the
-whole degeneracy rests on one property of `r`: it is *quadratically* flat at the
-corner. Let the base vanish to order `β` along a slack axis (`r ~ -A x^β`) and the
-perturbation be homogeneous of degree `α < β`. Then
+> **Theorem 6.1 (Zero vertex-localization threshold).**
+> The vertex
+> $$\theta_c=(1,0,2,3)$$
+> is optimal at $s=0$, but it ceases to be locally optimal for every $s>0$.
+> Therefore,
+> $$\boxed{s^{*}=0}.$$
 
-$$\Delta(s) = \Theta\!\left(s^{\,\beta/(\beta-\alpha)}\right).$$
+**Proof.** At the face corner $(u,w)=(1/2,1/2)$,
 
-**Proof.** Maximise `-A x^β + sγ x^α`: `x* = (αγs/(Aβ))^{1/(β-α)}`, and both terms
-scale as `x*^β ∝ s^{β/(β-α)}`. `∎`
+$$\frac{\partial f_s}{\partial u}=1-2u-2su(1-w^2)=-\frac{3s}{4}.$$
 
-This subsumes the whole series: `β=2` is the quadratic base, giving `2/(2-α)`
-(V.7 at `α=1`, V.10 for general `α`). **`β` need not be even** — the assumption
-was never used. Verified against measured gap exponents across a range of bases
-the model proposed:
+The inward direction is decreasing $u$. Therefore the inward directional
+derivative is
 
-| base `r` | order `β` | pred `p = β/(β-1)` | measured |
-|----------|-----------|--------------------|----------|
-| `-(1-λ)^2 - σ^2` | 2 | 2.000 | 2.000 |
-| `-|1-λ|^2.5 - |σ|^2.5` | 2.5 | 1.667 | 1.667 |
-| `-|1-λ|^3 - |σ|^3` | 3 | 1.500 | 1.500 |
-| `-(1-λ)^4 - σ^4` | 4 | 1.333 | 1.333 |
-| `-(1-λ)^6 - σ^6` | 6 | 1.200 | 1.200 |
-| `-(1-λ)^8 - σ^8` | 8 | 1.143 | 1.143 |
+$$D_u^{\mathrm{in}}f_s=-\frac{\partial f_s}{\partial u}=\frac{3s}{4}.$$
 
-**A flatter base breaks localization harder.** As `β → ∞` the exponent → 1
-(gap linear in `s`); as `β → α⁺` it diverges. The quadratic base is the *mildest*
-degeneracy, not a typical one. Anisotropic bases (`-(1-λ)^2 - σ^6`) follow the
-law on whichever slack axis is flatter.
+Similarly,
 
----
+$$D_w^{\mathrm{in}}f_s=\frac{3s}{4}.$$
 
-## Theorem V.13 (base self-failure — a prior, distinct mode)
+Both inward derivatives are strictly positive whenever $s>0$. Therefore an inward
+move increases the objective, and the corner cannot be a local maximizer for any
+positive $s$. $\blacksquare$
 
-All of V.1–V.12 assume the corner is the base's maximiser and ask when a
-perturbation dislodges it. A base can fail *before* any perturbation: its
-maximiser may be interior or on a non-corner face at `s = 0`.
-
-The model's `r = -((1-λ)-0.25)^2 - (σ-0.35)^2` has its maximum at
-`(λ,σ) = (0.75, 0.35)`, strictly interior. Vertex search returns the wrong point
-for **every** `s ≥ 0`. This is not the `s* = 0` story — there is no threshold at
-all, because localization was never valid.
-
-The margin criterion V.6 cannot detect this: it evaluates the corner and reports
-its margin, but here the corner is not the maximiser. The correct guard is
-global: compare the base's grid maximum to its vertex maximum
-(`base_self_fails`). This is the one failure the cheap local criterion misses,
-and it must be checked first.
-
-### How V.12 and V.13 were found
-
-The `base_search` frontier prompt asked the model for base *shapes* rather than
-perturbations. It returned flatness orders 2 through 8 (including the odd order 3
-that killed the even-`β` assumption), anisotropic mixes, edge/face ties, and —
-crucially — `interior_max`, a base whose maximiser is not a corner at all. The
-master law fit every flat-corner case exactly; `interior_max` is what forced
-V.13.
+At $s=0$, the inward derivatives in the $\lambda$ and $\sigma$ directions vanish.
+By contrast, the $b$ and $k$ directions have strictly negative inward
+derivatives, so those coordinates remain pinned at their upper bounds.
 
 ---
 
-## Theorem V.14 (weighted unified law — corrected)
+## 7. Displacement and Objective Gap
 
-Let `x_i ≥ 0` be inward coordinates at a maximizing corner and suppose, locally,
+Define the displacement
 
-$$r(0)-r(x) \asymp \sum_i A_i x_i^{\beta_i},\qquad A_i>0,\ \beta_i>1.$$
+$$\delta(s)=\frac12-t^{*}(s).$$
 
-Use the base-adapted dilation `D_t x = (t^{1/β_i}x_i)_i`. If the leading
-positive perturbation is weighted-homogeneous,
-`P(D_t x)-P(0) = t^q(P(x)-P(0))+o(t^q)`, with `0<q<1`, then
+> **Theorem 7.1 (Displacement and gap).**
+> As $s\to0^{+}$,
+> $$\delta(s)=\frac38s+O(s^2).$$
+> Furthermore, if
+> $$\Delta(s)=C_s(\theta^{*})-\max_{\theta\in\mathrm{ext}(H)}C_s(\theta),$$
+> then
+> $$\Delta(s)=\frac{9}{32}s^2+O(s^3).$$
 
-$$\boxed{\Delta(s)=\Theta\!\left(s^{1/(1-q)}\right)}.$$
+**Proof.** Set
 
-For a monomial `P(x)=γ∏x_i^{α_i}`, its weighted degree is
+$$t=\frac12-d.$$
+
+Substituting into the stationarity equation gives
+
+$$-\frac{3s}{4}+\left(2+\frac{s}{2}\right)d+3sd^2-2sd^3=0.$$
+
+Since $d=O(s)$,
+
+$$d=\frac38s+O(s^2).$$
+
+Along the inward diagonal path
+
+$$u=w=\frac12-x,$$
+
+the exact objective difference from the corner is
+
+$$\begin{aligned}
+&f_s\left(\frac12-x,\frac12-x\right)-f_s\left(\frac12,\frac12\right)\\
+&\qquad=\frac{3s}{2}x-\left(2+\frac{s}{2}\right)x^2+sx^3-\frac{s}{2}x^4.
+\end{aligned}$$
+
+Maximizing this expression gives
+
+$$\Delta(s)=\frac{9}{32}s^2+O(s^3). \qquad \blacksquare$$
+
+The exact negative Hessian at the corner is
+
+$$A=-\nabla^2 f_s\left(\frac12,\frac12\right)=
+\begin{pmatrix}
+2+\frac32s & -s\\
+-s & 2+\frac32s
+\end{pmatrix}.$$
+
+Its eigenvalue in the inward diagonal direction $(1,1)$ is
+
+$$2+\frac12s.$$
+
+Using the inward gradient
+
+$$\gamma=\frac{3s}{4}(1,1),$$
+
+the corresponding quadratic approximation to the gap is
+
+$$\Delta_{\mathrm{quad}}(s)=\frac{9s^2}{8(4+s)}.$$
+
+This is an approximation and should not be confused with the exact gap.
+
+A useful rational approximation for the displacement is
+
+$$\delta_{\mathrm{Pad\acute{e}}}(s)=\frac{3s}{8+2s}.$$
+
+It matches the first-order expansion but is not exact for finite $s$.
+
+---
+
+## 8. Why Grid Searches Missed the Failure
+
+Let $x$ denote the inward distance from the corner along the diagonal. The exact
+crossing distance $x_c(s)$ is the positive root of
+
+$$\frac{3s}{2}-\left(2+\frac{s}{2}\right)x+sx^2-\frac{s}{2}x^3=0.$$
+
+An interior grid point beats the corner whenever
+
+$$\frac{1}{n-1}<x_c(s).$$
+
+For small $s$,
+
+$$x_c(s)=\frac34s+O(s^2),$$
+
+so the required resolution behaves as
+
+$$n\approx 1+\frac{4}{3s}.$$
+
+This is an asymptotic estimate, not an exact identity involving $2\delta(s)$.
+
+The numerical difficulty has two sources:
+
+1. the optimizer displacement is only $O(s)$;
+2. the objective-value gap is only $O(s^2)$.
+
+Moreover, a four-dimensional grid with $n$ points per axis requires
+
+$$n^4$$
+
+objective evaluations.
+
+For example, at $s=0.05$,
+
+$$\Delta(0.05)\approx 0.000694.$$
+
+A coarse grid can therefore report the corner as the apparent maximizer even
+though the exact maximizer is interior.
+
+A classification rule such as
+
+```
+localization_at_vertex = (gap < 0.05)
+```
+
+is a tolerance-based numerical flag, not a mathematical certificate.
+
+---
+
+## 9. A Corrected Local Robustness Criterion
+
+Let $x_i\geq0$ denote inward slack coordinates from a candidate vertex
+$\theta_c$. Suppose the base objective has the local expansion
+
+$$C_0(\theta_c+x)=C_0(\theta_c)-\sum_i a_i x_i-\frac12x^\top Qx+o(\|x\|^2),$$
+
+with $a_i\geq0$.
+
+Suppose also that the perturbation satisfies
+
+$$P(\theta_c+x)=P(\theta_c)+\sum_i p_i x_i+\cdots.$$
+
+The perturbed first-order coefficient in coordinate $i$ is
+
+$$-a_i+sp_i.$$
+
+If $p_i>0$, the first-order stability limit on that axis is
+
+$$s_i=\frac{a_i}{p_i}.$$
+
+If $a_i=0$ and $p_i>0$, then
+
+$$s_i=0.$$
+
+This criterion is local. Before applying it, one must verify that $\theta_c$ is
+actually a global maximizer of $C_0$.
+
+> **Remark 9.1.** A strict vertex maximizer need not have a positive first-order
+> margin. For example,
+> $$C_0(x)=-x^2,\qquad x\geq0,$$
+> has a strict maximum at $x=0$, although its inward derivative is zero.
+> Therefore, strict maximality and positive first-order robustness are distinct
+> properties.
+
+---
+
+## 10. Smooth Perturbations on a Quadratically Flat Face
+
+Suppose the base objective has local quadratic loss
+
+$$C_0(\theta_c+x)=C_0(\theta_c)-\frac12x^\top Qx+o(\|x\|^2),$$
+
+where $Q$ is positive definite.
+
+Let the perturbation have a positive inward linear term
+
+$$P(\theta_c+x)=P(\theta_c)+g^\top x+o(\|x\|).$$
+
+The leading-order optimization problem is
+
+$$\max_{x\geq0}\left\{s\,g^\top x-\frac12x^\top Qx\right\}.$$
+
+Ignoring active-cone constraints, the optimizer is
+
+$$x^{*}=sQ^{-1}g+O(s^2),$$
+
+and the gap is
+
+$$\Delta(s)=\frac12s^2g^\top Q^{-1}g+O(s^3).$$
+
+If $Q$ is diagonal and the perturbation is separable, this becomes
+
+$$\Delta(s)=s^2\sum_i\frac{\gamma_i^2}{2c_i}+O(s^3).$$
+
+For coupled perturbations or coupled base curvature, the full quadratic form must
+be retained.
+
+---
+
+## 11. Fractional Perturbations
+
+Let the base loss be quadratic,
+
+$$-Ax^2,$$
+
+and suppose the perturbation behaves locally as
+
+$$P(x)-P(0)\sim\gamma x^\alpha,\qquad 0<\alpha<2.$$
+
+The local objective is
+
+$$-Ax^2+s\gamma x^\alpha.$$
+
+Its optimizer satisfies
+
+$$x^{*}=\left(\frac{\alpha\gamma s}{2A}\right)^{1/(2-\alpha)},$$
+
+and the gap scales as
+
+$$\Delta(s)=\Theta\left(s^{2/(2-\alpha)}\right).$$
+
+The result applies only while the predicted optimizer remains in the region where
+the local power-law approximation is valid.
+
+---
+
+## 12. Coupled Perturbations and Directional Optimization
+
+For a coupled perturbation, coordinate-wise contributions can overestimate the
+true gap. Let $d$ be an inward direction and write
+
+$$x=Rd.$$
+
+If the base loss is quadratic and $P$ is positively homogeneous of degree one,
+then
+
+$$C_0(\theta_c+Rd)+sP(\theta_c+Rd)=C_0(\theta_c)-\frac{R^2}{2}d^\top Qd+sR\,D_dP+\cdots.$$
+
+Optimizing over $R$ gives
+
+$$\Delta(s)=s^2\max_{d\in\mathcal K}\frac{(D_dP)^2}{2d^\top Qd}+o(s^2),$$
+
+where $\mathcal K$ is the inward direction cone.
+
+This formulation allows for multiple maximizing directions. It does not require
+the leading-order optimizer to lie on a unique ray.
+
+For isotropic curvature $Q=cI$,
+
+$$\Delta(s)=\frac{s^2}{2c}\max_{\substack{\|d\|=1\\d\in\mathcal K}}(D_dP)^2+o(s^2).$$
+
+---
+
+## 13. Amplitude Ceiling and Saturation
+
+Local derivative laws have a finite validity range. If the perturbation is
+bounded, then
+
+$$\Delta(s)\leq s\left(\sup_H P-P(\theta_c)\right).$$
+
+If $P(\theta_c)=0$ and $P\geq0$, this simplifies to
+
+$$\Delta(s)\leq s\sup_H P.$$
+
+Any derivative-based prediction that exceeds this bound is invalid. The
+perturbation has saturated before the local asymptotic optimizer is reached.
+
+This issue is relevant for bounded ridge-like or angular interactions. A large
+finite-difference slope near a corner does not imply an arbitrarily large
+objective gain.
+
+---
+
+## 14. General Flatness Law
+
+Suppose the base loss behaves as
+
+$$C_0(\theta_c)-C_0(\theta_c+x)\sim A x^\beta,$$
+
+and the perturbation behaves as
+
+$$P(\theta_c+x)-P(\theta_c)\sim \gamma x^\alpha,$$
+
+with
+
+$$0<\alpha<\beta.$$
+
+Then
+
+$$\max_x\{-Ax^\beta+s\gamma x^\alpha\}$$
+
+has optimizer
+
+$$x^{*}=\Theta\left(s^{1/(\beta-\alpha)}\right)$$
+
+and gap
+
+$$\boxed{\Delta(s)=\Theta\left(s^{\beta/(\beta-\alpha)}\right).}$$
+
+The quadratic-base result is obtained by setting $\beta=2$:
+
+$$\Delta(s)=\Theta\left(s^{2/(2-\alpha)}\right).$$
+
+A flatter base produces a smaller scaling exponent and therefore a larger gap at
+small interaction strength.
+
+---
+
+## 15. Weighted Anisotropic Law
+
+Suppose different coordinates have different base flatness orders:
+
+$$C_0(\theta_c)-C_0(\theta_c+x)\asymp\sum_i A_i x_i^{\beta_i}.$$
+
+Use the base-adapted dilation
+
+$$D_t x=\left(t^{1/\beta_i}x_i\right)_i.$$
+
+Suppose the leading perturbation is weighted-homogeneous:
+
+$$P(D_t x)-P(0)=t^q(P(x)-P(0))+o(t^q),\qquad 0<q<1.$$
+
+Then
+
+$$\boxed{\Delta(s)=\Theta\left(s^{1/(1-q)}\right).}$$
+
+For a monomial
+
+$$P(x)=\gamma\prod_i x_i^{\alpha_i},$$
+
+the weighted degree is
 
 $$q=\sum_i\frac{\alpha_i}{\beta_i}.$$
 
-**Proof.** Under `x=D_t z`, the base drop has order `t`, while the perturbation
-gain has order `s t^q`. Maximizing `-A(z)t+sB(z)t^q` over a direction with
-`B(z)>0` gives `t* = Θ(s^{1/(1-q)})`; both terms at `t*` have that order. Uniform
-two-sided local bounds on `A` and a positive maximizing direction give matching
-upper and lower bounds. `∎`
-
-The earlier formula is the isotropic corollary: if every active `β_i=β` and the
-ordinary total degree is `α=Σα_i`, then `q=α/β` and
-`1/(1-q)=β/(β-α)`. Coupling changes only the coefficient **when it preserves the
-weighted degree**—in particular on isotropic bases. It can change the exponent
-on anisotropic bases.
-
-`combined_screen` estimates every axis order `β_i`, probes both coordinate and
-joint base-adapted rays, selects the smallest accessible weighted exponent, and
-checks it against a full local optimization. Verified regression cases include:
-
-| base orders | perturbation | weighted `q` | predicted `p` |
-|-------------|--------------|--------------|---------------|
-| 2 | 1 (linear) | 1/2 | 2.000 |
-| 2 | 0.5 (√) | 1/4 | 1.333 |
-| 4 | 1 | 1/4 | 1.333 |
-| 4 | 0.5 (√) | 1/8 | 1.143 |
-| 4 | 1 (cone, coupled) | 1/4 | 1.333 |
-| 6 | 1/3 (∛) | 1/18 | 1.059 |
-| 2·λ / 6·σ (aniso) | 0.5 on σ | 1/12 | 1.091 |
-| 2·λ / 6·σ | `√(x y)` | 1/3 | 3/2 |
-
-The last row is the adversarial correction. For
-`r=-x²-y⁶`, `P=2√(xy)+3x`, the old axis rule predicted `p=2`. Stationarity gives
-`x=Θ(s^{3/4})`, `y=Θ(s^{1/4})`, and hence `Δ=Θ(s^{3/2})`, exactly as the weighted
-law predicts. The API-generated candidate therefore falsified the old wording
-and strengthened V.14 rather than being discarded. Saturation (V.11) remains a
-validity ceiling, while V.13 remains the case where the base corner already
-fails at `s=0`.
-
-### How V.14 was found
-
-`experiments/run_combined_law.py` asks the model for `(base, perturbation)` pairs
-that vary both parameters at once — flat bases with non-smooth coupled
-perturbations, anisotropic mixes — and screens each against the single formula.
+Thus anisotropic base flatness can change the scaling exponent even when the
+ordinary degree of the perturbation remains unchanged.
 
 ---
 
-## What this changes upstream
+## 16. Base Self-Failure
 
-- `docs/FORMAL_THEOREMS.md` Theorem 1 stands, but its conclusion is non-generic:
-  under the default `r` it holds with zero margin.
-- `nonlinear_objective.demonstrate_nonlinear`'s "small coupling preserves vertex
-  localization" is false as stated. Small coupling makes the failure *small*, not
-  absent.
-- `NonlinearAnalysis.localization_at_vertex` is a resolution-and-tolerance flag,
-  not a mathematical certificate. `vertex_margin` is the certificate.
+All preceding perturbation results assume that the candidate corner is the global
+maximizer of the base objective $C_0$.
+
+That assumption can fail independently of perturbations. For example,
+
+$$r(\lambda,\sigma)=-\bigl((1-\lambda)-0.25\bigr)^2-(\sigma-0.35)^2$$
+
+has its maximum at
+
+$$(\lambda,\sigma)=(0.75,0.35),$$
+
+which is strictly interior.
+
+A vertex search therefore returns the wrong point for every $s\geq0$. This is not
+an $s^{*}=0$ perturbation phenomenon; it is a failure of the base model.
+
+The appropriate diagnostic is global:
+
+$$\texttt{base\_self\_fails}=\left[\max_H C_0>\max_{\theta\in\mathrm{ext}(H)}C_0\right].$$
+
+This test should be performed before any local margin analysis.
+
+---
+
+## 17. Implementation Implications
+
+The following changes should be reflected in the implementation and
+documentation.
+
+### 17.1 Formal theorem documentation
+
+The vertex theorem may remain valid under its stated assumptions, but its
+conclusion is not automatically robust. Under the default base objective, the
+$(\lambda,\sigma)$ directions have zero first-order margin.
+
+### 17.2 `demonstrate_nonlinear`
+
+The claim that "small coupling preserves vertex localization" should be replaced
+by:
+
+> Small coupling can produce a small displacement and a small objective gap, but
+> it does not preserve the exact vertex maximizer when the base vertex is
+> first-order degenerate.
+
+### 17.3 `localization_at_vertex`
+
+This should be documented as a resolution-and-tolerance flag rather than a
+mathematical certificate.
+
+The analysis should report:
+
+- the candidate vertex;
+- whether the base objective self-fails;
+- all inward first-order margins;
+- local curvature or flatness order;
+- predicted displacement scaling;
+- predicted objective-gap scaling;
+- numerical grid resolution;
+- the perturbation amplitude ceiling.
+
+### 17.4 Recommended regression tests
+
+The test suite should verify:
+
+1. the sign of the inward directional derivative;
+2. the negative off-diagonal signs in $-\nabla^2f_s$;
+3. interior displacement for every $s>0$;
+4. $\dfrac{\delta(s)}{s}\longrightarrow\dfrac38$;
+5. $\dfrac{\Delta(s)}{s^2}\longrightarrow\dfrac{9}{32}$;
+6. the distinction between the exact grid-crossing distance and $2\delta(s)$;
+7. base self-failure before perturbation analysis;
+8. coupled directional optimization;
+9. saturation against the amplitude bound.
+
+---
+
+## 18. Final Conclusions
+
+For the stated `face_bowl` objective,
+
+$$\boxed{s^{*}=0}.$$
+
+The vertex is the optimizer only at $s=0$. Every positive interaction strength
+moves the optimizer into the interior of the $(\lambda,\sigma)$ face.
+
+The small-$s$ behavior is
+
+$$\boxed{\delta(s)=\frac38s+O(s^2)}$$
+
+and
+
+$$\boxed{\Delta(s)=\frac{9}{32}s^2+O(s^3).}$$
+
+The central result is mathematically sound after correcting the derivative sign
+convention and the Hessian display. The report should also distinguish carefully
+among:
+
+- exact global results;
+- local asymptotic laws;
+- heuristic approximants;
+- numerical grid classifications.
+
+The principal methodological lesson is:
+
+> Vertex localization is trustworthy only after global base validation and local
+> robustness analysis. A zero inward first-order margin means that an arbitrarily
+> small positive perturbation can move the optimizer away from the vertex.

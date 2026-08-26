@@ -1,6 +1,6 @@
 # Discoveries (automated)
 
-Generated: 2026-08-25 01:48 UTC
+Generated: 2026-08-26 12:32 UTC
 
 **10 findings** from systematic search over obstruction, certification, localization, algorithms, and stability.
 

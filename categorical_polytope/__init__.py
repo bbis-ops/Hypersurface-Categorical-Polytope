@@ -27,6 +27,16 @@ from .learner_diagram import (
     TrajectoryStep,
     recommend_search_mode,
 )
+from .confusion_scorer import (
+    ConfusionScorer,
+    LEDGER,
+    Proposition,
+    Stance,
+    TurnScore,
+    detect_stance,
+    score_dialogue,
+    score_text,
+)
 from .presheaf_site import FiniteSite, default_two_object_site, sweep_site_exponentials
 from .formal_proofs import (
     FormalStatement,
@@ -128,8 +138,69 @@ from .newton_tropical import (
     tropical_exponent,
     tropical_gap_leading,
 )
+from .face_selection import (
+    BasePower,
+    EdgeCoordinateChart,
+    FaceAnalysis,
+    FaceSelectionProblem,
+    FaceStatus,
+    HypothesisStatus,
+    InitialForm,
+    LawHypotheses,
+    PerturbationMonomial,
+    PolynomialPerturbation,
+    PositivityWitness,
+    SelectionResult,
+    StationaryProfile,
+    WeightedPrincipalPart,
+    infer_weight_from_exponent,
+    tilted_simplex_problem,
+)
+from .face_selection_phase import (
+    AffineWeightedDegree,
+    FaceSelectionPhaseDiagram,
+    MechanismQualification,
+    ParametricFaceMechanism,
+    ParametricFaceSelectionProblem,
+    PhaseChamber,
+    PhaseEvaluation,
+    PhaseTransition,
+    PhaseWall,
+    weighted_degree_from_exponents,
+)
+from .ambient_face_compiler import (
+    AmbientFaceCompilation,
+    AmbientTermTransport,
+    AmbientTransport,
+    EdgeMonomialLineage,
+    compile_ambient_face_selection,
+    exact_chart_from_active_constraints,
+    transport_ambient_polynomial,
+)
+
+
+def analyze_face_selection(payload, *, backend=None):
+    """Lazy public entry point for the JSON-safe face-selection backend."""
+    from .adjudication.polyhedra.backend import analyze_face_selection as _analyze
+
+    return _analyze(payload, backend=backend)
+
+
+def handle_face_selection_json(document, *, backend=None):
+    """Lazy public entry point for one JSON request or batch."""
+    from .adjudication.polyhedra.backend import handle_json as _handle
+
+    return _handle(document, backend=backend)
 
 __all__ = [
+    "ConfusionScorer",
+    "LEDGER",
+    "Proposition",
+    "Stance",
+    "TurnScore",
+    "detect_stance",
+    "score_dialogue",
+    "score_text",
     "DecompositionStabilityReport",
     "DecompositionStrategy",
     "DesignRulebook",
@@ -241,4 +312,39 @@ __all__ = [
     "sharp_single_axis_gap",
     "tropical_exponent",
     "tropical_gap_leading",
+    "BasePower",
+    "EdgeCoordinateChart",
+    "FaceAnalysis",
+    "FaceSelectionProblem",
+    "FaceStatus",
+    "HypothesisStatus",
+    "InitialForm",
+    "LawHypotheses",
+    "PerturbationMonomial",
+    "PolynomialPerturbation",
+    "PositivityWitness",
+    "SelectionResult",
+    "StationaryProfile",
+    "WeightedPrincipalPart",
+    "infer_weight_from_exponent",
+    "tilted_simplex_problem",
+    "AffineWeightedDegree",
+    "FaceSelectionPhaseDiagram",
+    "MechanismQualification",
+    "ParametricFaceMechanism",
+    "ParametricFaceSelectionProblem",
+    "PhaseChamber",
+    "PhaseEvaluation",
+    "PhaseTransition",
+    "PhaseWall",
+    "weighted_degree_from_exponents",
+    "AmbientFaceCompilation",
+    "AmbientTermTransport",
+    "AmbientTransport",
+    "EdgeMonomialLineage",
+    "compile_ambient_face_selection",
+    "exact_chart_from_active_constraints",
+    "transport_ambient_polynomial",
+    "analyze_face_selection",
+    "handle_face_selection_json",
 ]

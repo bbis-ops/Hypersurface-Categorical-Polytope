@@ -45,14 +45,14 @@ def _counts() -> tuple[dict[str, Counter], list[dict[str, Any]]]:
     records = _read(CORPUS, {}).get("records", [])
     out = {law: Counter() for law in LAWS}
     for row in records:
-        if row.get("law") in out:
-            out[row["law"]][row.get("status", "unknown")] += 1
-            out[row["law"]]["corpus"] += 1
+        if row.get("rule_id") in out:
+            out[row["rule_id"]][row.get("status", "unknown")] += 1
+            out[row["rule_id"]]["corpus"] += 1
     return out, records
 
 
 def _choose_law(cycle: int, counts: dict[str, Counter], records: list[dict[str, Any]]) -> tuple[str, bool]:
-    survivor_laws = sorted({r["law"] for r in records if r.get("status") == "counterexample"})
+    survivor_laws = sorted({r["rule_id"] for r in records if r.get("status") == "counterexample"})
     if survivor_laws and cycle % 4 == 0:
         return survivor_laws[(cycle // 4) % len(survivor_laws)], True
     if cycle % 4 == 3:
@@ -74,7 +74,7 @@ def main() -> None:
     ap.add_argument("--api-retries", type=int, default=4)
     ap.add_argument("--model", default=None,
                     help="any OpenAI-compatible model id; default resolves from preset/env")
-    ap.add_argument("--preset", default=None, help="named endpoint preset (openai, openrouter, ox-alpha); --model/--base-url override it")
+    ap.add_argument("--preset", default=None, help="named endpoint preset (openai, openrouter, nemotron); --model/--base-url override it")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
     if (args.hours <= 0 or args.batch_size < 1 or args.max_tokens < 1 or args.cycle_timeout < 60

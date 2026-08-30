@@ -5,6 +5,13 @@ Module: `categorical_polytope/newton_tropical.py`.
 Tests: `tests/test_newton_tropical.py` (11 tests, each closed form checked against a
 direct orthant maximization).
 
+The parameterized continuation is **V.17**, the exact universality phase-fan
+law: [`FORMAL_FACE_SELECTION_PHASE_FAN.md`](FORMAL_FACE_SELECTION_PHASE_FAN.md).
+Its qualification-complete stratification is **V.18**:
+[`FORMAL_QUALIFIED_SELECTION_STRATIFICATION.md`](FORMAL_QUALIFIED_SELECTION_STRATIFICATION.md).
+The constructive mixed-sign positivity closure is **V.19**:
+[`FORMAL_BINOMIAL_POSITIVITY_WITNESS.md`](FORMAL_BINOMIAL_POSITIVITY_WITNESS.md).
+
 The V.1–V.14 series (`docs/FORMAL_VERTEX_THRESHOLD.md`) settled the **exponent** of
 the vertex-localization gap: at a degenerate corner with base drop
 `r(0)-r(x) ≍ Σ_i A_i x_i^{β_i}` and a weighted-homogeneous perturbation of weighted

@@ -33,6 +33,23 @@ class TutorTurn:
 
 ResponseFn = Callable[[str, LearnerDiagramState, str], str]
 
+# Layer-2 hook: score the learner's own utterance instead of counting turns.
+# Returns interaction_strength for this turn. See confusion_scorer.py.
+ConfusionFn = Callable[[str, LearnerTrajectoryLog], float]
+
+# The canonical adjunction-learning dialogue. Promoted to a module constant so
+# calibration and regression tests can reference the same reference trajectory.
+SCRIPTED_PROMPTS: tuple[str, ...] = (
+    "I'm fine with product and curry.",
+    "Coproduct is just disjoint union, right?",
+    "Where is the coexponential in Set?",
+    "Cross-naturality seems to mix my blocks.",
+    "Maybe the best picture is not at a corner?",
+    "I keep trying corners but they feel wrong.",
+    "Adjoint functors reverse arrows — still confused.",
+    "Should I search the interior of the face?",
+)
+
 
 def _default_respond(user_message: str, state: LearnerDiagramState, mode: str) -> str:
     """Template tutor (swap for LLM API)."""
@@ -78,6 +95,9 @@ class CategoryLearningTutor:
     respond: ResponseFn = field(default_factory=lambda: _default_respond)
     base_confusion: float = 0.05
     confusion_per_turn: float = 0.04
+    # None keeps the legacy turn-index ramp; supply a ConfusionFn (e.g.
+    # confusion_scorer.ConfusionScorer) to measure the learner instead.
+    score_confusion: ConfusionFn | None = None
 
     def process_turn(
         self,
@@ -88,11 +108,14 @@ class CategoryLearningTutor:
         confusion: float | None = None,
     ) -> TutorTurn:
         t = len(self.turns)
-        conf = (
-            confusion
-            if confusion is not None
-            else min(0.95, self.base_confusion + t * self.confusion_per_turn)
-        )
+        if confusion is not None:
+            conf = confusion
+        elif self.score_confusion is not None:
+            # Measure the learner's own utterance. `user_message` is in hand
+            # before the state is built, so the loop needs no reordering.
+            conf = min(0.95, max(0.0, self.score_confusion(user_message, self.log)))
+        else:
+            conf = min(0.95, self.base_confusion + t * self.confusion_per_turn)
         state = LearnerDiagramState(
             lam=lam if lam is not None else max(0.5, 1.0 - t * 0.05),
             sigma=sigma if sigma is not None else min(0.5, t * 0.06),
@@ -120,20 +143,16 @@ class CategoryLearningTutor:
         self.turns.append(turn)
         return turn
 
-    def run_scripted_dialogue(self) -> list[TutorTurn]:
+    def run_scripted_dialogue(
+        self,
+        prompts: tuple[str, ...] = SCRIPTED_PROMPTS,
+    ) -> list[TutorTurn]:
         """Canned adjunction-learning dialogue (human/LLM scale)."""
-        prompts = (
-            "I'm fine with product and curry.",
-            "Coproduct is just disjoint union, right?",
-            "Where is the coexponential in Set?",
-            "Cross-naturality seems to mix my blocks.",
-            "Maybe the best picture is not at a corner?",
-            "I keep trying corners but they feel wrong.",
-            "Adjoint functors reverse arrows — still confused.",
-            "Should I search the interior of the face?",
-        )
         self.turns.clear()
         self.log = LearnerTrajectoryLog(interaction="face_bowl")
+        reset = getattr(self.score_confusion, "reset", None)
+        if callable(reset):
+            reset()
         for msg in prompts:
             self.process_turn(msg)
         return self.turns

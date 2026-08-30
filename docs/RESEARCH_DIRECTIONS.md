@@ -130,16 +130,36 @@ Choose the endpoint with `--model` / `--base-url` (or `LOOP_API_MODEL` /
 `LOOP_API_BASE`), or with a named preset from `loop_closure.PRESETS` via
 `--preset` / `LOOP_API_PRESET`:
 
-| preset | endpoint | model | sends `reasoning` |
-|--------|----------|-------|-------------------|
-| `openai` | `api.openai.com` | `gpt-4o-mini` | no |
-| `openrouter` | `openrouter.ai` | `openai/gpt-4o-mini` | no |
-| `ox-alpha` | `openrouter.ai` | `stealth/ox-alpha` | yes |
+| preset | endpoint | model | sends `reasoning` | served |
+|--------|----------|-------|-------------------|--------|
+| `openai` | `api.openai.com` | `gpt-4o-mini` | no | paid |
+| `openrouter` | `openrouter.ai` | `openai/gpt-4o-mini` | no | paid |
+| `nemotron` | `openrouter.ai` | `nvidia/nemotron-3.5-lightning:free` | yes | free |
+| `nemotron-super` | `openrouter.ai` | `nvidia/nemotron-3-super-120b-a12b:free` | yes | free |
+| `ox-alpha` | `openrouter.ai` | `stealth/ox-alpha` | yes | delisted |
+
+`nemotron` is 1M context but only 3B active parameters, and it does not
+advertise `response_format`; it holds a long structured reply together less
+reliably, so prefer small batches. `nemotron-super` does advertise
+`response_format` and `structured_outputs` — the better choice when one request
+must return a large, well-formed JSON batch. Both accept a `reasoning` block,
+and OpenRouter drops request fields a model does not advertise rather than
+rejecting the call.
+
+The two default ids are *placeholders that cost money*: with only a key set and
+no model chosen, a check against them returns `402 Payment Required` on an
+account with no credit. That is a statement about the default id, not about the
+key. `--preset nemotron` is the zero-cost way to confirm a key works; free ids
+rotate and are rate-limited, so treat it as a convenience rather than a fixture.
 
 The `ox-alpha` preset reproduces the backend that generated the recorded
-V.7--V.14 corpus. It is a preset, not a default: an explicit `--model` /
-`--base-url` always wins, and `POLYTOPE_API_REASONING=0/1` forces the
-`reasoning` block off or on for any model.
+V.7--V.14 corpus. It was delisted from OpenRouter on 2026-08-26 and now
+resolves only to a 404; the entry is kept so the `stealth/ox-alpha@...`
+descriptor recorded in those artifacts stays interpretable.
+
+None of these is a default: an explicit `--model` / `--base-url` always wins,
+and `POLYTOPE_API_REASONING=0/1` forces the `reasoning` block off or on for any
+model.
 
 Enter the key with the helper (masked input, never echoed, never written into
 the repo), which then verifies it with one round-trip:

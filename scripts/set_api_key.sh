@@ -6,6 +6,11 @@
 #     source scripts/set_api_key.sh                  # OPENROUTER_API_KEY
 #     source scripts/set_api_key.sh OPENAI_API_KEY   # or another variable
 #
+# A second argument picks the model to verify against; without one the check
+# falls back to a generic default that is a paid model on most accounts:
+#
+#     source scripts/set_api_key.sh OPENROUTER_API_KEY nvidia/nemotron-3.5-lightning:free
+#
 # The key is never printed and never passed as an argument (which would put it
 # in your shell history). Verification is delegated to `--check` so this script
 # and the experiment agree on which endpoint and model are used.
@@ -18,7 +23,10 @@ fi
 
 _cp_setkey() {
     local name="${1:-OPENROUTER_API_KEY}"
+    local model="${2:-}"
     local repo key tail
+    local -a sel=()
+    [ -n "$model" ] && sel=(--model "$model")
 
     case "$name" in
         OPENROUTER_API_KEY | OPENAI_API_KEY | LOOP_API_KEY) ;;
@@ -58,14 +66,27 @@ _cp_setkey() {
 
     echo
     echo "Verifying (one round-trip)..."
-    if python "$repo/experiments/run_loop_closure.py" --check; then
+    if python "$repo/experiments/run_loop_closure.py" --check "${sel[@]}"; then
         echo
         echo "Ready. Run the experiment with:"
-        echo "  python experiments/run_loop_closure.py --api"
+        echo "  python experiments/run_loop_closure.py --api ${sel[*]}"
+        if [ -n "$model" ]; then
+            echo
+            echo "Pass the same model every run, or set it once for this shell:"
+            echo "  export LOOP_API_MODEL='$model'"
+        fi
     else
         echo
         echo "Key is set but the check failed - see the message above."
-        echo "Common causes: typo in the key, no quota, or the free window closed."
+        if [ -z "$model" ]; then
+            echo "No model was chosen, so the check used a generic default that is"
+            echo "billed on most accounts. The key may well be fine. Retry with a"
+            echo "model you can actually reach - your key is still exported, so:"
+            echo "  python experiments/run_loop_closure.py --check --preset nemotron"
+        else
+            echo "Common causes: a typo in the key, no quota for that model, or an"
+            echo "id that endpoint does not serve."
+        fi
         return 1
     fi
 }

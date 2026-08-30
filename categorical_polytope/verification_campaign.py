@@ -1,8 +1,26 @@
-"""Local adjudicators for an adversarial V.7--V.14 verification corpus."""
+"""
+Local adjudicators for an adversarial V.7--V.14 verification corpus.
+
+Adjudication runs in two stages that may not see each other:
+
+  scope   Does this candidate satisfy the theorem's hypotheses? Decided from
+          the candidate alone, before any attempt to check whether the law
+          holds. May answer `rejected`, `outside_scope`, or `inconclusive`.
+
+  verdict Given an admitted candidate, does the law hold? May answer
+          `verified`, `counterexample`, or `inconclusive` -- never
+          `outside_scope`.
+
+The separation is the point. A verifier that can retire a candidate as
+"outside scope" *after* seeing that the law failed on it can shrink its own
+denominator at will, and its pass rate stops meaning anything. Keeping the
+stages apart means a case the verifier cannot resolve is recorded as
+`inconclusive` -- an admission -- rather than as a hypothesis it never covered.
+"""
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from math import cos, isfinite, log, pi, sin
 from typing import Any
 
@@ -11,6 +29,13 @@ from .interaction_search import _local_max, compile_expression, screen_candidate
 from .nonlinear_objective import default_nonlinear_bounds, vertex_maximize
 from .base_search import CustomBase
 from .hypersurface_box import Theta
+
+#: Statuses a scope decision may assign.
+SCOPE_STATUSES = frozenset({"rejected", "outside_scope", "inconclusive"})
+
+#: Statuses a verdict may assign. `outside_scope` is deliberately absent: once a
+#: candidate is admitted, the only honest outcomes are held, failed, or unknown.
+VERDICT_STATUSES = frozenset({"verified", "counterexample", "inconclusive"})
 
 
 @dataclass(frozen=True)
@@ -28,9 +53,35 @@ class VerificationRecord:
         return asdict(self)
 
 
+@dataclass(frozen=True)
+class ScopeDecision:
+    """Whether a candidate satisfies a theorem's hypotheses, and the evidence."""
+
+    admitted: bool
+    status: str = ""
+    reason: str = ""
+    metrics: dict[str, Any] = field(default_factory=dict)
+    #: The screen shared with the verdict stage, so it is measured only once.
+    screen: Any = None
+
+    def __post_init__(self) -> None:
+        if not self.admitted and self.status not in SCOPE_STATUSES:
+            raise ValueError(f"scope may not assign status {self.status!r}")
+
+
 def _record(law: str, cand: Candidate, status: str, reason: str, metrics: dict[str, Any]) -> VerificationRecord:
     return VerificationRecord(law, cand.name, cand.expr, status=status, reason=reason,
                               metrics=metrics, note=cand.note)
+
+
+def _verdict_record(
+    law: str, cand: Candidate, outcome: tuple[str, str, dict[str, Any]]
+) -> VerificationRecord:
+    """Build a record from a verdict, enforcing that it stayed in its lane."""
+    status, reason, metrics = outcome
+    if status not in VERDICT_STATUSES:
+        raise ValueError(f"verdict may not assign status {status!r}")
+    return _record(law, cand, status, reason, metrics)
 
 
 def _remeasure_exponent(cand: Candidate, s_hi: float, s_lo: float) -> float:
@@ -156,8 +207,14 @@ def _adaptive_separable_exponent(
     return sum(readings) / len(readings), scales
 
 
-def verify_interaction(law: str, cand: Candidate) -> VerificationRecord:
-    """Adjudicate V.7--V.11 against the fixed quadratic base."""
+def scope_interaction(law: str, cand: Candidate) -> ScopeDecision:
+    """
+    Decide whether `cand` satisfies the hypotheses of V.7--V.11.
+
+    Every condition here is a property of the candidate and the fixed base. None
+    of them consults whether the law subsequently holds, so admission cannot be
+    withdrawn once the verdict is unwelcome.
+    """
     result = screen_candidate(cand, s=0.01)
     metrics = {
         "regime": result.regime if result.ok else "rejected",
@@ -171,23 +228,14 @@ def verify_interaction(law: str, cand: Candidate) -> VerificationRecord:
         "saturating": result.saturating,
     }
     if not result.ok:
-        return _record(law, cand, "rejected", result.reason, metrics)
+        return ScopeDecision(False, "rejected", result.reason, metrics, result)
     if not all(isfinite(float(x)) for x in (result.alpha, result.measured_gap, result.amp_bound)):
-        return _record(law, cand, "inconclusive", "non-finite local measurement", metrics)
+        return ScopeDecision(False, "inconclusive", "non-finite local measurement", metrics, result)
 
     if law == "V.7":
         if not result.breaks or result.regime != "quadratic":
-            return _record(law, cand, "outside_scope", "not a finite-slope separable breaker", metrics)
-        # Accept a well-resolved initial estimate. Only shrink s when that
-        # estimate disagrees; blindly shrinking tiny-slope cases pushes their
-        # O(s^2) gaps below optimizer resolution and creates false survivors.
-        holds = result.gap_exponent > 0 and abs(result.gap_exponent - 2.0) < 0.15
-        if not holds:
-            asymptotic = _remeasure_exponent(cand, 0.00125, 0.000625)
-            metrics["measured_exponent_asymptotic"] = asymptotic
-            holds = asymptotic > 0 and abs(asymptotic - 2.0) < 0.15
-        return _record(law, cand, "verified" if holds else "counterexample",
-                       "quadratic exponent matched" if holds else "in-scope exponent mismatch", metrics)
+            return ScopeDecision(False, "outside_scope", "not a finite-slope separable breaker", metrics, result)
+        return ScopeDecision(True, metrics=metrics, screen=result)
 
     if law in ("V.8", "V.10"):
         axis_alphas = _axis_homogeneities(cand)
@@ -205,11 +253,11 @@ def verify_interaction(law: str, cand: Candidate) -> VerificationRecord:
         resolved_scope = result.breaks and result.regime == "fractional"
         # High V.10 exponents can put the initial s=.01 gap below the generic
         # optimizer's resolution. Axis homogeneity still identifies the formal
-        # slice; the adaptive measurement below decides whether a gap resolves.
+        # slice; whether a gap resolves is a verdict question, not a scope one.
         if law == "V.10" and in_alpha and homogeneous_axes:
             resolved_scope = True
         if not resolved_scope or not in_alpha or not homogeneous_axes or not local_controls_global:
-            return _record(law, cand, "outside_scope", "measured homogeneity is outside this theorem slice", metrics)
+            return ScopeDecision(False, "outside_scope", "measured homogeneity is outside this theorem slice", metrics, result)
         if law == "V.10":
             # The generic screen routes anything heuristically marked coupled
             # through the degree-one V.9 branch and can therefore leave a stale
@@ -217,6 +265,42 @@ def verify_interaction(law: str, cand: Candidate) -> VerificationRecord:
             # directly from the locally measured homogeneous degree.
             metrics["screen_predicted_exponent"] = result.predicted_exponent
             metrics["predicted_exponent"] = 2.0 / (2.0 - theorem_alpha)
+        return ScopeDecision(True, metrics=metrics, screen=result)
+
+    if law == "V.9":
+        if not result.breaks or result.regime != "coupled":
+            return ScopeDecision(False, "outside_scope", "not a degree-one coupled breaker", metrics, result)
+        return ScopeDecision(True, metrics=metrics, screen=result)
+
+    if law == "V.11":
+        if not result.breaks:
+            return ScopeDecision(False, "outside_scope", "candidate did not dislodge the corner", metrics, result)
+        return ScopeDecision(True, metrics=metrics, screen=result)
+
+    raise ValueError(f"unsupported interaction law: {law}")
+
+
+def _verdict_interaction(
+    law: str, cand: Candidate, scope: ScopeDecision
+) -> tuple[str, str, dict[str, Any]]:
+    """Decide whether an admitted candidate satisfies V.7--V.11."""
+    result = scope.screen
+    metrics = dict(scope.metrics)
+
+    if law == "V.7":
+        # Accept a well-resolved initial estimate. Only shrink s when that
+        # estimate disagrees; blindly shrinking tiny-slope cases pushes their
+        # O(s^2) gaps below optimizer resolution and creates false survivors.
+        holds = result.gap_exponent > 0 and abs(result.gap_exponent - 2.0) < 0.15
+        if not holds:
+            asymptotic = _remeasure_exponent(cand, 0.00125, 0.000625)
+            metrics["measured_exponent_asymptotic"] = asymptotic
+            holds = asymptotic > 0 and abs(asymptotic - 2.0) < 0.15
+        return ("verified" if holds else "counterexample",
+                "quadratic exponent matched" if holds else "in-scope exponent mismatch", metrics)
+
+    if law in ("V.8", "V.10"):
+        axis_alphas = metrics["axis_alphas"]
         # Prefer the already-resolved local estimate. Enlarging V.10 strengths
         # to 0.08/0.04 lets nominally higher-order distractions alter curvature
         # and creates a finite-scale exponent that the asymptotic theorem never
@@ -236,31 +320,37 @@ def verify_interaction(law: str, cand: Candidate) -> VerificationRecord:
             measured, scales = _adaptive_separable_exponent(cand, tuple(axis_alphas))
             metrics["adaptive_measurement_scales"] = scales
         if measured <= 0.0:
-            return _record(law, cand, "outside_scope", "no resolved inward fractional gap", metrics)
+            # The candidate is inside the theorem slice -- scope already said so
+            # on evidence that did not include this measurement. Failing to
+            # resolve a gap here is the verifier's limit, not the theorem's
+            # boundary, so it is recorded as an admission rather than banked as
+            # a hypothesis this campaign never covered.
+            return ("inconclusive", "no resolved inward fractional gap", metrics)
         metrics["measured_exponent_campaign"] = measured
         holds = measured > 0 and abs(measured - predicted_exponent) <= tol
-        return _record(law, cand, "verified" if holds else "counterexample",
-                       "fractional exponent matched" if holds else "in-scope exponent mismatch", metrics)
+        return ("verified" if holds else "counterexample",
+                "fractional exponent matched" if holds else "in-scope exponent mismatch", metrics)
 
     if law == "V.9":
-        if not result.breaks or result.regime != "coupled":
-            return _record(law, cand, "outside_scope", "not a degree-one coupled breaker", metrics)
         small_s = 0.00125
         small_gap = _measure_degree_one_polar_gap(cand, small_s)
         high_gap = _measure_degree_one_polar_gap(cand, 0.0025)
         scaled_prediction = result.best_prediction * (small_s / 0.01) ** 2
-        ratio = small_gap / scaled_prediction if scaled_prediction > 0 else float("inf")
-        asymptotic = log(high_gap / small_gap) / log(2.0) if min(high_gap, small_gap) > 1e-14 else 0.0
         metrics["polar_measured_gap"] = small_gap
+        # Both readings underflow together on a genuinely flat ray. Calling that
+        # a directional-law mismatch would report the optimizer's floor as a
+        # counterexample, so it is an admission instead.
+        if min(high_gap, small_gap) <= 1e-14 or scaled_prediction <= 0:
+            return ("inconclusive", "polar gap below resolution", metrics)
+        ratio = small_gap / scaled_prediction
+        asymptotic = log(high_gap / small_gap) / log(2.0)
         metrics["measured_to_directional_ratio"] = ratio
         metrics["measured_exponent_asymptotic"] = asymptotic
         holds = abs(asymptotic - 2.0) < 0.15 and 0.70 <= ratio <= 1.30
-        return _record(law, cand, "verified" if holds else "counterexample",
-                       "directional exponent and coefficient matched" if holds else "directional law mismatch", metrics)
+        return ("verified" if holds else "counterexample",
+                "directional exponent and coefficient matched" if holds else "directional law mismatch", metrics)
 
     if law == "V.11":
-        if not result.breaks:
-            return _record(law, cand, "outside_scope", "candidate did not dislodge the corner", metrics)
         from .vertex_threshold import amplitude_bound
         perturbation = compile_expression(cand.expr)
         dense_bound = amplitude_bound(perturbation, default_nonlinear_bounds(), 0.01, steps=21)
@@ -268,10 +358,18 @@ def verify_interaction(law: str, cand: Candidate) -> VerificationRecord:
         # A failure remains a numerical lead requiring an analytic supremum
         # check; the 21-grid is independent and denser, but still not interval arithmetic.
         holds = result.measured_gap <= dense_bound * 1.02 + 1e-10
-        return _record(law, cand, "verified" if holds else "counterexample",
-                       "measured gap stayed below dense amplitude ceiling" if holds else "dense sampled amplitude ceiling exceeded", metrics)
+        return ("verified" if holds else "counterexample",
+                "measured gap stayed below dense amplitude ceiling" if holds else "dense sampled amplitude ceiling exceeded", metrics)
 
     raise ValueError(f"unsupported interaction law: {law}")
+
+
+def verify_interaction(law: str, cand: Candidate) -> VerificationRecord:
+    """Adjudicate V.7--V.11 against the fixed quadratic base."""
+    scope = scope_interaction(law, cand)
+    if not scope.admitted:
+        return _record(law, cand, scope.status, scope.reason, scope.metrics)
+    return _verdict_record(law, cand, _verdict_interaction(law, cand, scope))
 
 
 def _dense_base_gap(cand: Candidate, *, steps: int = 101) -> tuple[bool, float]:
@@ -289,7 +387,14 @@ def _dense_base_gap(cand: Candidate, *, steps: int = 101) -> tuple[bool, float]:
     return best > vertex_value + 1e-8, best - vertex_value
 
 
-def verify_base(law: str, cand: Candidate) -> VerificationRecord:
+def scope_base(law: str, cand: Candidate) -> ScopeDecision:
+    """
+    Decide whether a base objective satisfies V.12's or V.13's hypotheses.
+
+    For V.13 the hypothesis *is* the existence of an off-corner maximum, so the
+    independent dense witness is a scope question, decided before the finite
+    guard's performance is looked at.
+    """
     result = screen_base(cand)
     metrics = {
         "flatness_order": result.flatness_order,
@@ -300,35 +405,54 @@ def verify_base(law: str, cand: Candidate) -> VerificationRecord:
         "legacy_grid_missed": result.legacy_grid_missed,
     }
     if not result.ok:
-        return _record(law, cand, "rejected", result.reason, metrics)
+        return ScopeDecision(False, "rejected", result.reason, metrics, result)
     if law == "V.12":
         if result.base_self_fails or not result.breaks or result.predicted_exponent <= 0:
-            return _record(law, cand, "outside_scope", "base is not an in-scope flat corner", metrics)
-        return _record(law, cand, "verified" if result.law_holds else "counterexample",
-                       "master exponent matched" if result.law_holds else "in-scope exponent mismatch", metrics)
+            return ScopeDecision(False, "outside_scope", "base is not an in-scope flat corner", metrics, result)
+        return ScopeDecision(True, metrics=metrics, screen=result)
     if law == "V.13":
         try:
             dense_fails, dense_gap = _dense_base_gap(cand)
         except (TypeError, ValueError, OverflowError, ZeroDivisionError) as exc:
-            return _record(law, cand, "rejected", f"dense check failed: {exc}", metrics)
+            return ScopeDecision(False, "rejected", f"dense check failed: {exc}", metrics, result)
         metrics["dense_grid_self_failure"] = dense_fails
         metrics["dense_grid_vertex_gap"] = dense_gap
         if not dense_fails:
-            return _record(law, cand, "outside_scope", "independent dense grid found no off-vertex maximum", metrics)
+            return ScopeDecision(False, "outside_scope", "independent dense grid found no off-vertex maximum", metrics, result)
+        return ScopeDecision(True, metrics=metrics, screen=result)
+    raise ValueError(f"unsupported base law: {law}")
+
+
+def _verdict_base(
+    law: str, cand: Candidate, scope: ScopeDecision
+) -> tuple[str, str, dict[str, Any]]:
+    """Decide whether an admitted base objective satisfies V.12 or V.13."""
+    result = scope.screen
+    metrics = dict(scope.metrics)
+    if law == "V.12":
+        return ("verified" if result.law_holds else "counterexample",
+                "master exponent matched" if result.law_holds else "in-scope exponent mismatch", metrics)
+    if law == "V.13":
         caught = result.base_self_fails
         metrics["adversarial_guard_missed"] = not caught
         # The independent witness confirms V.13 either way. A miss refutes the
         # finite guard, not the theorem that off-corner base maxima exist.
-        return _record(
-            law, cand, "verified",
-            "adversarial guard caught independent off-vertex witness" if caught
-            else "V.13 witness confirmed; finite adversarial guard missed it",
-            metrics,
-        )
+        return ("verified",
+                "adversarial guard caught independent off-vertex witness" if caught
+                else "V.13 witness confirmed; finite adversarial guard missed it",
+                metrics)
     raise ValueError(f"unsupported base law: {law}")
 
 
-def verify_combined(base: Candidate, pert: Candidate) -> VerificationRecord:
+def verify_base(law: str, cand: Candidate) -> VerificationRecord:
+    scope = scope_base(law, cand)
+    if not scope.admitted:
+        return _record(law, cand, scope.status, scope.reason, scope.metrics)
+    return _verdict_record(law, cand, _verdict_base(law, cand, scope))
+
+
+def scope_combined(base: Candidate, pert: Candidate) -> ScopeDecision:
+    """Decide whether a (base, perturbation) pair satisfies V.14's hypotheses."""
     result = combined_screen(base, pert)
     metrics = {
         "beta": result.beta,
@@ -342,14 +466,36 @@ def verify_combined(base: Candidate, pert: Candidate) -> VerificationRecord:
         "base_self_fails": result.base_self_fails,
         "measurement_scales": list(result.measurement_scales),
     }
+    if not result.ok:
+        return ScopeDecision(False, "rejected", result.reason, metrics, result)
+    if result.base_self_fails or not result.breaks or result.predicted_exponent <= 0:
+        return ScopeDecision(False, "outside_scope",
+                             result.reason or "pair does not satisfy weighted coercive-corner hypotheses",
+                             metrics, result)
+    return ScopeDecision(True, metrics=metrics, screen=result)
+
+
+def verify_combined(base: Candidate, pert: Candidate) -> VerificationRecord:
+    scope = scope_combined(base, pert)
     name = base.name.removesuffix("_b")
     record = VerificationRecord("V.14", name, pert.expr, base_expr=base.expr,
-                                metrics=metrics, note=base.note or pert.note)
-    if not result.ok:
-        return VerificationRecord(**{**record.as_dict(), "status": "rejected", "reason": result.reason})
-    if result.base_self_fails or not result.breaks or result.predicted_exponent <= 0:
-        return VerificationRecord(**{**record.as_dict(), "status": "outside_scope",
-                                     "reason": result.reason or "pair does not satisfy weighted coercive-corner hypotheses"})
+                                metrics=scope.metrics, note=base.note or pert.note)
+    if not scope.admitted:
+        return VerificationRecord(**{**record.as_dict(), "status": scope.status,
+                                     "reason": scope.reason})
+    result = scope.screen
+    if result.measured_exponent <= 0.0:
+        # Admitted, but no gap resolved at any strength the screen tried. That
+        # is the verifier's limit, not a failure of the law - the same call
+        # V.8/V.10 make. Banking it as a counterexample would inflate the
+        # finding count with measurement noise.
+        return VerificationRecord(**{**record.as_dict(), "status": "inconclusive",
+                                     "reason": "no resolved weighted gap"})
     status = "verified" if result.law_holds else "counterexample"
-    reason = "weighted unified exponent matched" if result.law_holds else "in-scope weighted exponent mismatch"
+    if status not in VERDICT_STATUSES:  # pragma: no cover - guarded by construction
+        raise ValueError(f"verdict may not assign status {status!r}")
+    reason = ("weighted unified exponent matched" if result.law_holds
+              else f"in-scope weighted exponent mismatch "
+                   f"(|{result.measured_exponent:.3f} - {result.predicted_exponent:.3f}| "
+                   f">= {result.tolerance:.3f})")
     return VerificationRecord(**{**record.as_dict(), "status": status, "reason": reason})

@@ -77,9 +77,19 @@ def main() -> None:
     if len(sys.argv) > 1 and sys.argv[1] == "loop":
         from .loop_closure import run_loop_closure
 
-        s = run_loop_closure(use_api="--api" in sys.argv)
+        s = run_loop_closure(
+            use_api="--api" in sys.argv,
+            measured_confusion="--measured" in sys.argv,
+        )
         print(s["narrative"])
         print(f"Closure turn {s['closure_turn']}: {s.get('closure_quote')}")
+        div = s.get("self_report_divergence")
+        if div:
+            print(
+                f"Coupling measured from prose; self-report off by "
+                f"{div['mean_abs_error']:.3f} on average "
+                f"(worst turn {div['worst_turn']}, {div['max_abs_error']:.3f})."
+            )
         return
 
     _section("0. Deliverables (firsts)")

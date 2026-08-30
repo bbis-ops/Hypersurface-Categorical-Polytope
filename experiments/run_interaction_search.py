@@ -31,7 +31,7 @@ def main() -> None:
     ap.add_argument("--s", type=float, default=0.01, help="interaction strength")
     ap.add_argument("--model", default=None)
     ap.add_argument("--base-url", default=None)
-    ap.add_argument("--preset", default=None, help="named endpoint preset (openai, openrouter, ox-alpha); --model/--base-url override it")
+    ap.add_argument("--preset", default=None, help="named endpoint preset (openai, openrouter, nemotron); --model/--base-url override it")
     args = ap.parse_args()
 
     from categorical_polytope.interaction_search import (

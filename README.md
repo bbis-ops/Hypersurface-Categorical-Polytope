@@ -21,6 +21,10 @@ Not tied to Aegis-Ops, www.echovalidum.com, or any other repository.
 
 **Vertex-localization threshold (V.1–V.14):** [`docs/FORMAL_VERTEX_THRESHOLD.md`](docs/FORMAL_VERTEX_THRESHOLD.md) — the interaction-strength threshold for vertex localization is exactly zero; exact displacement/gap laws; the weighted anisotropic master law `Δ ~ s^{1/(1-q)}`, where `q=Σαᵢ/βᵢ` (reducing to `β/(β-α)` isotropically); the directional law for coupled perturbations; the amplitude ceiling for saturating ridges; and base self-failure (interior/off-corner maxima). Modules: [`vertex_threshold.py`](categorical_polytope/vertex_threshold.py), [`interaction_search.py`](categorical_polytope/interaction_search.py), [`base_search.py`](categorical_polytope/base_search.py). Model proposals (`--api`) are only candidate generators; every result is verified locally with stdlib math.
 
+**Exact ambient-to-face compiler (V.20):** [`docs/FORMAL_AMBIENT_FACE_TRANSPORT.md`](docs/FORMAL_AMBIENT_FACE_TRANSPORT.md) — reconstructs the feasible edge chart exactly from active constraints, transports ambient base and perturbation polynomials with rational arithmetic, retains top-level term lineage and cancellation, reports geometric suppression on every face, selects the qualified weighted degree, and converts it to the response exponent. It resolves the simplex and sheared ambient-axis counterexamples as one structural family: the ambient control predicts `2`, while feasible-chart transport and measurement give `4/3`. Backend: [`ambient_face_compiler.py`](categorical_polytope/ambient_face_compiler.py) and [`backend.py`](categorical_polytope/adjudication/polyhedra/backend.py).
+
+**Finite exponent-law discovery engine (V.21):** [`docs/FORMAL_EXPONENT_DISCOVERY_ENGINE.md`](docs/FORMAL_EXPONENT_DISCOVERY_ENGINE.md) — screens explicit or generated perturbation families through the exact compiler, partitions them into universality and mechanism classes, emits registry-relative exponent-law candidates, and elevates cancellation, critical boundaries, observed-exponent mismatches, and unresolved mechanisms for diagnosis. Reproducible request: [`experiments/face_selection_discovery_v21_request.json`](experiments/face_selection_discovery_v21_request.json).
+
 ## Four deliverables ("firsts")
 
 | # | Artifact | Location |
@@ -59,10 +63,17 @@ do not depend on which model produced them.
 Any OpenAI-compatible endpoint works. Set one of `LOOP_API_KEY`,
 `OPENROUTER_API_KEY`, or `OPENAI_API_KEY` (see `scripts/set_api_key.ps1` /
 `.sh`), then pick a model with `--model` / `--base-url`, or a named preset
-with `--preset` / `LOOP_API_PRESET` (`openai`, `openrouter`, `ox-alpha`).
-The `ox-alpha` preset reproduces the backend that generated the recorded
-V.7-V.14 corpus; it is a preset, not a default. Presets are listed in
-`loop_closure.PRESETS` and documented in
+with `--preset` / `LOOP_API_PRESET` (`openai`, `openrouter`, `nemotron`, `nemotron-super`).
+
+A key alone is not enough: with no model chosen the default id is a paid one,
+so verification fails with `402 Payment Required` even when the key is good.
+Name a model you can reach —
+
+```bash
+python experiments/run_loop_closure.py --check --preset nemotron
+```
+
+Presets are listed in `loop_closure.PRESETS` and documented in
 [`docs/RESEARCH_DIRECTIONS.md`](docs/RESEARCH_DIRECTIONS.md).
 
 ## Run

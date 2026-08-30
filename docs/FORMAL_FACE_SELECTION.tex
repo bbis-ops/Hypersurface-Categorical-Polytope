@@ -1,0 +1,775 @@
+\documentclass[11pt]{article}
+
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  urlcolor=blue,
+  citecolor=blue
+}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{hypothesis}{Hypothesis}
+\setcounter{hypothesis}{-1}
+\newtheorem{definition}{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+\DeclareMathOperator{\cone}{cone}
+\DeclareMathOperator{\relint}{relint}
+\DeclareMathOperator{\supp}{supp}
+\DeclareMathOperator*{\wdeg}{w\text{-}deg}
+\newcommand{\inw}{\operatorname{in}_w}
+\newcommand{\R}{\mathbb{R}}
+
+\title{Face-Selection Law at a Simple Polyhedral Vertex}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+Theorem~V.16 in \texttt{FORMAL\_NEWTON\_TROPICAL.md} selects
+$q^\star=\min_j q_j$ over the monomials of the perturbation on the positive
+orthant. Section~15 of \texttt{FORMAL\_VERTEX\_THRESHOLD.md} gives the
+weighted degree of a single monomial. This note transports both results to a
+simple vertex of a general polyhedron, which is what domain three adjudicates.
+
+The transport is a change of coordinates, not a new theorem. What is new is
+that the hypotheses it needs are stated explicitly---including several the
+first draft left implicit---and that one of them is measured per corpus row
+rather than assumed.
+
+\section{Standing assumptions}
+
+$P\subset\R^n$ is a bounded full-dimensional polyhedron; $F$ and $G$ are
+continuous on $P$ and real analytic near the vertex under study. Boundedness
+is not cosmetic: it is what makes Lemma~\ref{lem:isolation} available, and the
+domain's proposal prompt already rejects unbounded systems.
+
+\section{Setup}
+
+Let $v$ be a \emph{simple} vertex with inward edge generators
+$u_1,\dots,u_n$, and set
+\[
+  \Phi(c)=v+\sum_{i=1}^{n}c_iu_i,\qquad c\in\R_{\ge0}^n .
+\]
+Simplicity makes the $u_i$ linearly independent, so $\Phi$ is a linear
+isomorphism from the nonnegative orthant onto the tangent cone $T_vP$; near
+$v$ it is a bijection onto a neighbourhood of $v$ in $P$. Put
+\[
+  D(c)=F(v)-F\bigl(\Phi(c)\bigr),
+  \qquad
+  R(c)=G\bigl(\Phi(c)\bigr)-G(v),
+\]
+and study
+\[
+  M(s)=\sup_{x\in P}\bigl(F(x)+sG(x)\bigr),\qquad s\to0^+ .
+\]
+
+\section{Global isolation}
+
+The first draft asserted that $v$ is ``the relevant unperturbed maximiser''
+and then worked locally. That is an assumption and needs to be one, because a
+perturbation can move the global optimum to a different vertex entirely.
+
+\begin{hypothesis}[isolation]\label{hyp:iso}
+$v$ is the unique maximiser of $F$ on $P$.
+\end{hypothesis}
+
+\begin{lemma}\label{lem:isolation}
+Under Hypothesis~\ref{hyp:iso}, for every neighbourhood $U$ of $v$ there is
+$s_U>0$ such that for all $0<s<s_U$ the supremum defining $M(s)$ is attained
+in $U$.
+\end{lemma}
+
+\begin{proof}
+$P\setminus U$ is compact and $F$ is continuous with a unique maximum at $v$,
+so
+\[
+  \eta:=F(v)-\max_{P\setminus U}F>0 .
+\]
+Let $K=2\sup_P|G|$, finite by compactness. For $x\in P\setminus U$,
+\[
+  F(x)+sG(x)\;\le\;F(v)-\eta+\tfrac{sK}{2}\;<\;F(v)+sG(v)
+\]
+as soon as $sK<\eta$. The value at $v$ already exceeds everything outside
+$U$, so the supremum is attained in $U$; take $s_U=\eta/K$.
+\end{proof}
+
+Everything below is therefore about the local problem in edge coordinates, and
+Lemma~\ref{lem:isolation} is what licenses that reduction. Without
+Hypothesis~\ref{hyp:iso}---at a tie between two vertices, say---the conclusion
+can fail outright, which is part of what the domain's
+\texttt{linear\_max\_at\_vertex} rule exists to exercise.
+
+\section{Weights and initial forms}
+
+Fix the weight vector $w=(1/\beta_1,\dots,1/\beta_n)$, the $\beta_i$ pinned by
+Hypothesis~\ref{hyp:base} below. For a monomial $c^{\alpha}$,
+\[
+  \wdeg\bigl(c^{\alpha}\bigr)=\langle w,\alpha\rangle
+  =\sum_{i=1}^{n}\frac{\alpha_i}{\beta_i}.
+\]
+
+\begin{definition}[initial form]
+For $H=\sum_j\gamma_jc^{\alpha_j}\not\equiv0$, the \emph{initial form}
+$\inw(H)$ is the sum of those terms of least $w$-degree, and $\wdeg(H)$ is
+that least degree.
+\end{definition}
+
+The anisotropic dilation
+\[
+  \delta_\tau(c)=\bigl(\tau^{1/\beta_1}c_1,\dots,\tau^{1/\beta_n}c_n\bigr)
+\]
+sends $c^{\alpha}$ to $\tau^{\langle w,\alpha\rangle}c^{\alpha}$, so $\inw(H)$
+is exactly what survives in $\tau^{-\wdeg(H)}H(\delta_\tau c)$ as
+$\tau\to0^+$. Both $D_0$ and $W_S$ below are initial forms in this sense,
+not descriptions of one.
+
+\section{Hypotheses, with uniform remainders}
+
+\begin{hypothesis}[positivity]\label{hyp:pos}
+$D(c)\ge0$ near $c=0$, with equality only at $c=0$.
+\end{hypothesis}
+
+\begin{hypothesis}[weighted principal part, uniform]\label{hyp:base}
+There are $A_i>0$ and $\beta_i>1$ such that, with
+$D_0(c)=\sum_iA_ic_i^{\beta_i}=\inw(D)$,
+\[
+  D(\delta_\tau z)=\tau\bigl(D_0(z)+e_D(\tau,z)\bigr),
+  \qquad
+  \sup_{z\in K}\lvert e_D(\tau,z)\rvert\longrightarrow0
+  \quad(\tau\to0^+)
+\]
+for every compact $K$ in the orthant.
+\end{hypothesis}
+
+\begin{hypothesis}[polynomial perturbation, uniform facewise]\label{hyp:pert}
+$R(c)=\sum_j\gamma_jc^{\alpha_j}$ is a finite sum, and for every face $S$ on
+which $R$ does not vanish identically,
+\[
+  R|_{C_S}(\delta_\tau z)=\tau^{q_S}\bigl(W_S(z)+e_R(\tau,z)\bigr),
+  \qquad
+  \sup_{z\in K}\lvert e_R(\tau,z)\rvert\longrightarrow0
+\]
+for every compact $K\subset C_S$, with $q_S$ and $W_S$ as in
+Section~\ref{sec:faces}.
+\end{hypothesis}
+
+Uniformity is the point. The first draft wrote $o(\tau)$ pointwise in $z$ and
+then took a supremum over $z$, which does not follow: pointwise remainders
+permit the error to blow up along a sequence of $z$ as $\tau\to0$. With $R$ a
+finite polynomial and $D$ analytic the uniform version holds automatically on
+compacta, so nothing is lost---but it must be said, because the balance in
+Section~\ref{sec:balance} exchanges a limit with a supremum.
+
+\begin{remark}
+Hypothesis~\ref{hyp:base} is the one the transport smuggles in, and the only
+one not implied by the setting: an arbitrary $F$ written in edge coordinates
+may carry cross terms of lower weight. The quantity
+\texttt{base\_homogeneity} in the corpus measures the exponent of
+$D(\delta_\tau z)$; the value $1$ means Hypothesis~\ref{hyp:base} holds for
+that row.
+\end{remark}
+
+\section{Faces, and admissibility defined from the data alone}
+\label{sec:faces}
+
+For nonempty $S\subseteq\{1,\dots,n\}$ let
+\[
+  C_S=\{c\ge0:\ c_i=0\ \text{for}\ i\notin S\},
+\]
+which $\Phi$ carries to $v+\cone\{u_i:i\in S\}$, the corresponding face of the
+tangent cone. Monomial $j$ has support $S_j=\{i:\alpha_{ij}>0\}$, and
+$c^{\alpha_j}$ is nonzero on $\relint(C_S)$ exactly when $S_j\subseteq S$.
+Monomial support and tangent-cone face are the same data in edge coordinates.
+
+Every $c\ge0$ lies in $\relint(C_S)$ for exactly one $S$, namely $\supp(c)$,
+so the faces partition the cone and
+\begin{equation}\label{eq:partition}
+  \sup_{c\ge0}\;=\;\max_{S}\ \Bigl(\ \sup_{\relint(C_S)}\ \Bigr).
+\end{equation}
+
+\begin{definition}[from the data $(F,G,T_vP)$ alone]\label{def:adm}
+For each face $S$:
+\begin{itemize}[nosep]
+  \item $S$ is \textbf{active} if $R|_{C_S}\not\equiv0$, i.e.\ some
+        $S_j\subseteq S$. For active $S$ put $q_S=\wdeg(R|_{C_S})$ and
+        $W_S=\inw(R|_{C_S})$; equivalently
+        $q_S=\min\{q_j:\ S_j\subseteq S,\ \gamma_j\ne0\}$ with
+        $q_j=\langle w,\alpha_j\rangle$.
+  \item $S$ is \textbf{positive} if $W_S(z)>0$ for some $z\in\relint(C_S)$.
+  \item $S$ is \textbf{subcritical} if $q_S<1$.
+\end{itemize}
+$S$ is \textbf{admissible} when it is active, positive and subcritical.
+\end{definition}
+
+None of the three properties refers to $M(s)$, to $\gamma$, or to any
+conclusion of this note; all are computable from the exponents, the
+coefficients and the cone. That is what makes Section~\ref{sec:selection}
+non-circular. The first draft folded ``the relevant branch has positive
+effective perturbation and $q^\star<1$'' into a hypothesis and then used
+admissibility in the conclusion, which is close to assuming what is to be
+proved.
+
+\begin{hypothesis}[no leading cancellation]\label{hyp:nocancel}
+For each admissible $S$, $W_S$ does not vanish identically on $\relint(C_S)$.
+\end{hypothesis}
+
+With $W_S$ a nonzero polynomial this is automatic; it is stated because the
+initial form of a \emph{sum} over a face can cancel even when no individual
+monomial does.
+
+\section{Inactive and non-positive faces contribute nothing}
+
+The first draft excluded such faces by fiat. Under \eqref{eq:partition} they
+must be shown harmless, because the supremum ranges over all of them.
+
+\begin{lemma}\label{lem:inadmissible}
+Let $S$ be a face that is not admissible. Then $S$ yields no positive
+improvement for all small $s$, and in particular never determines the leading
+order.
+\end{lemma}
+
+\begin{proof}
+Three cases.
+
+\emph{Inactive.} $R|_{C_S}=0$, so the objective on $C_S$ is $-D(c)\le0$ by
+Hypothesis~\ref{hyp:pos}, with supremum $0$ approached only as $c\to0$. It
+contributes nothing positive at all. This is the tilted simplex's vertical
+edge: feasible, but perturbatively silent.
+
+\emph{Active, not positive.} $W_S\le0$ throughout $\relint(C_S)$. Writing
+$c=\delta_\tau z$ with $z$ on a compact cross-section,
+Hypothesis~\ref{hyp:pert} gives
+$R|_{C_S}(\delta_\tau z)=\tau^{q_S}(W_S(z)+e_R)\le0$ for small $\tau$ by
+uniformity, whence the objective is $\le-\tau(D_0(z)+e_D)\le0$.
+
+\emph{Active, positive, not subcritical.} $q_S\ge1$. The leading balance of
+Section~\ref{sec:balance} is $-\tau A+s\tau^{q_S}B$ with $A,B>0$. For
+$q_S>1$, $\tau^{q_S}=o(\tau)$ and the expression is negative for all small
+$\tau>0$ once $s$ is small. For $q_S=1$ it equals $\tau(sB-A)$, negative once
+$s<A/B$. Either way the face yields no positive improvement at small $s$.
+\end{proof}
+
+Lemma~\ref{lem:inadmissible} turns \eqref{eq:partition} into a maximum over
+admissible faces only. It is the step that makes ``inadmissible'' mean
+\emph{contributes nothing} rather than \emph{excluded by hand}.
+
+\section{The facewise balance}\label{sec:balance}
+
+Fix an admissible $S$ and a compact cross-section $Z$ of $\relint(C_S)$---for
+instance $\{z\in C_S:D_0(z)=1\}$, compact by Hypothesis~\ref{hyp:pos}. Write
+$c=\delta_\tau z$. By Hypotheses~\ref{hyp:base} and~\ref{hyp:pert}, uniformly
+for $z\in Z$,
+\[
+  J_s(\tau,z)=-D(\delta_\tau z)+sR(\delta_\tau z)
+  =-\tau\bigl(D_0(z)+e_D\bigr)+s\tau^{q_S}\bigl(W_S(z)+e_R\bigr).
+\]
+With $A=D_0(z)>0$, $B=W_S(z)>0$ and $k=q_S\in(0,1)$, the leading expression
+$-\tau A+s\tau^{k}B$ is stationary at
+\[
+  \tau_\ast=\Bigl(\frac{skB}{A}\Bigr)^{\!1/(1-k)},
+\]
+and substituting back gives
+\[
+  J=A\,\tau_\ast\,\frac{1-k}{k}\;>\;0 .
+\]
+Since $\tau_\ast=\Theta\bigl(s^{1/(1-k)}\bigr)$, so is $J$. Uniformity of
+$e_D$ and $e_R$ on $Z$ is what lets the supremum over $z$ pass inside the
+limit, giving matching upper and lower constants and hence
+\[
+  \sup_{c\in\relint(C_S)}J_s=\Theta\bigl(s^{1/(1-q_S)}\bigr),
+  \qquad
+  \gamma_S=\frac{1}{1-q_S}.
+\]
+
+\begin{remark}[checked against measurement]
+For the tilted simplex face $c_2=0$ ($D_0=z^4$, $R=z$, $k=1/4$) the
+coefficient is $\tfrac34(\tfrac14)^{1/3}=0.472470$, and the adjudicator
+measures $0.472470\,s^{4/3}$ to six decimals at
+$s=10^{-2},\,2.5\times10^{-3},\,6.25\times10^{-4}$.
+\end{remark}
+
+\section{Selection, qualified}\label{sec:selection}
+
+\begin{theorem}\label{thm:selection}
+Assume Hypotheses~\ref{hyp:iso}--\ref{hyp:nocancel} and that at least one face
+is admissible. Put $q^\star=\min\{q_S:\ S\ \text{admissible}\}$. Then
+\[
+  M(s)-F(v)-sG(v)=\Theta\bigl(s^{1/(1-q^\star)}\bigr),
+  \qquad
+  \gamma=\frac{1}{1-q^\star}.
+\]
+\end{theorem}
+
+\begin{proof}
+Lemma~\ref{lem:isolation} localises the supremum to a neighbourhood of $v$,
+where $\Phi$ is a bijection onto the cone. By \eqref{eq:partition} and
+Lemma~\ref{lem:inadmissible} the supremum is the maximum over admissible faces
+of $\Theta(s^{1/(1-q_S)})$ from Section~\ref{sec:balance}. Since $1/(1-q)$ is
+increasing on $(0,1)$ and $s<1$, the largest such term is the one with the
+smallest exponent, i.e.\ the smallest $q_S$.
+\end{proof}
+
+\begin{proposition}[relation to V.16's monomial minimum]\label{prop:v16}
+$q^\star\ge\min_j q_j$, with equality precisely when some face attaining
+$\min_j q_j$ is admissible.
+\end{proposition}
+
+\begin{proof}
+$q_S$ is a minimum over the monomials supported in $S$, so the minimum of
+$q_S$ over \emph{all} nonempty faces is attained at the full face
+$S=\{1,\dots,n\}$ and equals $\min_j q_j$. Restricting the minimum to
+admissible faces can only raise it, which gives the inequality; equality holds
+exactly when the restricted minimum still reaches $\min_j q_j$, i.e.\ when
+some face attaining it is admissible.
+\end{proof}
+
+V.16's statement is therefore recovered under a sufficient condition---for
+example all $\gamma_j>0$, whence every active face is positive and no initial
+form cancels, together with $\min_j q_j<1$---and \emph{not} in general.
+
+\begin{remark}
+The qualification is not pedantic. \texttt{3d\_shear\_orders\_2\_4\_6} in the
+corpus has an inadmissible face carrying $q=1.3804$ alongside admissible ones
+at $q=0.5$. There the inadmissible face is the larger value, so nothing is
+lost; but that ordering is not guaranteed, and an implementation taking
+$\min_jq_j$ blindly would in general select a branch that contributes nothing.
+The adjudicator computes the face minimum, which is the quantity
+Theorem~\ref{thm:selection} is about.
+\end{remark}
+
+\section{Worked case: the tilted simplex}
+
+Let $P=\{x_0\ge0,\ x_1\ge0,\ x_0+x_1\le1\}$ and $v=(0,1)$. The active
+constraints at $v$ are $x_0\ge0$ and $x_0+x_1\le1$, so
+\[
+  T_vP=\{d\in\R^2:\ d_0\ge0,\ d_0+d_1\le0\},
+\]
+with extreme rays $u_1=(1,-1)$ and $u_2=(0,-1)$, and
+$x=(c_1,\,1-c_1-c_2)$. For $F=-\bigl((x_0+x_1-1)^2+x_0^4\bigr)$ we have
+$x_0+x_1-1=-c_2$ and $x_0=c_1$, hence
+\[
+  D(c)=c_2^2+c_1^4,\qquad \beta=(4,2),\qquad w=(\tfrac14,\tfrac12).
+\]
+With $G=x_0$ we get $R(c)=c_1$, of support $\{1\}$. Face $\{1\}$ is active,
+positive and subcritical with $q=1/4$. Face $\{2\}$ is \textbf{inactive}: $R$
+vanishes on it identically, so by Lemma~\ref{lem:inadmissible} its $\beta=2$
+never enters---the quadratic term is the leading behaviour of $F$ along that
+edge and is nonetheless irrelevant, which is the point the first draft got
+wrong by claiming the quadratic term was constant on the feasible cone. Hence
+$q^\star=1/4$ and $\gamma=4/3$.
+
+The ambient axis $e_0=(1,0)$ has $e_{0,0}+e_{0,1}=1>0$, so it is not in
+$T_vP$ at all; its quadratic decay is not a branch of the constrained problem.
+That is the \texttt{ambient\_exponent\_law} counterexample, stated exactly.
+
+\section{Scope}
+
+Conditional statement: for a \emph{simple} vertex, under
+Hypotheses~\ref{hyp:iso}--\ref{hyp:nocancel}, the asymptotic exponent is
+$\gamma=1/(1-q^\star)$ with $q^\star$ the minimum weighted degree over
+\emph{admissible} faces.
+
+Not established here:
+
+\begin{itemize}
+  \item \textbf{Hypothesis~\ref{hyp:base} for arbitrary $F$.} In edge
+        coordinates a base may carry cross terms; one of lower weight makes
+        the drop $\Theta(\tau^{c})$ with $c<1$, and the per-edge $\beta_i$
+        stop describing the cone's interior. Constructed violations at
+        $c=0.75$ and $c=0.5$ still predict correctly---a positive cross term
+        only steepens the interior and drives the optimum onto a face---but
+        agreeing is not being licensed. This is why
+        \texttt{base\_homogeneity} is recorded per row and never gated on.
+  \item \textbf{Non-simplicial vertices.} With more than $n$ active
+        constraints $\Phi$ is not an isomorphism onto the orthant and the
+        argument fails at Section~2. The vertex probe returns the vertex value
+        there rather than answering.
+  \item \textbf{Hypothesis~\ref{hyp:iso} in the corpus.} Uniqueness of the
+        unperturbed maximiser is measured rather than assumed, but only by a
+        finite probe. \texttt{rival\_margin} records per row the amount by
+        which the vertex outranks the best competing maximum found outside a
+        ball of radius $0.25$; it can exhibit a rival, it cannot certify that
+        none exists, so it is recorded and never gated on, exactly as
+        \texttt{base\_homogeneity} is. The count is not zero: the generated
+        report \texttt{docs/POLYHEDRA.md} lists the rows that come back at or
+        below zero, and some of them are rows the edge law is otherwise
+        counted as confirming. There the maximiser is a whole face,
+        Lemma~\ref{lem:isolation} does not hold, and the agreement between
+        predicted and measured exponent is not evidence for the law.
+\end{itemize}
+
+None of the three is a gap in the coordinate transport; all three are limits
+on where it applies.
+
+
+\section{What the framework answers}
+
+This section is an index, not an argument. Each entry names a question the
+framework is asked in practice and points at the result above that settles it.
+Nothing here is new; the purpose is to make the correspondence explicit for a
+reader who arrives with the question rather than with the proof.
+
+\paragraph{Edge generators and simplicity.}
+At a simple vertex the inward edge generators $u_1,\dots,u_n$ are linearly
+independent by definition, so $\Phi$ is a linear isomorphism from the
+nonnegative orthant onto $T_vP$ and a bijection onto a neighbourhood of $v$ in
+$P$. In the tilted simplex $u_1=(1,-1)$ and $u_2=(0,-1)$, and simplicity is
+$\det\left(\begin{smallmatrix}1&0\-1&-1\end{smallmatrix}\right)=-1\ne0$.
+
+\paragraph{Tangent cone and the monomial--face dictionary.}
+Orthant faces $C_S$ map to the faces $v+\cone\{u_i:i\in S\}$ of the tangent
+cone, and $c^{\alpha_j}$ survives on $\relint(C_S)$ exactly when
+$S_j\subseteq S$. Monomial support and tangent-cone face are the same
+combinatorial datum in edge coordinates; the minimal supporting face of
+monomial $j$ is $C_{S_j}$.
+
+\paragraph{Weighted principal part.}
+Hypothesis~\ref{hyp:base}, with the remainder uniform on compacta. Under
+$\delta_\tau$ one has the exact homogeneity $D_0(\delta_\tau c)=\tau D_0(c)$.
+The corpus quantity \texttt{base\_homogeneity} measures the resulting scaling
+exponent; the value $1$ licenses the hypothesis for that row. In the tilted
+simplex it holds exactly, with $D_0(c)=c_1^4+c_2^2$. The principal part is a
+weighted-homogeneous power sum, not a linear form.
+
+\paragraph{Weighted degree of a monomial.}
+Each monomial transforms under $\delta_\tau$ by $\tau^{q_j}$ with
+$q_j=\langle w,\alpha_j\rangle=\sum_i\alpha_{ij}/\beta_i$: the
+Newton--tropical valuation with respect to the base weights $w_i=1/\beta_i$.
+The value belongs to one monomial, hence to one minimal supporting face. It is
+\emph{not} obtained by summing independently measured ray exponents, which is
+the error this note exists to correct.
+
+\paragraph{Restriction, initial forms and cancellation.}
+On $C_S$ only monomials with $S_j\subseteq S$ survive; $q_S$ is the least of
+their weighted degrees, and $W_S=\inw(R|_{C_S})$ is an explicit homogeneous
+polynomial. If that lowest-weight sum vanishes identically one must pass to
+the next layer, which is what Hypothesis~\ref{hyp:nocancel} excludes on faces
+later called admissible.
+
+\paragraph{Admissibility, and why it is non-circular.}
+Definition~\ref{def:adm}: active, positive, subcritical. All three refer only
+to $(D_0,R)$ and the combinatorial face, never to $M(s)$ or to $\gamma$.
+Lemma~\ref{lem:inadmissible} then shows that a face failing any of them
+contributes nothing positive at small $s$, so ``inadmissible'' means
+\emph{contributes nothing} rather than \emph{excluded by hand}.
+
+\paragraph{Selection and the qualified minimum.}
+Theorem~\ref{thm:selection} takes $q^\star$ over admissible faces, and
+Proposition~\ref{prop:v16} relates it to V.16's monomial minimum:
+$q^\star\ge\min_jq_j$, with equality exactly when some face attaining
+$\min_jq_j$ is admissible. If a formally smaller $q_j$ belongs to an
+inadmissible face it is simply omitted, and the asymptotics are governed by
+the next-smallest admissible value.
+
+\paragraph{Predicted exponent, stationary scale, exact coefficient.}
+The facewise balance of Section~\ref{sec:balance} gives
+$\gamma_S=1/(1-q_S)$, and Lemma~\ref{lem:isolation} promotes the dominant face
+to the global statement. For the tilted simplex $\gamma=4/3$, and solving the
+one-dimensional problem on the active face gives the exact identity
+$M(s)=3\cdot4^{-4/3}s^{4/3}$. The anisotropic stationary scale is
+$\tau_\ast\asymp s^{4/3}$ while the physical edge coordinate scales as
+$c_1^\ast\asymp s^{1/3}$; the two are related by $c_1=\tau^{1/4}z_1$.
+
+\paragraph{Inactive directions that look plausible.}
+Two are correctly excluded: the vertical edge, geometrically feasible but with
+$R\equiv0$ on it, and the ambient axis $e_0=(1,0)$, which leaves $P$
+immediately and so belongs to no face of $T_vP$. Ambient exponents computed
+along infeasible rays have no standing in the constrained problem.
+
+\section{Three principles}
+
+The results above organise into three interlocking statements. They are
+restatements, not additions: each is a reading of a lemma already proved.
+
+\subsection*{1. The boundary controls the singularity}
+
+Near a simple vertex the singular behaviour of $M(s)-F(v)-sG(v)$ is determined
+by the faces of the tangent cone, not by the relative interior of the full
+cone.
+
+After transport to edge coordinates the base drop has principal part
+$D_0(c)=\sum_iA_ic_i^{\beta_i}$ with $\beta_i>1$, so any interior direction
+(all $c_i>0$) incurs a strictly positive combination of these costs. A
+perturbation monomial of weighted degree $q$ can produce a positive
+improvement of order $s^{1/(1-q)}$ only when $q<1$, and the balance realising
+it is the elementary competition between a term of order $\tau$ and one of
+order $s\tau^{q}$.
+
+The same competition can be run on an open subset of the orthant, but its
+critical point can always be projected onto a face by setting coordinates to
+zero. Every coordinate set to zero removes a non-negative base cost while, by
+the support rule, never introducing a leading perturbation term of lower
+weight, so the projected point improves by at least as much. Consequently the
+maximiser of the local model lies on a face---which is what
+\eqref{eq:partition} together with Lemma~\ref{lem:inadmissible} says
+formally.
+
+In the tilted simplex this is visible by elementary calculus: the objective
+$-a^4-b^2+sa$ is strictly decreasing in $b$ for $b>0$, so the maximiser is
+forced onto the slanted edge $b=0$. The interior of the cone is not irrelevant
+to the original optimisation; it is silent as a \emph{distinct leading
+mechanism}, because its contribution is matched or improved by an admissible
+boundary face.
+
+\subsection*{2. The lowest weight dominates}
+
+Among admissible faces the smallest $q_S$ produces the dominant gap, of order
+$s^{1/(1-q_S)}$; higher-weight faces contribute only lower-order terms.
+
+On an admissible face the balance $-\tau A+s\tau^{q_S}B$ with $A,B>0$ has
+stationary value of exact order $s^{1/(1-q_S)}$, and $q\mapsto1/(1-q)$ is
+strictly increasing on $(0,1)$. A smaller $q$ therefore gives a strictly
+larger exponent and, for small $s$, a strictly larger improvement. Comparing
+faces gives $q^\star=\min_{S\ \mathrm{admissible}}q_S$, every larger $q_S$
+contributing a remainder $o(s^{1/(1-q^\star)})$.
+
+The ordering recurs one level down: $q_S$ is itself the minimum over the
+monomials surviving on $S$. So the lowest weight, once restricted to
+admissible faces, is the only quantity entering $\gamma=1/(1-q^\star)$. There
+is no averaging and no max-weight rule; the Newton--tropical selection is a
+pure minimum.
+
+\subsection*{3. The feasible face selects the exponent}
+
+Only faces inside the tangent cone that satisfy Definition~\ref{def:adm}
+compete. Geometry (feasibility) and algebra (positive initial form,
+$0<q_S<1$) together select the exponent; ambient or inactive directions are
+invisible to the asymptotics.
+
+A direction leaving the polyhedron---the ambient axis $e_0=(1,0)$ at the
+tilted-simplex vertex---belongs to no face of $T_vP$ and never enters the
+minimum. A geometrically feasible face on which the perturbation vanishes
+identically---the vertical edge $C_{\{2\}}$---is inactive and is excluded on
+the same terms. After these exclusions a finite admissible set remains, and
+the exponent is read from it alone. The numerical value of an ambient or
+inactive degree, however suggestive, cannot alter the prediction: the exponent
+is a combinatorial-algebraic invariant of the admissible faces of the tangent
+cone. Feasibility is not an afterthought, it is part of the selection rule.
+
+\subsection*{Unified statement}
+
+Taken together: the singular asymptotics of a linearly perturbed maximisation
+problem near a simple polyhedral vertex are determined by a minimum of
+Newton--tropical weights, taken only over those faces of the tangent cone that
+are both geometrically feasible and algebraically capable of producing a
+positive improvement of order less than one. The boundary carries the
+singularity, the lowest admissible weight dominates, and the feasible face
+selects the exponent.
+
+That turns a technical asymptotic calculation into a selection principle with
+three layers:
+\begin{enumerate}[nosep]
+  \item \emph{Localisation}: the tangent cone replaces the global geometry
+        (Lemma~\ref{lem:isolation}).
+  \item \emph{Selection}: admissible faces are ranked by weighted degree
+        (Definition~\ref{def:adm}, Lemma~\ref{lem:inadmissible}).
+  \item \emph{Scaling}: the winning degree becomes the response exponent
+        (Section~\ref{sec:balance}, Theorem~\ref{thm:selection}).
+\end{enumerate}
+
+The boundary principle is not merely the observation that the optimiser
+happens to lie on a boundary. It says the boundary is the space in which the
+asymptotic competition is \emph{selected}. The face lattice of $T_vP$ acts as
+a discrete set of asymptotic channels and the variational problem chooses
+among them. A face wins not because it has fewer variables but because
+removing directions can lower the base cost without sacrificing the relevant
+perturbative gain, which gives the principle a variational rather than merely
+geometric meaning.
+
+The second principle has a consequence worth isolating: the exponent is
+insensitive to much that affects the coefficient. Once the winning admissible
+degree is known, $\gamma=1/(1-q^\star)$ is fixed, and distinct functions,
+coefficients or polyhedra sharing that degree share the exponent. The reduced
+optimisation on the winning face determines only the prefactor.
+
+The third is conceptually decisive. Newton data cannot be read in the ambient
+coordinate space alone; the relevant Newton diagram is filtered through the
+tangent-cone face lattice. An ambient monomial may look dominant
+algebraically and contribute nothing, because its direction is infeasible or
+its restriction to the feasible face vanishes. The slogan is that
+\emph{the Newton minimum is taken after geometric restriction, not before}.
+That is what prevents incorrect predictions from ambient scaling arguments,
+and it is the content of the \texttt{ambient\_exponent\_law} counterexample.
+
+The hierarchy implicit in all this is
+\[
+  \text{ambient monomials}\longrightarrow\text{face restrictions}
+  \longrightarrow\text{admissible weights}\longrightarrow q^\star
+  \longrightarrow\gamma,
+\]
+each arrow discarding information that cannot influence the leading
+singularity. What survives is a small invariant: the minimum admissible face
+weight. The law is best read as a local asymptotic analogue of an active-set
+rule,
+\[
+  \text{active constraint geometry}+\text{weighted perturbation order}
+  \;\Longrightarrow\;\text{singular response exponent},
+\]
+which explains why the power is encoded by the interaction between the Newton
+weights and the feasible face structure rather than merely computing it in one
+example.
+
+\section{Implications}
+
+\begin{enumerate}[wide=0pt]
+
+\item \textbf{Exponents become geometric invariants.}
+The response exponent is not primarily set by the numerical coefficients of
+$D$ and $R$ but by the weighted degree of the winning admissible face,
+$\gamma=1/(1-q^\star)$. Two optimisation problems sharing $q^\star$ belong to
+the same asymptotic universality class. Coefficients move the prefactor; the
+exponent is stable under many perturbations of the data.
+
+\item \textbf{Singular response is an active-constraint phenomenon.}
+A fractional-power law signals that the optimiser is asymptotically
+interacting with the boundary of the feasible cone, so the exponent records
+which constraints become active as well as the analytic order of the
+perturbation. An observed $s^{4/3}$ law points to an effective weighted degree
+$q^\star=1/4$; a different exponent indicates a different active face or
+scaling regime.
+
+\item \textbf{Newton theory must be constrained by geometry.}
+The relevant Newton--tropical object is the perturbation \emph{after}
+restriction to feasible faces. The correct order is: restrict to a feasible
+face, compute the surviving weights, then take the minimum. An ambient
+monomial can be algebraically dominant and contribute nothing because it
+points outside the tangent cone or vanishes on the active face.
+
+\item \textbf{Boundary stratification gives an algorithm.}
+For a simple polyhedral vertex the analysis is a finite combinatorial
+procedure:
+\begin{enumerate}[nosep,label=(\alph*)]
+  \item enumerate the faces of $T_vP$;
+  \item restrict the perturbation to each;
+  \item discard faces where the initial form vanishes or cannot be positive,
+        and those with $q_S\ge1$;
+  \item compute $q_S$ on the remainder;
+  \item select $q^\star=\min q_S$;
+  \item solve the reduced optimisation on the winning face for the
+        coefficient.
+\end{enumerate}
+A local variational problem becomes a face selection followed by a
+lower-dimensional calculation. This is what the adjudicator does.
+
+\item \textbf{Adding constraints can change the universality class.}
+A new constraint can remove the previously winning face; the minimum is then
+taken over a different admissible set and the exponent jumps from
+$1/(1-q_1)$ to $1/(1-q_2)$. Response behaviour can therefore change sharply
+under geometric deformation even when $F$ and $G$ vary smoothly, the
+transition being caused by a change in the active face lattice.
+
+\item \textbf{Perturbations can be classified by relevance.}\label{imp:classes}
+The admissible weights sort perturbation terms into asymptotic classes:
+$0<q<1$ relevant, of fractional-power type; $q=1$ critical, requiring a
+different balance; $q>1$ subleading for this mechanism; vanishing or
+sign-indefinite restrictions geometrically inactive. The hierarchy is
+analogous to scaling classifications in singular perturbation theory.
+
+\item \textbf{The leading coefficient carries finer geometric information.}
+The exponent sees only $q^\star$. The coefficient remembers the shape of the
+winning face, the principal form $D_0$ and the initial form $W_S$:
+\[
+  M(s)-F(v)-sG(v)\sim C_S\,s^{1/(1-q_S)},
+\]
+with $C_S$ from the reduced optimisation. The theory separates universal
+information ($q^\star$) from model-specific information ($C_S$).
+
+\item \textbf{The law is invertible in principle.}
+Read backwards, a measured fractional exponent $\gamma$ gives the effective
+perturbative weight $q^\star=1-1/\gamma$. Observed scaling can therefore
+identify the weighted order of the active perturbation and constrain which
+face controls the response.
+
+\item \textbf{It predicts which perturbations matter.}
+For $R=\sum_\alpha R_\alpha$, only the lowest-weight term surviving positively
+on an admissible face can control the leading response. Higher-weight terms
+may alter the prefactor or later corrections but cannot change the first
+singular exponent unless the leading term is removed by geometry or
+cancellation.
+
+\item \textbf{The phenomenon is locally determined.}
+Only the tangent cone, the weighted principal part and the restricted
+perturbation enter, so distant parts of the polyhedron do not affect the
+leading singularity---a strong locality principle taking the global
+optimisation problem to local vertex data. Polyhedral singularities therefore
+possess a finite, discrete asymptotic structure: their leading response is a
+competition among feasible faces, and the winning face is the channel through
+which the perturbation is amplified.
+
+\end{enumerate}
+
+\section{The law as a portable principle}
+
+The face-selection law is not a calculation for one example. Within the
+hypotheses of Theorem~\ref{thm:selection} it is a portable principle for
+singular asymptotics at simple polyhedral vertices---one that
+
+\begin{itemize}
+  \item \textbf{organises the theory} --- localisation to the tangent cone,
+        selection among admissible faces, and conversion of the winning weight
+        into a response exponent form a single hierarchy;
+
+  \item \textbf{explains the mechanism} --- the boundary controls the
+        singularity because interior directions project onto faces without
+        losing leading improvement; the lowest admissible weight dominates
+        because $q\mapsto1/(1-q)$ is increasing; the feasible face selects the
+        exponent because only algebraically and geometrically admissible
+        channels enter the minimum;
+
+  \item \textbf{predicts the exponent} --- once the admissible face weights
+        are known, $\gamma=1/(1-q^\star)$ with
+        $q^\star=\min\{q_S:\ S\ \text{admissible}\}$;
+
+  \item \textbf{filters irrelevant directions} --- ambient axes leaving the
+        polyhedron, faces on which the perturbation vanishes, and weights
+        $q_S\ge1$ are excluded by Definition~\ref{def:adm} before any
+        comparison is made, and Lemma~\ref{lem:inadmissible} shows the
+        exclusion costs nothing;
+
+  \item \textbf{classifies perturbations} --- relevant, critical, subleading
+        and inactive, as in implication~\ref{imp:classes};
+
+  \item \textbf{reveals active constraints} --- a measured fractional exponent
+        identifies both the weighted order of the active perturbation,
+        $q^\star=1-1/\gamma$, and the face on which it is realised;
+
+  \item \textbf{generalises cleanly} --- the three principles apply at any
+        simple vertex once edge coordinates, a weighted principal part and a
+        polynomial perturbation are given; only the combinatorics of the face
+        lattice change;
+
+  \item \textbf{is checked, within a stated reach} --- the tilted simplex
+        gives the exact identity $M(s)=3\cdot4^{-4/3}s^{4/3}$, the edge law
+        carries no counterexample in the corpus while the ambient rule carries
+        two, and inactive faces are discarded correctly. What the corpus does
+        \emph{not} yet settle is the selection clause itself. Only a row whose
+        admissible faces disagree can separate the minimum from the maximum,
+        and only one whose rival degree is also below $1$ lets measurement
+        choose between two finite numbers rather than merely reject a
+        divergence. The adjudicator records that per row as
+        \texttt{selection\_discriminates}, alongside
+        \texttt{hypotheses\_licensed} and \texttt{rival\_margin}, and
+        \texttt{docs/POLYHEDRA.md} reports how many rows satisfy all three at
+        once. That count is the number to move.
+\end{itemize}
+
+In short: the law converts a local variational problem near a simple
+polyhedral vertex into a finite face-selection procedure whose output is a
+geometric invariant---the minimum admissible weighted degree---together with a
+model-specific prefactor from the reduced optimisation on the winning face.
+That is the content of the three principles and of the ten implications that
+follow from them.
+\end{document}

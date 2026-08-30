@@ -1,0 +1,6 @@
+{
+  "request_id": "v19-mixed-sign-binomial-certificate",
+  "system": "([[-1,0],[0,-1],[1,0],[0,1]], [0,0,1,1])",
+  "base": "-(x0**2 + x1**4)",
+  "perturbation": "-2*x0 + x1**2"
+}

@@ -1,0 +1,18 @@
+{
+  "operation": "portfolio",
+  "request_id": "v20-two-ambient-counterexamples",
+  "cases": [
+    {
+      "request_id": "simplex_quartic_ambient",
+      "system": "([[-1,0],[0,-1],[1,1]], [0,0,1])",
+      "base": "-((x0+x1-1)**2 + x0**4)",
+      "perturbation": "x0"
+    },
+    {
+      "request_id": "sheared_quartic_ambient",
+      "system": "([[-1,0],[0,-1],[1,2]], [0,0,2])",
+      "base": "-((x0+2*x1-2)**2 + x0**4)",
+      "perturbation": "x0"
+    }
+  ]
+}

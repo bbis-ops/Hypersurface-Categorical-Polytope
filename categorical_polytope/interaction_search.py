@@ -665,18 +665,27 @@ def propose_candidates(
     global _LAST_PROPOSAL_REQUEST_AT
     last = "unknown error"
     for attempt in range(retries):
-        shared_remaining = 0.0
-        if rate_state_path:
-            from .api_rate_limit import seconds_until_allowed
-
-            shared_remaining = seconds_until_allowed(rate_state_path)
         local_remaining = 0.0
         if _LAST_PROPOSAL_REQUEST_AT is not None:
             local_remaining = paced_interval - (time.monotonic() - _LAST_PROPOSAL_REQUEST_AT)
-        remaining = max(0.0, local_remaining, shared_remaining)
+        remaining = max(0.0, local_remaining)
         if remaining > 0:
             print(f"  pacing API request for {remaining:.1f}s", file=sys.stderr, flush=True)
             time.sleep(remaining)
+        if rate_state_path:
+            from .api_rate_limit import reserve_request
+
+            reservation = reserve_request(
+                rate_state_path, base_interval=paced_interval, batch_size=n
+            )
+            shared_remaining = float(reservation["reservation_wait_seconds"])
+            if shared_remaining > 0:
+                print(
+                    f"  pacing shared API slot for {shared_remaining:.1f}s",
+                    file=sys.stderr,
+                    flush=True,
+                )
+                time.sleep(shared_remaining)
         req = urllib.request.Request(
             f"{backend.base_url}/chat/completions",
             data=data_bytes,
@@ -684,12 +693,6 @@ def propose_candidates(
             method="POST",
         )
         _LAST_PROPOSAL_REQUEST_AT = time.monotonic()
-        if rate_state_path:
-            from .api_rate_limit import reserve_request
-
-            reserve_request(
-                rate_state_path, base_interval=paced_interval, batch_size=n
-            )
         try:
             with urllib.request.urlopen(req, timeout=request_timeout) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
@@ -763,6 +766,11 @@ def propose_candidates(
                             "backend": backend.descriptor(),
                             "requested_n": n,
                             "parsed_items": len(parsed),
+                            # Whether the reply was cut off matters as much as
+                            # how long it was when nothing parsed: without this
+                            # a plan truncated at the cap is indistinguishable
+                            # from a complete reply in the wrong format.
+                            "finish_reason": choice.get("finish_reason"),
                             "usage": data.get("usage", {}),
                             "response": text,
                         }) + "\n")
@@ -798,12 +806,28 @@ def parse_proposals(text: Any) -> list[Candidate]:
             try:
                 payload = json.loads(m.group(0))
             except json.JSONDecodeError:
-                return []
-    if not isinstance(payload, dict):
-        return []
-    raw = payload.get("candidates")
+                payload = None
+
+    raw: Any = None
+    if isinstance(payload, dict):
+        raw = payload.get("candidates")
     if not isinstance(raw, list):
-        return []
+        # Salvage. A reply truncated at the completion cap leaves the array
+        # open and the last record half written; parsing strictly would throw
+        # away every complete record before it. Measured 2026-08-26: a
+        # truncated Nemotron reply yielded 0 candidates here while the
+        # code-property parser, which already salvaged, recovered one from the
+        # same failure. Extract the objects that did close.
+        raw = []
+        for chunk in re.findall(r"\{[^{}]*\"expr\"[^{}]*\}", text, re.DOTALL):
+            try:
+                item = json.loads(chunk)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(item, dict):
+                raw.append(item)
+        if not raw:
+            return []
 
     out: list[Candidate] = []
     seen: set[str] = set()
@@ -811,6 +835,14 @@ def parse_proposals(text: Any) -> list[Candidate]:
         if not isinstance(item, dict):
             continue
         expr = str(item.get("expr", "")).strip()
+        # Models write mathematical caret for exponentiation no matter how the
+        # prompt is worded; in Python `^` is XOR, which the whitelist rejects.
+        # Measured 2026-08-26: 8 of 12 otherwise-valid Nemotron candidates were
+        # discarded for this alone. Normalising the notation is safe because it
+        # changes no semantics the whitelist would have allowed - `^` can never
+        # survive `compile_expression`, and every rewritten expression is still
+        # parsed and validated below exactly as before.
+        expr = expr.replace("^", "**")
         name = str(item.get("name", "")).strip() or f"proposed_{len(out)}"
         name = re.sub(r"[^A-Za-z0-9_]", "_", name)[:24]
         if not expr or expr in seen:

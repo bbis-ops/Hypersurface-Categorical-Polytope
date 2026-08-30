@@ -5,8 +5,10 @@ __pycache__/
 dist/
 build/
 .pytest_cache/
+.pytest-*/
 pytest-cache-files-*/
 .pytest_tmp/
+tmp/
 .mypy_cache/
 .ruff_cache/
 .venv/
@@ -17,3 +19,9 @@ venv/
 # secrets - never commit an API key
 .env
 *.key
+
+# Generated campaign/runtime state. Curated result corpora may still be
+# committed explicitly with `git add -f` after review.
+experiments/*_api_raw.jsonl
+experiments/*_api_rate_state.json
+experiments/*.v*.backup.json

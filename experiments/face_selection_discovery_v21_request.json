@@ -1,0 +1,35 @@
+{
+  "operation": "discover",
+  "request_id": "v21-finite-exponent-law-search",
+  "system": "([[-1,0],[0,-1],[1,0],[0,1]], [0,0,1,1])",
+  "base": "-(x0**2 + x1**4)",
+  "known_class_ids": [
+    "face-weight:1/4|response:4/3"
+  ],
+  "candidates": [
+    {
+      "id": "linear-y",
+      "expression": "x1"
+    },
+    {
+      "id": "linear-x",
+      "expression": "x0"
+    },
+    {
+      "id": "quadratic-y",
+      "expression": "x1**2"
+    },
+    {
+      "id": "mixed",
+      "expression": "x0*x1"
+    },
+    {
+      "id": "critical-x",
+      "expression": "x0**2"
+    },
+    {
+      "id": "cancelled-linear",
+      "expression": "x1-x1+x0"
+    }
+  ]
+}

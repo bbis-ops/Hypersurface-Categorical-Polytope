@@ -1,0 +1,28 @@
+{
+  "operation": "phase_diagram",
+  "request_id": "v18-coefficient-qualification-transition",
+  "parameter": "theta",
+  "domain": [0, 1],
+  "mechanisms": [
+    {
+      "id": "emerging-low-face",
+      "face": ["x"],
+      "degree": {"intercept": "1/4"},
+      "coefficient": {"intercept": "-1/3", "slope": 1}
+    },
+    {
+      "id": "positive-fallback",
+      "face": ["y"],
+      "degree": {"intercept": "1/2"}
+    }
+  ],
+  "evaluate_at": ["1/4", "1/3", "1/2"],
+  "assumptions": {
+    "fixed_admissibility": true,
+    "coefficient_qualification_verified": true,
+    "affine_degrees_verified": true,
+    "uniform_local_base_maximality": true,
+    "uniform_principal_remainder": true,
+    "uniform_global_isolation": true
+  }
+}

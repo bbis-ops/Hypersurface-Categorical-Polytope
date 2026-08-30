@@ -14,8 +14,18 @@
 
 .PARAMETER Name
     Which variable to set. Default OPENROUTER_API_KEY, which selects the
-    OpenRouter endpoint. The model is chosen separately, with --model or a
-    preset (LOOP_API_PRESET / --preset); no model is assumed by this script.
+    OpenRouter endpoint. The model is chosen separately, with -Model or
+    -Preset (or LOOP_API_MODEL / LOOP_API_PRESET); no model is assumed by
+    this script. Without one, verification falls back to a generic default
+    that is a paid model on most accounts - see -Model.
+
+.PARAMETER Model
+    Any OpenAI-compatible model id to verify against, e.g.
+    nvidia/nemotron-3.5-lightning:free. Overrides -Preset.
+
+.PARAMETER Preset
+    A named endpoint preset from loop_closure.PRESETS (openai, openrouter,
+    nemotron). -Model and -BaseUrl override it.
 
 .PARAMETER Persist
     Also save to your user environment so new terminals inherit it.
@@ -28,6 +38,9 @@
 
 .EXAMPLE
     .\scripts\set_api_key.ps1
+
+.EXAMPLE
+    .\scripts\set_api_key.ps1 -Model nvidia/nemotron-3.5-lightning:free
 
 .EXAMPLE
     .\scripts\set_api_key.ps1 -Persist
@@ -43,6 +56,7 @@ param(
     [switch]$Remove,
     [switch]$NoCheck,
     [string]$Model,
+    [string]$Preset,
     [string]$BaseUrl
 )
 
@@ -116,16 +130,38 @@ Write-Host ""
 Write-Host "Verifying (one round-trip)..."
 $checkArgs = @((Join-Path $repo 'experiments\run_loop_closure.py'), '--check')
 if ($Model) { $checkArgs += @('--model', $Model) }
+if ($Preset) { $checkArgs += @('--preset', $Preset) }
 if ($BaseUrl) { $checkArgs += @('--base-url', $BaseUrl) }
 & python @checkArgs
+
+$sel = ''
+if ($Model) { $sel += " --model $Model" }
+if ($Preset) { $sel += " --preset $Preset" }
+if ($BaseUrl) { $sel += " --base-url $BaseUrl" }
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host ""
     Write-Host "Ready. Run the experiment with:" -ForegroundColor Green
-    Write-Host "  python experiments/run_loop_closure.py --api"
+    Write-Host "  python experiments/run_loop_closure.py --api$sel"
+    if ($sel) {
+        Write-Host ""
+        Write-Host "Pass the same selection every run, or set it once for this session:"
+        if ($Model) { Write-Host "  `$env:LOOP_API_MODEL = '$Model'" }
+        if ($Preset) { Write-Host "  `$env:LOOP_API_PRESET = '$Preset'" }
+        if ($BaseUrl) { Write-Host "  `$env:LOOP_API_BASE = '$BaseUrl'" }
+    }
 }
 else {
     Write-Host ""
     Write-Host "Key is set but the check failed - see the message above." -ForegroundColor Yellow
-    Write-Host "Common causes: typo in the key, no quota, or the free window closed."
+    if (-not ($Model -or $Preset)) {
+        Write-Host "No model was chosen, so the check used a generic default that is"
+        Write-Host "billed on most accounts. The key may well be fine. Retry with a"
+        Write-Host "model you can actually reach - your key is still set, so:"
+        Write-Host "  python experiments/run_loop_closure.py --check --preset nemotron"
+    }
+    else {
+        Write-Host "Common causes: a typo in the key, no quota for that model, or an"
+        Write-Host "id that endpoint does not serve."
+    }
 }

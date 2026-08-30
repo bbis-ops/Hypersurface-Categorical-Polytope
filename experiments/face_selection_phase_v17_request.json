@@ -1,0 +1,40 @@
+{
+  "operation": "phase_diagram",
+  "request_id": "v17-derived-two-face-transition",
+  "parameter": "theta",
+  "domain": ["0", "3/4"],
+  "base_orders": {
+    "x": 4,
+    "y": 2
+  },
+  "mechanisms": [
+    {
+      "id": "face-a",
+      "face": ["x"],
+      "exponents": {
+        "x": {
+          "intercept": 1,
+          "slope": 2
+        }
+      }
+    },
+    {
+      "id": "face-b",
+      "face": ["y"],
+      "exponents": {
+        "y": {
+          "intercept": 1,
+          "slope": -1
+        }
+      }
+    }
+  ],
+  "evaluate_at": ["0", "1/8", "1/4", "1/2"],
+  "assumptions": {
+    "fixed_admissibility": true,
+    "affine_degrees_verified": true,
+    "uniform_local_base_maximality": true,
+    "uniform_principal_remainder": true,
+    "uniform_global_isolation": true
+  }
+}

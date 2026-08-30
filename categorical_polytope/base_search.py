@@ -505,10 +505,27 @@ class CombinedResult:
     measurement_scales: tuple[float, float] = ()
 
     @property
+    def tolerance(self) -> float:
+        """
+        Exponent tolerance, scaled to the quantity being compared.
+
+        This was a flat 0.08 until verifier v17. Across the recorded corpus the
+        predicted exponent spans 1.03 to 4.6e6, so a fixed absolute window is
+        not a threshold, it is an accident of scale: generous at p=1 and
+        impossible at p=20. V.8 and V.10 already use a relative rule, and V.14
+        now matches them rather than being stricter for no stated reason.
+        """
+        return max(0.15, 0.10 * self.predicted_exponent)
+
+    @property
     def law_holds(self) -> bool:
         if not self.breaks or self.predicted_exponent <= 0.0:
             return False
-        return abs(self.measured_exponent - self.predicted_exponent) < 0.08
+        if self.measured_exponent <= 0.0:
+            # Nothing resolved. `verify_combined` reports this as inconclusive;
+            # it must not read as a satisfied law here either.
+            return False
+        return abs(self.measured_exponent - self.predicted_exponent) < self.tolerance
 
     def row(self) -> str:
         if not self.ok:

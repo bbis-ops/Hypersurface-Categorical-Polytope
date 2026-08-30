@@ -47,9 +47,9 @@ def campaign(tmp_path, monkeypatch):
             "version": 1, "next_allowed_epoch": 0.0, "recommended_batch_size": 4,
         }),
         "CORPUS": (tmp_path / "verification_campaign.json", {"records": [
-            {"law": "V.11", "status": "counterexample"},
-            {"law": "V.11", "status": "verified"},
-            {"law": "V.7", "status": "verified"},
+            {"rule_id": "V.11", "status": "counterexample"},
+            {"rule_id": "V.11", "status": "verified"},
+            {"rule_id": "V.7", "status": "verified"},
         ]}),
     }
     for name, (path, payload) in fixtures.items():

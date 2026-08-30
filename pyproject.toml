@@ -22,6 +22,7 @@ notebook = ["matplotlib>=3.7", "jupyter>=1.0"]
 
 [project.scripts]
 categorical-polytope = "categorical_polytope.__main__:main"
+categorical-face-selection = "categorical_polytope.adjudication.polyhedra.backend:main"
 
 [tool.setuptools.packages.find]
 where = ["."]

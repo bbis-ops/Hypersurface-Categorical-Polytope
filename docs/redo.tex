@@ -1,0 +1,304 @@
+\documentclass[11pt]{article}
+
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  urlcolor=blue,
+  citecolor=blue
+}
+
+\newtheorem{theorem}{Theorem}
+\theoremstyle{definition}
+\newtheorem{hypothesis}{Hypothesis}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+\DeclareMathOperator{\cone}{cone}
+\DeclareMathOperator{\relint}{relint}
+
+\title{Face-Selection Law at a Simple Polyhedral Vertex}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+Theorem V.16 in \texttt{FORMAL\_NEWTON\_TROPICAL.md} selects
+$q^*=\min_j q_j$ over the monomials of the perturbation on the positive
+orthant.  Section~15 of \texttt{FORMAL\_VERTEX\_THRESHOLD.md} gives the
+weighted degree of a single monomial.  This note transports both results to a
+simple vertex of a general polyhedron, which is what domain three adjudicates.
+
+The transport is a change of coordinates, not a new theorem.  What is new is
+that the hypothesis it needs is stated explicitly and measured per corpus row
+rather than assumed.
+
+\section{Setup}
+
+Let $P$ be full-dimensional and let $v$ be a \emph{simple} vertex with inward
+edge generators $u_1,\dots,u_n$.  Define
+\[
+  \Phi(c)=v+\sum_{i=1}^n c_i u_i,
+  \qquad c\in\mathbb{R}_{\geq 0}^n.
+\]
+Simplicity makes the $u_i$ linearly independent, so $\Phi$ is a linear
+isomorphism from the nonnegative orthant onto the tangent cone $T_vP$.  Set
+\[
+  D(c)=F(v)-F\bigl(\Phi(c)\bigr),
+  \qquad
+  R(c)=G\bigl(\Phi(c)\bigr)-G(v),
+\]
+and study
+\[
+  M(s)=\sup_{x\in P}\bigl(F(x)+sG(x)\bigr)
+  \qquad\text{as }s\to0^+.
+\]
+
+\subsection{Hypotheses}
+
+\begin{enumerate}[label=\arabic*.]
+  \item $D(c)\geq0$ near $0$, with equality only at $0$.
+
+  \item
+  \[
+    D(c)=D_0(c)+o\bigl(D_0(c)\bigr),
+    \qquad
+    D_0(c)=\sum_{i=1}^n A_i c_i^{\beta_i},
+  \]
+  where $A_i>0$ and $\beta_i>1$.
+
+  \item The perturbation is a finite polynomial,
+  \[
+    R(c)=\sum_j\gamma_j c^{\alpha_j}.
+  \]
+
+  \item The relevant branch has positive effective perturbation and $q^*<1$.
+
+  \item There is no cancellation among terms of equal lowest weighted degree
+  on the selected face.
+\end{enumerate}
+
+Hypothesis~2 is the condition that the transport otherwise smuggles in.
+Under the anisotropic dilation
+\[
+  \delta_\tau(c)
+  =\bigl(\tau^{1/\beta_i}c_i\bigr)_{i=1}^n,
+\]
+it says exactly that
+\[
+  D_0(\delta_\tau c)=\tau D_0(c),
+\]
+so the $i$th edge coordinate has weighted degree $1/\beta_i$.
+\texttt{base\_homogeneity} in the corpus measures the resulting exponent;
+$1.0$ means that Hypothesis~2 holds for that row.
+
+\section{Monomials Are Faces}
+
+Monomial $j$ has support
+\[
+  S_j=\{i:\alpha_{ij}>0\}.
+\]
+For $S\subseteq\{1,\dots,n\}$, the orthant face
+\[
+  C_S=\{c\geq0:c_i=0\text{ for }i\notin S\}
+\]
+maps under $\Phi$ to
+\[
+  v+\cone\{u_i:i\in S\},
+\]
+the corresponding face of the tangent cone.  Moreover,
+$c^{\alpha_j}$ is nonzero on $\relint(C_S)$ exactly when $S_j\subseteq S$.
+Thus monomial support and tangent-cone face are the same data in edge
+coordinates.
+
+\section{Weighted Degree of a Monomial}
+
+Under $\delta_\tau$, the monomial transforms according to
+\[
+  (\delta_\tau c)^{\alpha_j}
+  =\tau^{q_j}c^{\alpha_j},
+  \qquad
+  q_j=\sum_{i=1}^n\frac{\alpha_{ij}}{\beta_i}.
+\]
+This value belongs to one monomial, hence to one minimal supporting face.  It
+is not obtained by summing independently measured ray exponents; that was the
+defect this note exists to correct.
+
+\section{Restriction to a Face}
+
+On $C_S$, only monomials with $S_j\subseteq S$ survive.  Define
+\[
+  q_S=\min\{q_j:S_j\subseteq S,\ \gamma_j\neq0\}.
+\]
+Factoring out $\tau^{q_S}$ gives
+\[
+  R\big|_{C_S}(\delta_\tau c)
+  =\tau^{q_S}
+   \left[
+     W_S(c)
+     +\sum_{q_j>q_S}\tau^{q_j-q_S}(\cdots)
+   \right].
+\]
+Consequently,
+\[
+  R\big|_{C_S}(\delta_\tau c)
+  \sim \tau^{q_S}W_S(c)
+  \qquad (\tau\to0^+),
+\]
+provided the leading sum does not cancel.  A higher-dimensional face therefore
+inherits the minimum $q$ among the monomials it supports.
+
+\section{One-Parameter Balance}
+
+Set $c=\delta_\tau z$ with $z\in C_S$.  Then
+\[
+  J_s(\tau,z)
+  =-\tau D_0(z)+s\tau^{q_S}W_S(z)+o(\cdots).
+\]
+Writing
+\[
+  A=D_0(z)>0,
+  \qquad B=W_S(z)>0,
+  \qquad k=q_S,
+\]
+the stationary point of $-\tau A+s\tau^kB$ is
+\[
+  \tau_*
+  =\left(\frac{skB}{A}\right)^{1/(1-k)}.
+\]
+Substitution gives
+\[
+  J=A\tau_*\frac{1-k}{k},
+\]
+which is positive for $0<k<1$.  Since
+$\tau_*\asymp s^{1/(1-k)}$, the face predicts
+\[
+  \gamma_S=\frac{1}{1-q_S}.
+\]
+
+\paragraph{Check against measurement.}
+For the tilted-simplex face $c_2=0$, with
+$D_0=z^4$, $R=z$, and $k=1/4$, this gives the coefficient
+\[
+  \frac34\left(\frac14\right)^{1/3}=0.472470.
+\]
+The adjudicator measures $0.472470\,s^{4/3}$ to six decimal places at
+$s=10^{-2},\ 2.5\times10^{-3},\ 6.25\times10^{-4}$.
+
+\section{Selection}
+
+For every monomial $j$, $q_{S_j}\leq q_j$, since $S_j\subseteq S_j$.
+Conversely, every admissible face $S$ has $q_S=q_j$ for some surviving
+monomial.  Quantifying over admissible faces and the monomials whose leading
+behavior is admissible on both sides yields
+\[
+  q^*
+  =\min_{S\text{ admissible}}q_S
+  =\min_{j\text{ admissible}}q_j.
+\]
+Hence
+\[
+  M(s)-F(v)-sG(v)
+  =\Theta\!\left(s^{1/(1-q^*)}\right),
+  \qquad
+  \boxed{\gamma=\frac{1}{1-q^*}}.
+\]
+
+The admissibility restriction is not cosmetic.  If the globally minimizing
+monomial lies on an inadmissible face, the left-hand side is strictly greater.
+The corpus row \texttt{3d\_shear\_orders\_2\_4\_6} has an inadmissible face at
+$q=1.3804$, which does not affect the result only because it is the larger
+value.
+
+\section{Admissibility}
+
+A face is admissible when some $z\in C_S$ satisfies
+\[
+  D_0(z)>0
+  \qquad\text{and}\qquad
+  W_S(z)>0.
+\]
+Admissibility fails when no monomial survives on the face, when the leading
+coefficient is nonpositive, when the branch leaves the feasible cone, when the
+leading terms cancel, or when $q_S\geq1$.  The tilted simplex's vertical edge
+is geometrically feasible but perturbatively inactive: $R$ vanishes there
+identically, so it is not a competing branch.
+
+\section{Worked Case: The Tilted Simplex}
+
+Let
+\[
+  P=\{(x_0,x_1):x_0\geq0,\ x_1\geq0,\ x_0+x_1\leq1\},
+  \qquad v=(0,1),
+\]
+with edges
+\[
+  u_1=(1,-1),
+  \qquad u_2=(0,-1).
+\]
+Thus
+\[
+  x=(c_1,1-c_1-c_2).
+\]
+For
+\[
+  F(x)=-\bigl((x_0+x_1-1)^2+x_0^4\bigr),
+\]
+we have $x_0+x_1-1=-c_2$ and $x_0=c_1$, hence
+\[
+  D(c)=c_2^2+c_1^4,
+  \qquad
+  \beta=(4,2).
+\]
+With $G(x)=x_0$, one has $R(c)=c_1$ and support $\{1\}$, so
+\[
+  q=\frac14,
+  \qquad
+  \gamma=\frac43.
+\]
+The ambient axis $e_0=(1,0)$ satisfies $e_{0,0}+e_{0,1}=1>0$ and therefore
+does not belong to the tangent cone.  Its quadratic decay is irrelevant to the
+constrained problem.  This states the \texttt{ambient\_exponent\_law}
+counterexample exactly.
+
+\section{Scope and What Is Not Proved}
+
+The result is conditional: for a simple vertex, if edge coordinates transport
+the tangent cone to an orthant, if the base has a valid weighted principal
+part, if the perturbation has noncancelling polynomial leading terms, and if
+Theorem~V.16's admissibility conditions hold, then
+\[
+  \boxed{
+    \gamma=\frac{1}{1-\min_{S\text{ admissible}}q_S}
+  }.
+\]
+
+The following claims are not established here.
+
+\begin{itemize}
+  \item \textbf{Hypothesis~2 for arbitrary $F$.}
+  In edge coordinates a base may contain cross terms.  A cross term of lower
+  weight makes the drop $\Theta(\tau^c)$ with $c<1$, so the per-edge
+  $\beta_i$ cease to describe the cone's interior.  Constructed violations at
+  $c=0.75$ and $c=0.5$ still predict correctly---a positive cross term only
+  steepens the interior and drives the optimum onto a face---but agreement is
+  not a license.  This is why \texttt{base\_homogeneity} is recorded per row
+  and is never gated on.
+
+  \item \textbf{Nonsimplicial vertices.}
+  With more than $n$ active constraints, $\Phi$ is not an isomorphism from the
+  orthant, and the argument fails at the first step.  The vertex probe
+  currently returns the vertex value there rather than answering.
+\end{itemize}
+
+Neither limitation is a gap in the coordinate transport; both delimit where
+it applies.
+
+\end{document}

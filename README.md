@@ -25,6 +25,186 @@ Not tied to Aegis-Ops, www.echovalidum.com, or any other repository.
 
 **Finite exponent-law discovery engine (V.21):** [`docs/FORMAL_EXPONENT_DISCOVERY_ENGINE.md`](docs/FORMAL_EXPONENT_DISCOVERY_ENGINE.md) — screens explicit or generated perturbation families through the exact compiler, partitions them into universality and mechanism classes, emits registry-relative exponent-law candidates, and elevates cancellation, critical boundaries, observed-exponent mismatches, and unresolved mechanisms for diagnosis. Reproducible request: [`experiments/face_selection_discovery_v21_request.json`](experiments/face_selection_discovery_v21_request.json).
 
+## Face-selection backend quick start
+
+The face-selection law is the repository's end-to-end **Newton-tropical
+selection principle**. It turns what first appears to be a technical
+asymptotic calculation into one portable mechanism:
+
+1. **Localization:** replace the original global polyhedron by the tangent
+   cone at the selected simple maximizing vertex.
+2. **Selection:** transport the perturbation into the feasible edge chart,
+   restrict it to cone faces, and rank admissible faces by exact weighted
+   degree.
+3. **Scaling:** convert the winning degree into the response exponent
+   `gamma = 1 / (1 - q_star)`.
+
+This single hierarchy:
+
+- organizes the theory around one local geometric object;
+- explains the mechanism rather than merely fitting an exponent;
+- predicts the exponent before numerical measurement;
+- filters irrelevant directions without deleting their audit trail;
+- classifies perturbations as relevant, critical, subleading, or inactive;
+- reveals which constraints remain binding and which are released;
+- identifies cancellation and geometric suppression independently;
+- groups perturbations into universality classes; and
+- generalizes from one example to finite families, portfolios, and parametric
+  phase diagrams.
+
+Within its stated hypotheses, this is a theorem-backed selection law. Across
+the repository's checked examples—including the two ambient-axis
+counterexamples that motivated exact feasible-chart transport—the hierarchy
+has produced the correct mechanism and exponent. Unverified analytic
+hypotheses remain visible in the response, so successful calculation is never
+silently presented as a licensed theorem conclusion.
+
+The implementation lives in the
+[`categorical_polytope`](categorical_polytope/) package and is exposed as a
+reusable backend with Python and JSON process interfaces. Its complete data
+flow is:
+
+```text
+ambient polynomial -> feasible edge chart -> tangent-cone faces
+                   -> Newton weights -> qualified q* -> gamma = 1/(1-q*)
+```
+
+### The decisive insight: feasibility comes before degree
+
+Ambient coordinate axes are not intrinsic to a polyhedron. At a tilted
+vertex, an ambient axis may fail to point into the feasible set at all. Reading
+an order along that axis can therefore manufacture a mechanism that no
+admissible displacement realizes.
+
+The compiler instead solves, exactly,
+
+```text
+A_S v = b_S               selected simple vertex
+A_S u_i = -e_i            inward edge generators
+x = v + sum_i c_i u_i     feasible local chart, c_i >= 0
+```
+
+and only then pulls the base and perturbation back to the edge variables
+`c_i`. Positive rescaling of an edge changes coefficients, but not Newton
+support, weights, winning faces, or the response exponent. That is the
+coordinate-invariant content of the law.
+
+The two canonical ambient counterexamples make the distinction concrete. At
+the simplex and sheared vertices, exact transport gives the same localized
+problem:
+
+```text
+D_0(c) = c0^4 + c1^2      -> weights (1/4, 1/2)
+W(c)   = c0               -> q* = 1/4
+gamma  = 1/(1 - 1/4)      -> 4/3
+```
+
+An ambient-axis calculation predicts `2`; feasible-chart transport and direct
+measurement give `4/3`. These are not unrelated numerical exceptions. They
+identify one structural obstruction: **ambient degree is not authoritative
+until it has been transported through the tangent geometry**.
+
+### What the minimum over faces means
+
+`q_star` is not a sum of every directional degree and it is not simply the
+lowest monomial degree in the unreduced expression. For each tangent-cone
+face, the backend:
+
+1. removes monomials that vanish on that face;
+2. combines like signatures exactly, exposing cancellation;
+3. takes the first non-cancelling weighted layer;
+4. requires `0 < q_F < 1` and a positive relative-interior witness; and
+5. minimizes `q_F` over the faces that remain qualified.
+
+This explains several otherwise surprising facts:
+
+- a coefficient can change the leading amplitude without changing the
+  exponent class;
+- a coefficient crossing zero can remove a mechanism and expose a new
+  exponent without any degree laws crossing;
+- a high-order ambient term may become low-order after feasible transport;
+- a seemingly dominant term may be inactive because it is geometrically
+  suppressed or cancels exactly; and
+- a larger face may inherit the same degree from a smaller face without
+  representing a distinct released-constraint mechanism.
+
+### From one exponent to a phase structure
+
+For a parameterized family with affine mechanism degrees
+`q_j(t) = a_j + b_j*t`, selection is the lower envelope of the qualified
+degrees. Every possible transition lies on a finite exact wall:
+
+```text
+q_i(t) = q_j(t)    mechanisms exchange dominance
+q_i(t) = 0         zero-weight boundary
+q_i(t) = 1         critical boundary
+c_i(t) = 0         qualification/cancellation boundary
+```
+
+Between walls, the winning face and mechanism are constant and
+`gamma(t) = 1/(1-q_star(t))` is exact. The backend therefore returns a phase
+fan and robustness margin rather than a grid of sampled regimes. A narrow
+chamber cannot be skipped.
+
+### How to read a result
+
+| Question | Backend evidence |
+|---|---|
+| What caused the response? | Winning face, initial form, and ambient-term lineage |
+| Why this exponent? | Base orders, Newton weights, `q_star`, and the scaling map |
+| Which constraints move? | Released constraints; the remainder stay binding |
+| Which terms were ignored? | Per-face suppression, cancellation, criticality, or subleading status |
+| Is another perturbation equivalent? | Universality and mechanism class identifiers |
+| How close is a mechanism change? | Exact phase wall and robustness margin |
+| What does an observed exponent imply? | Inverse weight `q = 1 - 1/gamma` and consistent feasible faces |
+| Is the conclusion a theorem? | Named hypothesis evidence and explicit license blockers |
+
+The distinction between a calculation and a theorem is deliberate. Exact
+finite algebra determines transport, qualification, selection, and scaling;
+local maximality, uniform remainder control, and global isolation are analytic
+hypotheses. If those hypotheses are not independently established, the backend
+returns the calculation as `unlicensed` rather than weakening the scope after
+seeing the result.
+
+```python
+from categorical_polytope import analyze_face_selection
+
+result = analyze_face_selection({
+    "request_id": "tilted-simplex",
+    "system": "([[-1,0],[0,-1],[1,1]], [0,0,1])",
+    "base": "-((x0+x1-1)**2 + x0**4)",
+    "perturbation": "x0",
+    "observed_exponent": 4 / 3,
+})
+
+assert result["selection"]["weighted_degree"] == 0.25
+assert abs(result["scaling"]["response_exponent"] - 4 / 3) < 1e-9
+```
+
+Run the same capability as a JSON process:
+
+```bash
+python -m categorical_polytope.adjudication.polyhedra.backend --pretty \
+  < experiments/face_selection_ambient_v20_request.json
+```
+
+After `pip install -e .`, the process entry point is also available as
+`categorical-face-selection`. Beyond a single analysis, the backend supports
+finite-family `discover`, cross-case `portfolio`, and parametric
+`phase_diagram` operations. See [`docs/FACE_SELECTION_BACKEND.md`](docs/FACE_SELECTION_BACKEND.md)
+for the complete request and response contracts.
+
+Correctness boundaries are explicit:
+
+- polynomial transport, cancellation, Newton weights, and response exponents
+  retain exact rational arithmetic;
+- boundedness uses an exhaustive recession-cone check for the supported
+  dimensions rather than sampled directions;
+- the linear-programming control admits affine objectives only;
+- malformed batch items fail independently at a total JSON boundary;
+- API-generated candidates remain untrusted and are locally adjudicated;
+- shared campaign pacing uses locked, cross-process request reservations.
+
 ## Four deliverables ("firsts")
 
 | # | Artifact | Location |
@@ -38,8 +218,8 @@ Not tied to Aegis-Ops, www.echovalidum.com, or any other repository.
 ```bash
 python -m categorical_polytope firsts     # manifest paths
 python experiments/run_all.py           # quadratic + nonlinear JSON + figures
-python -m unittest discover -s tests -v   # 13 tests
-pip install -e ".[dev]"                     # optional matplotlib, pytest
+python -m pytest -q                     # 524 tests + 24 subtests in the current suite
+pip install -e ".[dev]"                 # optional matplotlib, pytest
 ```
 
 Full reproduction: [`docs/RUNBOOK.md`](docs/RUNBOOK.md).
@@ -102,6 +282,10 @@ python -m categorical_polytope
 | `fisher_pruned_search.py` | Theorem 3: top-\(k\) Fisher-pruned vertex search |
 | `firsts.py` | Deliverables manifest + run experiments |
 | `nonlinear_objective.py` | Non-quadratic \(C\), empirical Fisher, vertex vs separable |
+| `face_selection.py` | Exact face restriction, admissibility, weighted selection, and scaling |
+| `ambient_face_compiler.py` | Exact ambient-to-edge polynomial transport and term lineage |
+| `face_selection_phase.py` | Parametric Newton-weight chambers, walls, and transitions |
+| `adjudication/polyhedra/backend.py` | Stable Python/JSON backend, discovery, portfolio, and audit contracts |
 | `__main__.py` | Demo CLI |
 
 ## Theory (encoded)

@@ -312,7 +312,7 @@ pip install -e ".[dev]"                  # optional matplotlib, pytest
 
 Full reproduction: [`docs/RUNBOOK.md`](docs/RUNBOOK.md).
 
-## Applications: evaluation and safety methodology
+## Applications & conditional design warnings
 
 The evaluation material is a downstream application of the optimization
 theorems, not the repository's foundational claim. It translates geometric
@@ -346,6 +346,10 @@ longer the README's organizing result. See
 [`SHORT_NOTE.md`](docs/SHORT_NOTE.md),
 [`PAPER_OUTLINE.md`](docs/PAPER_OUTLINE.md), and the
 [`master overview`](categorical_polytope/Overview.md).
+
+The original coexponential obstruction motivated the search for an
+operational substitute; the face-selection law is that substitute in
+geometric form.
 
 The earlier vertex, Fisher-factorization, and constructive-search results are
 preserved in [`FORMAL_THEOREMS.md`](docs/FORMAL_THEOREMS.md),

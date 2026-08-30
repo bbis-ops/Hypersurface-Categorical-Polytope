@@ -25,6 +25,89 @@ Not tied to Aegis-Ops, www.echovalidum.com, or any other repository.
 
 **Finite exponent-law discovery engine (V.21):** [`docs/FORMAL_EXPONENT_DISCOVERY_ENGINE.md`](docs/FORMAL_EXPONENT_DISCOVERY_ENGINE.md) — screens explicit or generated perturbation families through the exact compiler, partitions them into universality and mechanism classes, emits registry-relative exponent-law candidates, and elevates cancellation, critical boundaries, observed-exponent mismatches, and unresolved mechanisms for diagnosis. Reproducible request: [`experiments/face_selection_discovery_v21_request.json`](experiments/face_selection_discovery_v21_request.json).
 
+## Face-selection backend quick start
+
+The face-selection law is the repository's end-to-end **Newton-tropical
+selection principle**. It turns what first appears to be a technical
+asymptotic calculation into one portable mechanism:
+
+1. **Localization:** replace the original global polyhedron by the tangent
+   cone at the selected simple maximizing vertex.
+2. **Selection:** transport the perturbation into the feasible edge chart,
+   restrict it to cone faces, and rank admissible faces by exact weighted
+   degree.
+3. **Scaling:** convert the winning degree into the response exponent
+   `gamma = 1 / (1 - q_star)`.
+
+This single hierarchy:
+
+- organizes the theory around one local geometric object;
+- explains the mechanism rather than merely fitting an exponent;
+- predicts the exponent before numerical measurement;
+- filters irrelevant directions without deleting their audit trail;
+- classifies perturbations as relevant, critical, subleading, or inactive;
+- reveals which constraints remain binding and which are released;
+- identifies cancellation and geometric suppression independently;
+- groups perturbations into universality classes; and
+- generalizes from one example to finite families, portfolios, and parametric
+  phase diagrams.
+
+Within its stated hypotheses, this is a theorem-backed selection law. Across
+the repository's checked examples—including the two ambient-axis
+counterexamples that motivated exact feasible-chart transport—the hierarchy
+has produced the correct mechanism and exponent. Unverified analytic
+hypotheses remain visible in the response, so successful calculation is never
+silently presented as a licensed theorem conclusion.
+
+The implementation lives in the
+[`categorical_polytope`](categorical_polytope/) package and is exposed as a
+reusable backend with Python and JSON process interfaces. Its complete data
+flow is:
+
+```text
+ambient polynomial -> feasible edge chart -> tangent-cone faces
+                   -> Newton weights -> qualified q* -> gamma = 1/(1-q*)
+```
+
+```python
+from categorical_polytope import analyze_face_selection
+
+result = analyze_face_selection({
+    "request_id": "tilted-simplex",
+    "system": "([[-1,0],[0,-1],[1,1]], [0,0,1])",
+    "base": "-((x0+x1-1)**2 + x0**4)",
+    "perturbation": "x0",
+    "observed_exponent": 4 / 3,
+})
+
+assert result["selection"]["weighted_degree"] == 0.25
+assert abs(result["scaling"]["response_exponent"] - 4 / 3) < 1e-9
+```
+
+Run the same capability as a JSON process:
+
+```bash
+python -m categorical_polytope.adjudication.polyhedra.backend --pretty \
+  < experiments/face_selection_ambient_v20_request.json
+```
+
+After `pip install -e .`, the process entry point is also available as
+`categorical-face-selection`. Beyond a single analysis, the backend supports
+finite-family `discover`, cross-case `portfolio`, and parametric
+`phase_diagram` operations. See [`docs/FACE_SELECTION_BACKEND.md`](docs/FACE_SELECTION_BACKEND.md)
+for the complete request and response contracts.
+
+Correctness boundaries are explicit:
+
+- polynomial transport, cancellation, Newton weights, and response exponents
+  retain exact rational arithmetic;
+- boundedness uses an exhaustive recession-cone check for the supported
+  dimensions rather than sampled directions;
+- the linear-programming control admits affine objectives only;
+- malformed batch items fail independently at a total JSON boundary;
+- API-generated candidates remain untrusted and are locally adjudicated;
+- shared campaign pacing uses locked, cross-process request reservations.
+
 ## Four deliverables ("firsts")
 
 | # | Artifact | Location |
@@ -38,8 +121,8 @@ Not tied to Aegis-Ops, www.echovalidum.com, or any other repository.
 ```bash
 python -m categorical_polytope firsts     # manifest paths
 python experiments/run_all.py           # quadratic + nonlinear JSON + figures
-python -m unittest discover -s tests -v   # 13 tests
-pip install -e ".[dev]"                     # optional matplotlib, pytest
+python -m pytest -q                     # 524 tests + 24 subtests in the current suite
+pip install -e ".[dev]"                 # optional matplotlib, pytest
 ```
 
 Full reproduction: [`docs/RUNBOOK.md`](docs/RUNBOOK.md).
@@ -102,6 +185,10 @@ python -m categorical_polytope
 | `fisher_pruned_search.py` | Theorem 3: top-\(k\) Fisher-pruned vertex search |
 | `firsts.py` | Deliverables manifest + run experiments |
 | `nonlinear_objective.py` | Non-quadratic \(C\), empirical Fisher, vertex vs separable |
+| `face_selection.py` | Exact face restriction, admissibility, weighted selection, and scaling |
+| `ambient_face_compiler.py` | Exact ambient-to-edge polynomial transport and term lineage |
+| `face_selection_phase.py` | Parametric Newton-weight chambers, walls, and transitions |
+| `adjudication/polyhedra/backend.py` | Stable Python/JSON backend, discovery, portfolio, and audit contracts |
 | `__main__.py` | Demo CLI |
 
 ## Theory (encoded)

@@ -32,7 +32,8 @@ selection principle**. It turns what first appears to be a technical
 asymptotic calculation into one portable mechanism:
 
 1. **Localization:** replace the original global polyhedron by the tangent
-   cone at the selected simple maximizing vertex.
+   cone at a simple base-maximizing vertex fixed independently of the
+   perturbed optimizer.
 2. **Selection:** transport the perturbation into the feasible edge chart,
    restrict it to cone faces, and rank admissible faces by exact weighted
    degree.
@@ -68,6 +69,66 @@ flow is:
 ambient polynomial -> feasible edge chart -> tangent-cone faces
                    -> Newton weights -> qualified q* -> gamma = 1/(1-q*)
 ```
+
+### The missing geometric step: from an orthant law to a polyhedral law
+
+The orthant Newton–tropical theorem answers a powerful but conditional
+question: once feasible coordinates `c_i >= 0`, base orders `beta_i`, and a
+perturbation polynomial are already given, which weighted monomial controls
+the balance? On its own, that theorem does not say how an arbitrary ambient
+polyhedron produces those coordinates, which coordinate subspaces are actual
+feasible faces, or whether a formal leading term can generate a positive
+improvement on such a face.
+
+The face-selection note supplies exactly that missing geometry. At a simple
+vertex, the inward edge generators are linearly independent, so the edge map
+
+```text
+Phi(c) = v + sum_i c_i u_i,    c_i >= 0
+```
+
+is an isomorphism from the nonnegative orthant onto the tangent cone. It
+transports the ambient base and perturbation into intrinsic feasible
+coordinates and identifies every cone face with a subset of released edge
+coordinates. The orthant balance law can then be applied face by face without
+changing its mechanism. In compact form:
+
+```text
+orthant balance law
+  + exact tangent-cone transport
+  + outcome-independent face qualification
+  = portable face-selection law at a simple polyhedral vertex
+```
+
+This is also what makes the principle **non-circular**. A face is admissible
+using only the localized data `(D_0, R)` and the candidate face `C_S`: its
+degree must be finite with `0 < q_S < 1`, its initial form must not vanish
+identically, and it must admit a relative-interior point where both the base
+cost and leading perturbation gain are positive. None of these tests refers
+to the eventual response exponent, the observed optimizer path, or a
+comparison with another face.
+
+The prohibited circular workflow would be:
+
+```text
+observe a numerical optimizer path -> choose its face -> compute its exponent
+```
+
+The implemented predictive workflow reverses that logic:
+
+```text
+fix the base vertex -> construct its tangent cone -> enumerate every face
+-> transport and restrict exactly -> qualify each face independently
+-> minimize q_S -> predict the active face and exponent -> test numerically
+```
+
+Thus the note is not another calculation layered on top of the orthant
+formula. It is the geometric compiler that turns that formula into a finite,
+portable, auditable selection principle for any simple polyhedral vertex
+satisfying the stated local and global analytic hypotheses. Simplicity is
+essential to this formulation: non-simple vertices require an additional
+cone decomposition or a separate extension theorem and are not silently
+claimed here.
 
 ### The decisive insight: feasibility comes before degree
 

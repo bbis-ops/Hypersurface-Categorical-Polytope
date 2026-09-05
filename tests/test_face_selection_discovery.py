@@ -43,7 +43,7 @@ def test_discovery_screens_and_groups_exact_exponent_laws():
     out = FaceSelectionBackend().handle(discovery())
 
     assert out["operation"] == DISCOVERY_OPERATION
-    assert out["asset_version"] == ASSET_VERSION == "portable-principle.v7"
+    assert out["asset_version"] == ASSET_VERSION == "portable-principle.v8"
     assert out["status"] == "complete"
     assert out["candidate_count"] == 6
     assert out["screening"]["counts"] == {"relevant": 5, "critical": 1}

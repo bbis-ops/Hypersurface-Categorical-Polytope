@@ -150,6 +150,33 @@ def test_invalid_request_does_not_raise_across_the_backend_boundary():
     assert not out["answered"]
 
 
+@pytest.mark.parametrize("extra", ["", "+x1**5"])
+def test_curved_positive_channel_blocks_backend_licensing(extra):
+    out = analyze_face_selection({
+        "system": "([[-1,0],[0,-1],[1,0],[0,1]], [0,0,1,1])",
+        "base": "-(x0**6+x1**6)",
+        "perturbation": "-x0**2+x0*x1**2" + extra,
+    })
+    assert not out["licensed"]
+    assert not out["exact_refinement"]["selection_complete"]
+    assert out["exact_refinement"]["unresolved_faces"] == [[0, 1]]
+    assert not out["scope"]["hypotheses"]["face_selection_settled"]
+    assert any("higher_order_unresolved" in reason for reason in out["scope"]["blockers"])
+
+
+def test_negative_lower_layer_does_not_mask_a_certified_boundary_channel():
+    out = analyze_face_selection({
+        "system": "([[-1,0],[0,-1],[1,0],[0,1]], [0,0,1,1])",
+        "base": "-(x0**6+x1**6)",
+        "perturbation": "-x0**2+x1**3",
+    })
+    assert out["licensed"]
+    assert out["exact_refinement"]["status"] == "applied"
+    assert out["exact_refinement"]["selection_complete"]
+    assert out["selection"]["weighted_degree"] == pytest.approx(0.5)
+    assert out["scaling"]["response_exponent"] == pytest.approx(2)
+
+
 def test_hostile_expression_is_never_executed(monkeypatch):
     import os
 

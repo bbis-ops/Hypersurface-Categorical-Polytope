@@ -1,0 +1,6 @@
+# Store text files with LF in the repository regardless of core.autocrlf.
+# History here was written under core.autocrlf=true (LF blobs), but generators
+# run on Windows emit CRLF. Without this rule a regenerated doc lands in the
+# repo with CRLF while the rest of the tree is LF, producing whole-file diffs
+# whose real content delta is a line or two.
+* text=auto

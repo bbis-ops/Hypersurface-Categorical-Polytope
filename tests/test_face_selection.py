@@ -138,6 +138,92 @@ class TestFaceAlgebra(unittest.TestCase):
         analysis = problem.select().analysis_for({"x"})
         self.assertEqual(analysis.status, FaceStatus.NON_POSITIVE)
 
+    def test_curved_positive_channel_is_not_discarded(self) -> None:
+        # Along x=y**2/2, -x**2+x*y**2=y**4/4. The true gap is
+        # s**3/432 + O(s**6), despite every face initial form being <= 0.
+        result = _orthant_problem((
+            PerturbationMonomial(-1, {"x": 2}),
+            PerturbationMonomial(1, {"x": 1, "y": 2}),
+        ), orders=(6, 6)).select()
+        self.assertIsNone(result.q_star)
+        self.assertFalse(result.theorem_licensed)
+        self.assertEqual(result.analysis_for({"x", "y"}).status,
+                         FaceStatus.HIGHER_ORDER_UNRESOLVED)
+        self.assertEqual(len(result.unresolved_faces), 1)
+        self.assertTrue(any("higher_order_unresolved" in b for b in result.scope_blockers))
+
+    def test_exact_curved_channel_upper_bound_and_witness(self) -> None:
+        # All arithmetic is rational. Taking s=6*t**2 makes the sharp
+        # witness y=t, x=t**2/2 rational as well.
+        for t in (Fraction(1, 10), Fraction(1, 100), Fraction(1, 1000)):
+            s = 6 * t**2
+            upper = s**3 / 432
+            for x, y in ((t**2 / 2, t), (t, t / 2), (Fraction(0), t), (t, Fraction(0))):
+                value = -x**6 - y**6 + s * (-x**2 + x * y**2)
+                certificate = (upper - (y**2 - s / 6)**2 * (y**2 + s / 12)
+                               - s * (x - y**2 / 2)**2 - x**6)
+                self.assertEqual(value, certificate)
+                self.assertLessEqual(value, upper)
+            x, y = s / 12, t
+            lower = -x**6 - y**6 + s * (-x**2 + x * y**2)
+            self.assertEqual(lower, upper - s**6 / 12**6)
+            self.assertGreater(lower, 0)
+            self.assertLess(1 - lower / upper, s**3)
+
+    def test_curved_channel_blocks_an_incorrect_selected_exponent(self) -> None:
+        # y**5 alone predicts exponent 6; the curved channel has exponent 3.
+        result = _orthant_problem((
+            PerturbationMonomial(-1, {"x": 2}),
+            PerturbationMonomial(1, {"x": 1, "y": 2}),
+            PerturbationMonomial(1, {"y": 5}),
+        ), orders=(6, 6)).select()
+        self.assertEqual(result.response_exponent, Fraction(6))
+        self.assertFalse(result.theorem_licensed)
+        self.assertTrue(result.unresolved_faces)
+
+    def test_divisible_positive_remainder_is_absorbed(self) -> None:
+        result = _orthant_problem((
+            PerturbationMonomial(-1, {"x": 2}),
+            PerturbationMonomial(100, {"x": 3, "y": 1}),
+        ), orders=(6, 6)).select()
+        self.assertFalse(result.unresolved_faces)
+        self.assertEqual(result.analysis_for({"x", "y"}).status, FaceStatus.NON_POSITIVE)
+
+    def test_selected_degree_controls_positive_remainders(self) -> None:
+        # R <= y**3 gives the upper bound; x=0 gives the matching lower bound.
+        result = _orthant_problem((
+            PerturbationMonomial(-1, {"x": 2}),
+            PerturbationMonomial(1, {"y": 3}),
+        ), orders=(6, 6)).select()
+        self.assertEqual(result.response_exponent, Fraction(2))
+        self.assertTrue(result.theorem_licensed)
+
+    def test_cancelled_higher_layer_does_not_create_an_obstruction(self) -> None:
+        result = _orthant_problem((
+            PerturbationMonomial(-1, {"x": 2}),
+            PerturbationMonomial(1, {"x": 1, "y": 2}),
+            PerturbationMonomial(-1, {"x": 1, "y": 2}),
+        ), orders=(6, 6)).select()
+        self.assertFalse(result.unresolved_faces)
+
+    def test_critical_positive_remainder_is_bounded_by_base_cost(self) -> None:
+        result = _orthant_problem((
+            PerturbationMonomial(-1, {"x": 2}),
+            PerturbationMonomial(1, {"x": 1, "y": 5}),
+        ), orders=(6, 6)).select()
+        self.assertFalse(result.unresolved_faces)
+
+    def test_interior_zero_locus_remains_unresolved(self) -> None:
+        result = _orthant_problem((
+            PerturbationMonomial(-1, {"x": 2}),
+            PerturbationMonomial(2, {"x": 1, "y": 1}),
+            PerturbationMonomial(-1, {"y": 2}),
+            PerturbationMonomial(1, {"x": 3}),
+        ), orders=(4, 4)).select()
+        self.assertFalse(result.theorem_licensed)
+        self.assertEqual(result.analysis_for({"x", "y"}).status,
+                         FaceStatus.POSITIVITY_UNRESOLVED)
+
     def test_mixed_sign_binomial_gets_constructive_evidence(self) -> None:
         problem = _orthant_problem(
             (

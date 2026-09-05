@@ -1,6 +1,6 @@
 # The mixed-sign binomial positivity-witness law
 
-Formal result **V.19** · backend asset `portable-principle.v7` · exact engine:
+Formal result **V.19** · backend asset `portable-principle.v8` · exact engine:
 `categorical_polytope/face_selection.py`.
 
 ## Abstract
@@ -87,7 +87,8 @@ $$
 q_*=min_{F\text{ qualified}}q_F.
 $$
 
-If the localization, uniform-remainder, and isolation hypotheses are licensed,
+If the localization, uniform-remainder, isolation, and positive-gain
+upper-envelope hypotheses are licensed,
 the backend may therefore return
 
 $$
@@ -95,6 +96,10 @@ $$
 $$
 
 instead of withholding the result because positivity was unresolved.
+
+A binomial witness settles positivity of that layer. It does not by itself
+exclude uncontrolled higher layers on other non-positive faces; see
+[`MATHEMATICAL_AUDIT.md`](MATHEMATICAL_AUDIT.md).
 
 For the implemented example
 

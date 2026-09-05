@@ -1,6 +1,6 @@
 # The finite exponent-law discovery principle
 
-Formal result **V.21** · backend asset `portable-principle.v7` · operation:
+Formal result **V.21** · backend asset `portable-principle.v8` · operation:
 `polyhedral_face_selection_discovery`.
 
 ## Principle

@@ -436,6 +436,7 @@ class AmbientFaceCompilation:
             faces.append({
                 "face": sorted(analysis.face),
                 "status": analysis.status.value,
+                "reason": analysis.reason,
                 "weighted_degree": (
                     None if analysis.degree is None else _number(analysis.degree)
                 ),

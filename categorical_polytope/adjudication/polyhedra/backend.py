@@ -43,6 +43,7 @@ from ...ambient_face_compiler import (
 from ...face_selection import BasePower, EdgeCoordinateChart, WeightedPrincipalPart
 from ...face_selection_phase import problem_from_mapping as phase_problem_from_mapping
 from .domain import PolyhedronDomain
+from .curved import OPERATION as CURVED_OPERATION, analyze_curved_polyhedron
 from .predict import (
     CRITICAL,
     INACTIVE,
@@ -58,7 +59,7 @@ from .predict import (
 
 
 SCHEMA_VERSION = "face-selection.backend.v1"
-ASSET_VERSION = "portable-principle.v7"
+ASSET_VERSION = "portable-principle.v8"
 OPERATION = "polyhedral_face_selection"
 PORTFOLIO_OPERATION = "polyhedral_face_selection_portfolio"
 PHASE_OPERATION = "polyhedral_face_selection_phase_diagram"
@@ -261,6 +262,11 @@ class FaceSelectionBackend:
         except (RequestValidationError, TypeError, ValueError) as exc:
             return _error_response("invalid_request", str(exc), request_id=request_id)
         try:
+            if payload.get("operation") in {"curved_reduction", CURVED_OPERATION}:
+                return analyze_curved_polyhedron(
+                    request.system, request.base, request.perturbation,
+                    request_id=request.request_id,
+                )
             return self.analyze(request)
         except Exception as exc:  # the backend boundary must remain total
             return _error_response(
@@ -528,6 +534,12 @@ def _response(
     groups = prediction.by_relevance()
     hypotheses, blockers = _scope(prediction)
     invariants = _effective_invariants(request, prediction)
+    if not invariants["refinement"].get("selection_complete", True):
+        licensed = False
+        status = "unlicensed" if prediction.answered else "refused"
+        blockers.extend(invariants["refinement"].get("selection_blockers", []))
+        if hypotheses is not None:
+            hypotheses["face_selection_settled"] = False
     universality = _universality_class(prediction, invariants)
     mechanism = _mechanism(prediction, invariants)
     perturbation_analysis = _classify_perturbation_terms(
@@ -594,8 +606,9 @@ def _response(
             "binding": list(prediction.binding),
             "released": list(prediction.released),
             "interpretation": (
-                "released constraints open the winning asymptotic channel; "
-                "binding constraints define its face"
+                "released and binding constraints describe the candidate leading "
+                "channel; the optimizer's exact support needs reduced and possibly "
+                "subleading analysis"
             ),
         },
         "mechanism": mechanism,
@@ -647,6 +660,12 @@ def _effective_invariants(
         system=request.system,
         base_expression=request.base,
     )
+    if symbolic is not None:
+        refinement.update({
+            "selection_complete": symbolic.get("selection_complete", False),
+            "unresolved_faces": symbolic.get("unresolved_faces", []),
+            "selection_blockers": symbolic.get("selection_blockers", []),
+        })
     if not prediction.answered:
         if symbolic is None:
             ambient_hierarchy = unavailable_hierarchy
@@ -695,7 +714,7 @@ def _effective_invariants(
         )
         refinement.update({
             "status": "incomplete",
-            "reason": "at least one symbolic face still needs positivity evidence",
+            "reason": "at least one symbolic face needs positivity or higher-order control",
             "unresolved_faces": symbolic.get("unresolved_faces", []),
         })
     else:
@@ -1101,6 +1120,7 @@ def _term_classification(
         classification_licensed = bool(
             total_prediction.hypotheses is not None
             and total_prediction.hypotheses.licensed
+            and symbolic.get("selection_complete", False)
         )
     else:
         assert term_prediction is not None
@@ -1258,6 +1278,12 @@ def _symbolic_term_classification(
             "weight_source": weight_source,
         }
     minimum = min(analysis.degree for analysis in with_degree if analysis.degree is not None)
+    if result.q_star is not None:
+        # Negative lower layers on other faces do not replace a qualified
+        # channel. Uncontrolled remainders still block licensing below.
+        minimum = result.q_star
+    elif result.unresolved_faces:
+        minimum = min(analysis.degree for analysis in result.unresolved_faces)
     at_minimum = [analysis for analysis in with_degree if analysis.degree == minimum]
     statuses = {analysis.status for analysis in at_minimum}
     if FaceStatus.ADMISSIBLE in statuses:
@@ -1272,10 +1298,11 @@ def _symbolic_term_classification(
         relevance, reason, exponent = (
             "subleading", "exact edge-polynomial degree is q > 1", None
         )
-    elif FaceStatus.POSITIVITY_UNRESOLVED in statuses:
+    elif statuses & {FaceStatus.POSITIVITY_UNRESOLVED, FaceStatus.HIGHER_ORDER_UNRESOLVED}:
         relevance, reason, exponent = (
             "unresolved",
-            "general mixed-sign initial form needs a positivity witness",
+            "; ".join(analysis.reason for analysis in at_minimum
+                      if analysis in result.unresolved_faces),
             None,
         )
     else:
@@ -1287,7 +1314,7 @@ def _symbolic_term_classification(
         "relevant": {FaceStatus.ADMISSIBLE},
         "critical": {FaceStatus.CRITICAL},
         "subleading": {FaceStatus.SUBLEADING},
-        "unresolved": {FaceStatus.POSITIVITY_UNRESOLVED},
+        "unresolved": {FaceStatus.POSITIVITY_UNRESOLVED, FaceStatus.HIGHER_ORDER_UNRESOLVED},
         "inactive": {
             FaceStatus.NON_POSITIVE,
             FaceStatus.CANCELLED_INITIAL_FORM,
@@ -1338,6 +1365,10 @@ def _symbolic_term_classification(
         "supporting_faces": supporting_faces,
         "response_exponent": exponent,
         "selection_complete": not unresolved_faces,
+        "selection_blockers": [
+            f"{analysis.status.value} on face {sorted(analysis.face)}: {analysis.reason}"
+            for analysis in result.unresolved_faces
+        ],
         "unresolved_faces": unresolved_faces,
         "positivity_certificates": positivity_certificates,
         "ambient_transport": ambient_transport,

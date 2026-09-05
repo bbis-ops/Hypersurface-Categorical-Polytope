@@ -230,46 +230,52 @@ With $W_S$ a nonzero polynomial this is automatic; it is stated because the
 initial form of a \emph{sum} over a face can cancel even when no individual
 monomial does.
 
-\section{Inactive and non-positive faces contribute nothing}
+\section{Upper control on unqualified faces}
 
-The first draft excluded such faces by fiat. Under \eqref{eq:partition} they
-must be shown harmless, because the supremum ranges over all of them.
+The former assertion that every unqualified face contributes nothing is
+false for signed perturbations. On $[0,1]^2$, take $D_0=x^6+y^6$ and
+$R=-x^2+xy^2$. All face initial forms are non-positive, yet
+\[
+ -D_0+sR=\frac{s^3}{432}
+ -(y^2-s/6)^2(y^2+s/12)-s(x-y^2/2)^2-x^6.
+\]
+Evaluating at $y=\sqrt{s/6}$, $x=s/12$ gives
+\[
+ \frac{s^3}{432}-\frac{s^6}{12^6}\le\Delta(s)\le\frac{s^3}{432}.
+\]
+Uniform convergence to a non-positive initial form does not preserve its
+sign near its zero set. See \texttt{MATHEMATICAL\_AUDIT.md} for the proof,
+a family of counterexamples, and the implemented sufficient certificates.
 
-\begin{lemma}\label{lem:inadmissible}
-Let $S$ be a face that is not admissible. Then $S$ yields no positive
-improvement for all small $s$, and in particular never determines the leading
-order.
+\begin{lemma}[safe exclusions]\label{lem:inadmissible}
+An inactive face gives no improvement. A face on which
+$R_+(c):=\max(R(c),0)\le K D_0(c)$ locally also gives no improvement for
+small $s$. This includes faces whose surviving terms all have degree at
+least one, and faces on which $R\le0$ locally.
 \end{lemma}
-
 \begin{proof}
-Three cases.
-
-\emph{Inactive.} $R|_{C_S}=0$, so the objective on $C_S$ is $-D(c)\le0$ by
-Hypothesis~\ref{hyp:pos}, with supremum $0$ approached only as $c\to0$. It
-contributes nothing positive at all. This is the tilted simplex's vertical
-edge: feasible, but perturbatively silent.
-
-\emph{Active, not positive.} $W_S\le0$ throughout $\relint(C_S)$. Writing
-$c=\delta_\tau z$ with $z$ on a compact cross-section,
-Hypothesis~\ref{hyp:pert} gives
-$R|_{C_S}(\delta_\tau z)=\tau^{q_S}(W_S(z)+e_R)\le0$ for small $\tau$ by
-uniformity, whence the objective is $\le-\tau(D_0(z)+e_D)\le0$.
-
-\emph{Active, positive, not subcritical.} $q_S\ge1$. The leading balance of
-Section~\ref{sec:balance} is $-\tau A+s\tau^{q_S}B$ with $A,B>0$. For
-$q_S>1$, $\tau^{q_S}=o(\tau)$ and the expression is negative for all small
-$\tau>0$ once $s$ is small. For $q_S=1$ it equals $\tau(sB-A)$, negative once
-$s<A/B$. Either way the face yields no positive improvement at small $s$.
+The compact closed section $D_0(z)=1$ and Hypothesis~\ref{hyp:base}
+give $D(c)\ge aD_0(c)$ near the origin for some $a>0$. Hence
+$-D+sR\le(-a+sK)D_0\le0$ when $sK<a$. Terms of degree at least one
+are bounded by a constant times $D_0$ on the same normalized section.
 \end{proof}
 
-Lemma~\ref{lem:inadmissible} turns \eqref{eq:partition} into a maximum over
-admissible faces only. It is the step that makes ``inadmissible'' mean
-\emph{contributes nothing} rather than \emph{excluded by hand}.
+\begin{hypothesis}[uniform positive-gain envelope]\label{hyp:envelope}
+The independently qualified faces have a minimum $q^\star\in(0,1)$,
+and there is a finite $K$ such that, near the vertex,
+\[
+ R_+(c)\le K D_0(c)^{q^\star}.
+\]
+\end{hypothesis}
+This is automatic for nonnegative combined coefficients, and when the
+full cone's lowest layer has a positive witness. Other signed polynomials
+need separate control near zeros of non-positive initial forms.
 
 \section{The facewise balance}\label{sec:balance}
 
-Fix an admissible $S$ and a compact cross-section $Z$ of $\relint(C_S)$---for
-instance $\{z\in C_S:D_0(z)=1\}$, compact by Hypothesis~\ref{hyp:pos}. Write
+Fix an admissible $S$ and the closed cross-section
+$Z=\{z\in C_S:D_0(z)=1\}$, compact by positive base coefficients.
+It includes the boundary; its relative-interior portion need not be compact. Write
 $c=\delta_\tau z$. By Hypotheses~\ref{hyp:base} and~\ref{hyp:pert}, uniformly
 for $z\in Z$,
 \[
@@ -289,7 +295,7 @@ Since $\tau_\ast=\Theta\bigl(s^{1/(1-k)}\bigr)$, so is $J$. Uniformity of
 $e_D$ and $e_R$ on $Z$ is what lets the supremum over $z$ pass inside the
 limit, giving matching upper and lower constants and hence
 \[
-  \sup_{c\in\relint(C_S)}J_s=\Theta\bigl(s^{1/(1-q_S)}\bigr),
+  \sup_{c\in\relint(C_S),\ c\text{ near }0}J_s=\Theta\bigl(s^{1/(1-q_S)}\bigr),
   \qquad
   \gamma_S=\frac{1}{1-q_S}.
 \]
@@ -304,7 +310,7 @@ $s=10^{-2},\,2.5\times10^{-3},\,6.25\times10^{-4}$.
 \section{Selection, qualified}\label{sec:selection}
 
 \begin{theorem}\label{thm:selection}
-Assume Hypotheses~\ref{hyp:iso}--\ref{hyp:nocancel} and that at least one face
+Assume Hypotheses~\ref{hyp:iso}--\ref{hyp:envelope} and that at least one face
 is admissible. Put $q^\star=\min\{q_S:\ S\ \text{admissible}\}$. Then
 \[
   M(s)-F(v)-sG(v)=\Theta\bigl(s^{1/(1-q^\star)}\bigr),
@@ -314,12 +320,12 @@ is admissible. Put $q^\star=\min\{q_S:\ S\ \text{admissible}\}$. Then
 \end{theorem}
 
 \begin{proof}
-Lemma~\ref{lem:isolation} localises the supremum to a neighbourhood of $v$,
-where $\Phi$ is a bijection onto the cone. By \eqref{eq:partition} and
-Lemma~\ref{lem:inadmissible} the supremum is the maximum over admissible faces
-of $\Theta(s^{1/(1-q_S)})$ from Section~\ref{sec:balance}. Since $1/(1-q)$ is
-increasing on $(0,1)$ and $s<1$, the largest such term is the one with the
-smallest exponent, i.e.\ the smallest $q_S$.
+Lemma~\ref{lem:isolation} localises the maximum. Put $t=D_0(c)$.
+Hypotheses~\ref{hyp:base} and~\ref{hyp:envelope} give
+$-D+sR\le-at+sKt^{q^\star}$ for some $a>0$. The supremum of this scalar
+expression is $O(s^{1/(1-q^\star)})$. A fixed positive witness on a
+qualified minimizing face gives the matching lower bound by
+Section~\ref{sec:balance}.
 \end{proof}
 
 \begin{proposition}[relation to V.16's monomial minimum]\label{prop:v16}
@@ -378,7 +384,7 @@ That is the \texttt{ambient\_exponent\_law} counterexample, stated exactly.
 \section{Scope}
 
 Conditional statement: for a \emph{simple} vertex, under
-Hypotheses~\ref{hyp:iso}--\ref{hyp:nocancel}, the asymptotic exponent is
+Hypotheses~\ref{hyp:iso}--\ref{hyp:envelope}, the asymptotic exponent is
 $\gamma=1/(1-q^\star)$ with $q^\star$ the minimum weighted degree over
 \emph{admissible} faces.
 
@@ -462,17 +468,17 @@ later called admissible.
 \paragraph{Admissibility, and why it is non-circular.}
 Definition~\ref{def:adm}: active, positive, subcritical. All three refer only
 to $(D_0,R)$ and the combinatorial face, never to $M(s)$ or to $\gamma$.
-Lemma~\ref{lem:inadmissible} then shows that a face failing any of them
-contributes nothing positive at small $s$, so ``inadmissible'' means
-\emph{contributes nothing} rather than \emph{excluded by hand}.
+Failure of these tests does not imply absence of positive improvement.
+Lemma~\ref{lem:inadmissible} gives safe exclusions; the additional uniform
+envelope in Hypothesis~\ref{hyp:envelope} controls the full supremum.
 
 \paragraph{Selection and the qualified minimum.}
 Theorem~\ref{thm:selection} takes $q^\star$ over admissible faces, and
 Proposition~\ref{prop:v16} relates it to V.16's monomial minimum:
 $q^\star\ge\min_jq_j$, with equality exactly when some face attaining
 $\min_jq_j$ is admissible. If a formally smaller $q_j$ belongs to an
-inadmissible face it is simply omitted, and the asymptotics are governed by
-the next-smallest admissible value.
+inadmissible face, omitting it is safe only after verifying the upper envelope.
+Curved approaches near its zeros can otherwise expose a missed mechanism.
 
 \paragraph{Predicted exponent, stationary scale, exact coefficient.}
 The facewise balance of Section~\ref{sec:balance} gives
@@ -494,11 +500,11 @@ along infeasible rays have no standing in the constrained problem.
 The results above organise into three interlocking statements. They are
 restatements, not additions: each is a reading of a lemma already proved.
 
-\subsection*{1. The boundary controls the singularity}
+\subsection*{1. The tangent cone organises the singularity}
 
-Near a simple vertex the singular behaviour of $M(s)-F(v)-sG(v)$ is determined
-by the faces of the tangent cone, not by the relative interior of the full
-cone.
+Near a simple vertex, the tangent cone carries the local optimization
+problem. Its full-dimensional face must be included: a coupled perturbation
+can attain its optimum in the relative interior of the full cone.
 
 After transport to edge coordinates the base drop has principal part
 $D_0(c)=\sum_iA_ic_i^{\beta_i}$ with $\beta_i>1$, so any interior direction
@@ -508,14 +514,12 @@ improvement of order $s^{1/(1-q)}$ only when $q<1$, and the balance realising
 it is the elementary competition between a term of order $\tau$ and one of
 order $s\tau^{q}$.
 
-The same competition can be run on an open subset of the orthant, but its
-critical point can always be projected onto a face by setting coordinates to
-zero. Every coordinate set to zero removes a non-negative base cost while, by
-the support rule, never introducing a leading perturbation term of lower
-weight, so the projected point improves by at least as much. Consequently the
-maximiser of the local model lies on a face---which is what
-\eqref{eq:partition} together with Lemma~\ref{lem:inadmissible} says
-formally.
+Projection onto a proper face need not preserve perturbative gain. For
+$D_0=x^4+y^4$ and $R=xy$, every proper face has zero gain while the
+interior has positive gain for small $s$. The face partition
+\eqref{eq:partition} includes the full cone and does not assert boundary
+optimality. Signed perturbations can also require curved approaches beyond
+the first initial forms, as the counterexample above shows.
 
 In the tilted simplex this is visible by elementary calculus: the objective
 $-a^4-b^2+sa$ is strictly decreasing in $b$ for $b>0$, so the maximiser is
@@ -532,7 +536,7 @@ $s^{1/(1-q_S)}$; higher-weight faces contribute only lower-order terms.
 On an admissible face the balance $-\tau A+s\tau^{q_S}B$ with $A,B>0$ has
 stationary value of exact order $s^{1/(1-q_S)}$, and $q\mapsto1/(1-q)$ is
 strictly increasing on $(0,1)$. A smaller $q$ therefore gives a strictly
-larger exponent and, for small $s$, a strictly larger improvement. Comparing
+smaller exponent and, for small $s$, a strictly larger improvement. Comparing
 faces gives $q^\star=\min_{S\ \mathrm{admissible}}q_S$, every larger $q_S$
 contributing a remainder $o(s^{1/(1-q^\star)})$.
 
@@ -575,7 +579,7 @@ three layers:
   \item \emph{Localisation}: the tangent cone replaces the global geometry
         (Lemma~\ref{lem:isolation}).
   \item \emph{Selection}: admissible faces are ranked by weighted degree
-        (Definition~\ref{def:adm}, Lemma~\ref{lem:inadmissible}).
+        with upper control (Definition~\ref{def:adm}, Hypothesis~\ref{hyp:envelope}).
   \item \emph{Scaling}: the winning degree becomes the response exponent
         (Section~\ref{sec:balance}, Theorem~\ref{thm:selection}).
 \end{enumerate}
@@ -722,9 +726,9 @@ singular asymptotics at simple polyhedral vertices---one that
         selection among admissible faces, and conversion of the winning weight
         into a response exponent form a single hierarchy;
 
-  \item \textbf{explains the mechanism} --- the boundary controls the
-        singularity because interior directions project onto faces without
-        losing leading improvement; the lowest admissible weight dominates
+  \item \textbf{explains the mechanism} --- the tangent cone organises the
+        singularity; under the uniform envelope
+        the lowest admissible weight dominates
         because $q\mapsto1/(1-q)$ is increasing; the feasible face selects the
         exponent because only algebraically and geometrically admissible
         channels enter the minimum;
@@ -742,9 +746,10 @@ singular asymptotics at simple polyhedral vertices---one that
   \item \textbf{classifies perturbations} --- relevant, critical, subleading
         and inactive, as in implication~\ref{imp:classes};
 
-  \item \textbf{reveals active constraints} --- a measured fractional exponent
-        identifies both the weighted order of the active perturbation,
-        $q^\star=1-1/\gamma$, and the face on which it is realised;
+  \item \textbf{identifies candidate active constraints} --- under the theorem's
+        hypotheses, a measured exponent gives the effective weight
+        $q^\star=1-1/\gamma$. Multiple faces may realize it; exact optimizer
+        support requires further reduced and possibly subleading analysis;
 
   \item \textbf{generalises cleanly} --- the three principles apply at any
         simple vertex once edge coordinates, a weighted principal part and a

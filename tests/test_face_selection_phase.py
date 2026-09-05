@@ -251,7 +251,7 @@ def test_backend_v18_returns_the_qualified_selection_consequence():
         },
     })
 
-    assert out["asset_version"] == "portable-principle.v7"
+    assert out["asset_version"] == "portable-principle.v8"
     assert out["status"] == "licensed"
     assert out["phase_diagram"]["summary"]["dynamic_qualification_count"] == 1
     transition = out["phase_diagram"]["transitions"][0]

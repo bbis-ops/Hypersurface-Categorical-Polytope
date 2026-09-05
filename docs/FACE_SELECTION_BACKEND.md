@@ -76,7 +76,9 @@ After installing the package, the same interface is available as
 ## Request contract
 
 The wire schema remains `face-selection.backend.v1`; the additive portable-law
-extension is identified by `asset_version = portable-principle.v7`. Existing
+extension is identified by `asset_version = portable-principle.v8`. Version 8
+adds fail-closed higher-layer control for signed perturbations; consumers that
+use licensing status should treat the correction as semantically significant. Existing
 v1 consumers can ignore the new fields without changing behavior.
 
 | Field | Required | Meaning |
@@ -151,7 +153,29 @@ law candidates, and diagnostic candidates. `include_cases = true` attaches
 every full backend response; it defaults to false so large screens stay
 compact. See [V.21](FORMAL_EXPONENT_DISCOVERY_ENGINE.md).
 
-## Status semantics
+## Curved channels by exact quadratic elimination
+
+Set `operation` to `curved_reduction` (alias `polyhedral_curved_reduction`)
+to use the [quadratic-elimination theorem](FORMAL_CURVED_REDUCTION.md).
+This operation accepts the same `system`, `base`, `perturbation`, and optional
+`request_id` fields. It has its own `curved-reduction.backend.v1` response
+contract: `localization`, `reduction`, `scaling`, and `scope`.
+
+For an exact two-dimensional loss `A*x^p+B*y^q` and perturbation
+`-a*x^2+x*H(y)+K(y)`, it combines the reduced polynomial
+`S(y)=H(y)^2/(4*a)+K(y)` exactly. A positive initial order `alpha<q`, a
+positive square-center curve of order `r`, and `p*r>q` license
+`gamma=q/(q-alpha)` and a sharp closed-form coefficient. The full base,
+simple vertex, feasibility, and boundedness are checked exactly.
+
+Supported cases return `status="licensed"`; unproved cases return
+`status="outside_scope"` with blockers and vertex attempts. A refused
+reduction does not assert that the true response vanishes. The original
+face-selection operation retains its separate scope and audit.
+
+Example: [`curved_reduction_request.json`](../experiments/curved_reduction_request.json).
+
+## Face-selection status semantics
 
 ### `licensed`
 
@@ -159,12 +183,17 @@ The exponent was produced and all measured hypotheses hold: the selected
 vertex is simple, every edge order exceeds one, the base has the required
 weighted homogeneity, and the maximizer is isolated to the resolution of the
 probe. The winning face degree and all potentially competing face degrees must
-also have settled numerically.
+also have settled numerically. For exactly transported polynomials, unresolved
+positivity or higher positive layers block licensing even if the numerical
+face probes appear settled. See the corrected upper-bound hypothesis and
+exact counterexample in [the mathematical audit](MATHEMATICAL_AUDIT.md).
 
 ### `unlicensed`
 
 The algebraic exponent was produced but at least one analytic hypothesis is
-unmet, or a potentially competing face degree remains numerically unsettled.
+unmet, a potentially competing face degree remains numerically unsettled,
+or exact transport finds an uncontrolled higher positive layer near zeros of
+a non-positive initial form (`higher_order_unresolved`).
 The number is returned because it is diagnostically valuable; the
 `scope.blockers` list prevents a caller from mistaking it for a warranted
 conclusion.
@@ -174,7 +203,15 @@ conclusion.
 The setting lies outside this law: examples include an unbounded system, no
 simple maximizing vertex, no positively active face, or a winning degree
 outside `(0,1)`. Localization evidence reached before the refusal remains in
-the response.
+the response. A refusal for lack of a qualified face does not prove zero
+response: curved approaches can produce gains beyond the current selector.
+`exact_refinement.selection_complete`, `unresolved_faces`, and the scope
+blockers distinguish unresolved cases.
+
+The `active_constraints` field describes candidate leading channels. Exact
+optimizer support can include additional coordinates at subleading scales;
+face-degree selection alone does not certify that the reported binding
+constraints remain equalities at every small positive perturbation.
 
 ### `invalid_request` and `analysis_error`
 

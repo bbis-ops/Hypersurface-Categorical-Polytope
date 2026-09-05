@@ -149,41 +149,46 @@ not vanish identically on `relint(C_S)`. With `W_S` a nonzero polynomial this
 is automatic; it is stated because the initial form of a *sum* over a face can
 cancel even when no individual monomial does.
 
-## 6. Inactive and non-positive faces contribute nothing
+## 6. Upper control on unqualified faces
 
-The first draft excluded such faces by fiat. Under (*) they must be shown
-harmless, because the supremum ranges over all of them.
+**Correction.** The former Lemma 2 asserted that every unqualified face
+contributes nothing. This is false for signed perturbations. With
+`D_0=x^6+y^6` and `R=-x^2+xy^2`, every face is unqualified, but completing
+the square proves `Delta(s) ~ s^3/432`. Uniform convergence to a non-positive
+initial form does not preserve its sign near its zero set. See the exact
+proof and implementation certificate in
+[`MATHEMATICAL_AUDIT.md`](MATHEMATICAL_AUDIT.md).
 
-**Lemma 2.** Let `S` be a face that is not admissible. Then `S` yields no
-positive improvement for all small `s`, and in particular never determines the
-leading order.
+**Lemma 2 (safe exclusions).** An inactive face gives no improvement. A face
+on which `R_+(c) <= K D_0(c)` locally also gives no improvement for small
+`s`. In particular this holds if every surviving monomial has degree at
+least one, or if `R <= 0` locally.
 
-*Proof.* Three cases.
+*Proof.* The compact closed section `D_0(z)=1` and Hypothesis 2 give
+`D(c) >= a D_0(c)` for some `a>0`. Thus
+`-D+sR <= (-a+sK)D_0 <= 0` when `sK<a`. If every degree is at least one,
+normalizing on that same section bounds `R_+` by `K D_0` locally. ∎
 
-*Inactive.* `R|C_S = 0`, so the objective on `C_S` is `-D(c) <= 0` by
-Hypothesis 1, with supremum `0` approached only as `c -> 0`. It contributes
-nothing positive at all. This is the tilted simplex's vertical edge: feasible,
-but perturbatively silent.
+For the selection theorem define `q*` from independently qualified faces,
+then require the additional data-only upper bound:
 
-*Active, not positive.* `W_S <= 0` throughout `relint(C_S)`. Writing
-`c = delta_tau z` with `z` on a compact cross-section, Hypothesis 3 gives
-`R|C_S(delta_tau z) = tau**q_S (W_S(z) + e_R)`, which is `<= 0` for small
-`tau` by uniformity. The objective is then `<= -tau(D_0(z) + e_D) <= 0`.
+**Hypothesis 5 (uniform positive-gain envelope).** The qualified set is
+nonempty, and near the vertex there is a finite `K` such that
 
-*Active, positive, not subcritical.* `q_S >= 1`. The leading balance of section
-7 is `-tau A + s tau**q_S B` with `A, B > 0`. For `q_S > 1`, `tau**q_S = o(tau)`
-and the expression is negative for all small `tau > 0` once `s` is small. For
-`q_S = 1` it is `tau(sB - A)`, negative once `s < A/B`. Either way the face
-yields no positive improvement at small `s`. ∎
+    R_+(c) := max(R(c), 0) <= K D_0(c)**q*.
 
-Lemma 2 turns (*) into a maximum over admissible faces only. It is the step
-that makes "inadmissible" mean *contributes nothing* rather than *excluded by
-hand*.
+This holds automatically for nonnegative combined polynomial coefficients.
+It also holds when the full cone's lowest layer has a positive witness.
+For other signed polynomials it needs a separate certificate; qualification
+alone is insufficient. The backend checks monomial domination of negative
+layers and retains uncontrolled cases as `higher_order_unresolved`.
 
 ## 7. The facewise balance
 
-Fix an admissible `S` and a compact cross-section `Z` of `relint(C_S)` — for
-instance `{z in C_S : D_0(z) = 1}`, compact by Hypothesis 1. Write
+Fix an admissible `S` and the closed cross-section
+`Z = {z in C_S : D_0(z) = 1}`, compact by positivity of the base coefficients.
+This section includes the boundary; its relative-interior portion need not
+be compact. Write
 `c = delta_tau z`. By Hypotheses 2 and 3, uniformly for `z` in `Z`,
 
     J_s(tau, z) = -D(delta_tau z) + s R(delta_tau z)
@@ -202,7 +207,7 @@ Since `tau_*` scales as `s**(1/(1-k))`, so does `J`. Uniformity of `e_D` and
 `e_R` on `Z` is what lets the supremum over `z` pass inside the limit, giving
 matching upper and lower constants and hence
 
-    sup_{c in relint(C_S)} J_s = Theta( s**(1/(1-q_S)) ),
+    sup_{c in relint(C_S), c near 0} J_s = Theta( s**(1/(1-q_S)) ),
 
 so the face predicts `gamma_S = 1/(1 - q_S)`.
 
@@ -217,10 +222,11 @@ Define
 
     q* = min { q_S : S admissible }.
 
-By (*) and Lemma 2 the supremum over the cone is the maximum over admissible
-faces of `Theta(s**(1/(1-q_S)))`. Since `1/(1-q)` is increasing on `(0,1)` and
-`s < 1`, the largest of these is the one with the **smallest** exponent, hence
-the smallest `q_S`. With Lemma 1 localising the global problem,
+Under Hypothesis 5, put `t=D_0(c)`. Hypothesis 2 gives the uniform upper
+bound `-D+sR <= -a t+sK t**q*` for some `a>0`. Maximizing this scalar
+expression gives `O(s**(1/(1-q*)))`. A fixed positive witness on a minimizing
+qualified face gives the matching lower bound by section 7. With Lemma 1
+localising the global problem,
 
     M(s) - F(v) - s G(v) = Theta( s**(1/(1-q*)) ),    gamma = 1/(1-q*).
 
@@ -268,7 +274,7 @@ That is the `ambient_exponent_law` counterexample, stated exactly.
 
 ## 10. Scope
 
-Conditional statement: for a **simple** vertex, under Hypotheses 0–4, the
+Conditional statement: for a **simple** vertex, under Hypotheses 0–5, the
 asymptotic exponent is `gamma = 1/(1 - q*)` with `q*` the minimum weighted
 degree over **admissible** faces.
 

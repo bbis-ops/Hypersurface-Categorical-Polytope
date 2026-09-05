@@ -2,7 +2,7 @@
 
 Formal result **V.17** · executable module:
 `categorical_polytope/face_selection_phase.py` · backend asset:
-`portable-principle.v7` (V.17 phase fan, V.18 qualification, V.19
+`portable-principle.v8` (V.17 phase fan, V.18 qualification, V.19
 constructive binomial positivity, V.20 exact ambient transport, and V.21
 finite-family discovery).
 

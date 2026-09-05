@@ -20,13 +20,16 @@ licensed conclusion. General mixed-sign initial forms require an explicit
 positive relative-interior witness, but a binomial with distinct signatures is
 resolved constructively by monomial-ratio separation. Absence of either
 certificate is ``UNRESOLVED``, not evidence of inactivity. The implementation
-is stdlib-only and uses
+also checks higher positive layers over non-positive initial forms: curved
+approaches to their zeros can produce gains missed by coordinate faces.
+Uncontrolled layers prevent theorem licensing (see docs/MATHEMATICAL_AUDIT.md).
+The implementation is stdlib-only and uses
 ``fractions.Fraction`` for all weights and response exponents.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from enum import Enum
 from fractions import Fraction
 from itertools import combinations
@@ -382,6 +385,7 @@ class FaceStatus(Enum):
     ZERO_WEIGHT = "zero_weight"
     NON_POSITIVE = "non_positive"
     POSITIVITY_UNRESOLVED = "positivity_unresolved"
+    HIGHER_ORDER_UNRESOLVED = "higher_order_unresolved"
     CRITICAL = "critical"
     SUBLEADING = "subleading"
 
@@ -446,7 +450,9 @@ class SelectionResult:
     @property
     def scope_blockers(self) -> tuple[str, ...]:
         face_blockers = tuple(
-            f"positivity is unresolved on face {_face_key(analysis.face)}"
+            ("positivity is unresolved" if analysis.status is FaceStatus.POSITIVITY_UNRESOLVED
+             else analysis.status.value)
+            + f" on face {_face_key(analysis.face)}: {analysis.reason}"
             for analysis in self.unresolved_faces
         )
         return self.hypotheses.blockers + face_blockers
@@ -458,7 +464,10 @@ class SelectionResult:
     @property
     def unresolved_faces(self) -> tuple[FaceAnalysis, ...]:
         return tuple(
-            a for a in self.analyses if a.status is FaceStatus.POSITIVITY_UNRESOLVED
+            a for a in self.analyses if a.status in {
+                FaceStatus.POSITIVITY_UNRESOLVED,
+                FaceStatus.HIGHER_ORDER_UNRESOLVED,
+            }
         )
 
     @property
@@ -525,9 +534,13 @@ class FaceSelectionProblem:
             self._analyse_face(face, witnesses.get(face)) for face in self.faces()
         )
         admissible = tuple(a for a in analyses if a.status is FaceStatus.ADMISSIBLE)
+        q_star = min(
+            (a.degree for a in admissible if a.degree is not None), default=None
+        )
+        analyses = self._guard_nonpositive_remainders(analyses, q_star)
         if not admissible:
             return SelectionResult(analyses, self.hypotheses, None, None, ())
-        q_star = min(a.degree for a in admissible if a.degree is not None)
+        assert q_star is not None
         winners = tuple(a.face for a in admissible if a.degree == q_star)
         return SelectionResult(
             analyses=analyses,
@@ -536,6 +549,56 @@ class FaceSelectionProblem:
             response_exponent=1 / (1 - q_star),
             winning_faces=winners,
         )
+
+    def _guard_nonpositive_remainders(
+        self, analyses: tuple[FaceAnalysis, ...], q_star: Fraction | None,
+    ) -> tuple[FaceAnalysis, ...]:
+        """Certify an upper bound before discarding a negative initial layer.
+
+        Strict negativity in a face's relative interior need not be uniform
+        near its boundary. For example, -x**2 + x*y**2 is positive along
+        x=y**2/2 although its initial form for equal weights is -x**2.
+
+        Positive terms of degree >= q_star obey the required upper envelope
+        C*D_0**q_star. A lower-degree positive term can instead be absorbed
+        locally by a negative initial monomial that divides it: their ratio
+        tends uniformly to zero. If neither certificate applies, retain an
+        unresolved face. With no selected channel use degree 1 as the cutoff;
+        an O(D_0) perturbation cannot improve the objective for small s.
+        """
+        cutoff = q_star if q_star is not None else Fraction(1)
+        guarded = []
+        for analysis in analyses:
+            if analysis.status is not FaceStatus.NON_POSITIVE:
+                guarded.append(analysis)
+                continue
+            assert analysis.initial_form is not None
+            negative = analysis.initial_form.terms
+            combined = self._combine_like_terms(tuple(
+                term for term in self.perturbation.terms
+                if term.support <= analysis.face
+            ))
+            uncontrolled = any(
+                term.coefficient > 0
+                and term.weighted_degree(self.principal) < cutoff
+                and not any(
+                    all(term.powers.get(axis, 0) >= power
+                        for axis, power in divisor.powers.items())
+                    for divisor in negative
+                )
+                for term in combined
+            )
+            if uncontrolled:
+                analysis = replace(
+                    analysis, status=FaceStatus.HIGHER_ORDER_UNRESOLVED,
+                    reason=(
+                        "a higher positive layer may contribute near zeros of the "
+                        "non-positive initial form; a uniform upper bound or "
+                        "analysis along curved approaches is required"
+                    ),
+                )
+            guarded.append(analysis)
+        return tuple(guarded)
 
     def stationary_profile(
         self,

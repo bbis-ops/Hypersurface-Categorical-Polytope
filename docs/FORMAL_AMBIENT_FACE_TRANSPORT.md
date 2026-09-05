@@ -1,6 +1,6 @@
 # The feasible-chart transport principle
 
-Formal result **V.20** · backend asset `portable-principle.v7` · exact compiler:
+Formal result **V.20** · backend asset `portable-principle.v8` · exact compiler:
 `categorical_polytope/ambient_face_compiler.py`.
 
 ## Statement

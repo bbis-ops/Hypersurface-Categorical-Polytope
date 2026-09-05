@@ -34,7 +34,11 @@ let `q_S` be the first surviving weighted degree. Qualify the face using only
 relative-interior point where both the base cost and leading perturbation gain
 are positive.
 
-Then, under the stated uniform-remainder and global-isolation hypotheses,
+For signed perturbations, additionally verify the local uniform upper bound
+`max(R(c), 0) <= K D_0(c)^q*` for a finite `K`. Nonnegative combined
+coefficients satisfy this automatically; arbitrary signed initial forms
+require additional control near their zeros. Then, under this bound and the
+stated uniform-remainder and global-isolation hypotheses,
 
 ```text
 q*    = min { q_S : C_S is admissible }
@@ -42,12 +46,27 @@ gamma = 1 / (1 - q*)
 M(s) - F(v) - s G(v) = Theta(s^gamma)    as s -> 0+.
 ```
 
-The minimizing face predicts which constraints are released; the remaining
-constraints stay asymptotically active. The exponent depends on the winning
+The minimizing faces identify candidate leading channels. Determining the
+optimizer's support requires the reduced optimization and sometimes
+subleading analysis. The exponent depends on the winning
 weighted degree, while the sharp leading coefficient is determined by the
 reduced optimization problem on that face. Because admissibility is fixed
 before faces are compared and never refers to an observed exponent, this is a
 selection theorem rather than a post-hoc fit.
+
+The [mathematical audit](docs/MATHEMATICAL_AUDIT.md) proves why the extra
+upper bound is needed: `D_0=x^6+y^6`, `R=-x^2+xy^2` has no qualified
+coordinate face, yet `Delta(s) ~ s^3/432` along a curved approach. The
+backend marks uncontrolled higher layers as unresolved and withholds
+theorem licensing.
+
+For a supported class of these cases, the new
+[quadratic-elimination theorem](docs/FORMAL_CURVED_REDUCTION.md) supplies a
+constructive resolution. Backend operation `curved_reduction` completes the
+square in `R=-a*x^2+x*H(y)+K(y)`, checks that the omitted base cost is
+subleading, and returns an exact exponent and sharp coefficient. It resolves
+the example above to `gamma=3`, `C=1/432`, and detects cancellations that
+expose a different exponent on the curved channel.
 
 ## The three-layer selection principle
 
@@ -69,7 +88,7 @@ This single hierarchy:
 - predicts the exponent before numerical measurement;
 - filters irrelevant directions without deleting their audit trail;
 - classifies perturbations as relevant, critical, subleading, or inactive;
-- reveals which constraints remain binding and which are released;
+- identifies the constraints defining candidate leading channels;
 - identifies cancellation and geometric suppression independently;
 - groups perturbations into universality classes; and
 - generalizes from one example to finite families, portfolios, and parametric
@@ -235,7 +254,7 @@ chamber cannot be skipped.
 |---|---|
 | What caused the response? | Winning face, initial form, and ambient-term lineage |
 | Why this exponent? | Base orders, Newton weights, `q_star`, and the scaling map |
-| Which constraints move? | Released constraints; the remainder stay binding |
+| Which constraints define the leading channel? | Candidate released/binding constraints; exact optimizer support needs further analysis |
 | Which terms were ignored? | Per-face suppression, cancellation, criticality, or subleading status |
 | Is another perturbation equivalent? | Universality and mechanism class identifiers |
 | How close is a mechanism change? | Exact phase wall and robustness margin |
@@ -294,15 +313,17 @@ Correctness boundaries are explicit:
 |---|---|---|
 | **Vertex localization and weighted scaling (V.1–V.14)** | Zero interaction threshold, displacement and gap laws, anisotropic balance `q = sum_i alpha_i/beta_i`, saturation ceilings, and explicit failure regimes | [`FORMAL_VERTEX_THRESHOLD.md`](docs/FORMAL_VERTEX_THRESHOLD.md) |
 | **Orthant Newton–tropical law (V.15)** | Weighted monomial degrees determine the finite candidate set and convert by `q -> 1/(1-q)` into response exponents | [`FORMAL_NEWTON_TROPICAL.md`](docs/FORMAL_NEWTON_TROPICAL.md) |
-| **Qualified face-selection law (V.16)** | Tangent-cone localization, face restriction, non-circular admissibility, minimum admissible degree, active-constraint prediction, and sharp reduced-face asymptotics | [`FORMAL_FACE_SELECTION.md`](docs/FORMAL_FACE_SELECTION.md) and [`FORMAL_QUALIFIED_SELECTION_STRATIFICATION.md`](docs/FORMAL_QUALIFIED_SELECTION_STRATIFICATION.md) |
+| **Qualified face-selection law (V.16)** | Tangent-cone localization, face restriction, non-circular admissibility, minimum admissible degree, candidate leading-channel constraints, and sharp reduced-face asymptotics | [`FORMAL_FACE_SELECTION.md`](docs/FORMAL_FACE_SELECTION.md) and [`FORMAL_QUALIFIED_SELECTION_STRATIFICATION.md`](docs/FORMAL_QUALIFIED_SELECTION_STRATIFICATION.md) |
 | **Exact ambient-to-face compiler (V.20)** | Active constraints are converted to an exact edge chart; ambient polynomials are transported with rational arithmetic; cancellation, lineage, and geometric suppression remain auditable | [`FORMAL_AMBIENT_FACE_TRANSPORT.md`](docs/FORMAL_AMBIENT_FACE_TRANSPORT.md) |
 | **Phase fan and discovery engine (V.21)** | Finite perturbation families are partitioned into exponent and mechanism classes; exact walls locate dominance, criticality, and cancellation transitions | [`FORMAL_FACE_SELECTION_PHASE_FAN.md`](docs/FORMAL_FACE_SELECTION_PHASE_FAN.md) and [`FORMAL_EXPONENT_DISCOVERY_ENGINE.md`](docs/FORMAL_EXPONENT_DISCOVERY_ENGINE.md) |
+| **Curved-channel quadratic elimination (V.22)** | Exact square completion resolves a certified family of signed perturbations missed by first-layer coordinate-face selection, including sharp coefficients and reduced-layer cancellation | [`FORMAL_CURVED_REDUCTION.md`](docs/FORMAL_CURVED_REDUCTION.md) and [`MATHEMATICAL_AUDIT.md`](docs/MATHEMATICAL_AUDIT.md) |
 | **First-class backend** | Python and JSON interfaces expose analysis, discovery, portfolios, phase diagrams, evidence, and fail-closed theorem licensing | [`FACE_SELECTION_BACKEND.md`](docs/FACE_SELECTION_BACKEND.md) |
 
 The progression is deliberate: V.15 gives the weighted law on an orthant;
 V.16 supplies the missing geometric and non-circular selection step; V.20
 compiles ambient problems into that theorem exactly; and V.21 applies the
-compiler across families to discover and classify new exponent laws.
+compiler across families to discover and classify new exponent laws; V.22
+resolves a signed curved-channel family by exact elimination.
 
 ```bash
 python experiments/run_all.py            # quadratic + nonlinear JSON + figures

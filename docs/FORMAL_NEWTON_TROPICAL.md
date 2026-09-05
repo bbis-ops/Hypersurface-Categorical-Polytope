@@ -31,6 +31,15 @@ P(x)=\sum_j \gamma_j \prod_i x_i^{\alpha_{ij}},\ \ \gamma_j>0,$$
 
 and the gap is `Δ(s) = max_{x≥0} f(x)` with `f(0)=0`.
 
+**Scope clarification.** The unrestricted orthant maximum requires control
+at infinity; a positive term of weighted degree greater than one can make
+it infinite. When such terms are present, interpret the law on a fixed
+compact neighborhood with the unique base maximizer at the origin (or use
+the global-isolation hypothesis of the polyhedral theorem). The positivity
+of the coefficients is essential to the stated selection argument. The
+signed extension requires the additional uniform upper bound proved in
+[`MATHEMATICAL_AUDIT.md`](MATHEMATICAL_AUDIT.md).
+
 ---
 
 ## Theorem V.15 (sharp constant — the `Θ` becomes a `∼`)

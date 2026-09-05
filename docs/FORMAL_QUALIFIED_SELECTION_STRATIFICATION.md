@@ -1,6 +1,6 @@
 # The stratified qualified-selection law
 
-Formal result **V.18** · backend asset `portable-principle.v7` · executable
+Formal result **V.18** · backend asset `portable-principle.v8` · executable
 implementation: `categorical_polytope/face_selection_phase.py`.
 
 ## Abstract
@@ -57,8 +57,9 @@ of localized face mechanisms. Assume:
 2. each mechanism represents a single positive monomial channel, or a group of
    like channels whose coefficients have first been combined exactly;
 3. every combined coefficient $c_j$ and degree $q_j$ is affine;
-4. local base maximality, principal-remainder control, and global isolation
-   hold uniformly on the interval; and
+4. local base maximality, principal-remainder control, global isolation, and
+   the positive-gain upper envelope of the corrected face-selection theorem
+   hold uniformly wherever a consequence is asserted; and
 5. coefficient positivity is a valid certificate of positivity for each
    represented face initial form.
 

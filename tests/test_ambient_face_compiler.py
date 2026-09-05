@@ -161,7 +161,7 @@ def test_backend_promotes_the_counterexample_resolution_to_a_first_class_asset(
         "perturbation": "x0 + x0**8",
     })
 
-    assert out["asset_version"] == ASSET_VERSION == "portable-principle.v7"
+    assert out["asset_version"] == ASSET_VERSION == "portable-principle.v8"
     assert out["ambient_hierarchy"]["chart_source"] == "exact active-constraint solve"
     assert out["ambient_hierarchy"]["weight_layer"]["exact_pullback_axial_orders"] == {
         "c0": 4,

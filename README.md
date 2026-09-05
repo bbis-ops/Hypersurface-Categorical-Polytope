@@ -401,8 +401,26 @@ so verification fails with `402 Payment Required` even when the key is good.
 Name a model you can reach —
 
 ```bash
-python experiments/run_loop_closure.py --check --preset nemotron
+python experiments/run_loop_closure.py --check --preset nemotron-super
 ```
+
+**For immediate use, pick `nemotron-super`.** Candidate generation asks for
+each batch as a single JSON object (`response_format={"type": "json_object"}`),
+so the endpoint has to support JSON mode — that includes the `--calibrate`
+pass in `run_campaign.py` and `run_code_properties.py`, which measures yield
+over one batch. `nemotron-super` advertises `response_format` and structured
+outputs; `nemotron` (lightning) advertises neither.
+
+That difference is invisible to `--check`, which lightning answers cleanly.
+It shows up only on real prompts, where lightning writes its plan as ordinary
+content and truncates before emitting any JSON — 0 of 12 candidates on the
+campaign prompts (2026-08-26), against 4 of 4 for super (2026-08-28).
+
+Size `--max-tokens` to cover hidden reasoning as well as candidates, roughly
+1,940 completion tokens per record on these prompts. Undersized, the request
+dies at `finish_reason: "length"` and the provider returns the partial
+reasoning trace in `content` — which looks exactly like a model with no JSON
+mode. That failure is a budget problem, not a reason to switch models.
 
 Presets are listed in `loop_closure.PRESETS` and documented in
 [`docs/RESEARCH_DIRECTIONS.md`](docs/RESEARCH_DIRECTIONS.md).

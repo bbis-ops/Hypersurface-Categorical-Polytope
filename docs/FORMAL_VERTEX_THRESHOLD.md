@@ -16,11 +16,9 @@ $$s^{*}=0.$$
 The displacement from the vertex is linear in $s$, while the objective-value gap
 is quadratic:
 
-$$
-\delta(s)=\frac{3}{8}s+O(s^2),
+$$\delta(s)=\frac{3}{8}s+O(s^2),
 \qquad
-\Delta(s)=\frac{9}{32}s^2+O(s^3).
-$$
+\Delta(s)=\frac{9}{32}s^2+O(s^3).$$
 
 Coarse grid searches can miss this failure because the displacement and value gap
 become small faster than practical grid resolution can detect them.
@@ -95,12 +93,10 @@ is reliable only after checking both:
 
 Consider the objective
 
-$$
-\begin{aligned}
+$$\begin{aligned}
 C_s(\theta)={}& b+k+\left[1-(1-\lambda)^2\right]+\left[1-\sigma^2\right]\\
 &+s\left(1-\left(\lambda-\tfrac12\right)^2\right)\left(1-\left(\sigma-\tfrac12\right)^2\right),
-\end{aligned}
-$$
+\end{aligned}$$
 
 where $s\geq 0$ and
 
@@ -116,11 +112,9 @@ The problem consequently reduces to the $(\lambda,\sigma)$ face.
 
 Introduce centered coordinates
 
-$$
-u=\lambda-\frac12,
+$$u=\lambda-\frac12,
 \qquad
-w=\frac12-\sigma.
-$$
+w=\frac12-\sigma.$$
 
 Then
 
@@ -182,23 +176,19 @@ that the maximizer lies on the diagonal $u=w$.
 
 **Proof.** The Hessian is
 
-$$
-\nabla^2 f_s(u,w)=
+$$\nabla^2 f_s(u,w)=
 \begin{pmatrix}
 -2-2s(1-w^2) & 4suw\\
 4suw & -2-2s(1-u^2)
-\end{pmatrix}.
-$$
+\end{pmatrix}.$$
 
 Therefore,
 
-$$
--\nabla^2 f_s(u,w)=
+$$-\nabla^2 f_s(u,w)=
 \begin{pmatrix}
 2+2s(1-w^2) & -4suw\\
 -4suw & 2+2s(1-u^2)
-\end{pmatrix}.
-$$
+\end{pmatrix}.$$
 
 The diagonal entries are at least $2$. Since
 
@@ -214,13 +204,11 @@ $$1-u^2,\;1-w^2\geq \frac34.$$
 
 Consequently,
 
-$$
-\begin{aligned}
+$$\begin{aligned}
 \det(-\nabla^2 f_s)
 &\geq\left(2+\frac{3s}{2}\right)^2-s^2\\
 &=4+6s+\frac{5s^2}{4}>0.
-\end{aligned}
-$$
+\end{aligned}$$
 
 Thus $-\nabla^2 f_s$ is positive definite, so $f_s$ is strictly concave.
 $\blacksquare$
@@ -275,23 +263,19 @@ maximizer. $\blacksquare$
 
 In the original coordinates,
 
-$$
-\lambda^{*}=\frac12+t^{*}(s),
+$$\lambda^{*}=\frac12+t^{*}(s),
 \qquad
 \sigma^{*}=\frac12-t^{*}(s),
 \qquad
 b^{*}=2,
 \qquad
-k^{*}=3.
-$$
+k^{*}=3.$$
 
 Hence, for every $s>0$,
 
-$$
-\lambda^{*}<1,
+$$\lambda^{*}<1,
 \qquad
-\sigma^{*}>0.
-$$
+\sigma^{*}>0.$$
 
 The optimizer immediately leaves the vertex $(1,0,2,3)$.
 
@@ -361,12 +345,10 @@ $$u=w=\frac12-x,$$
 
 the exact objective difference from the corner is
 
-$$
-\begin{aligned}
+$$\begin{aligned}
 &f_s\left(\frac12-x,\frac12-x\right)-f_s\left(\frac12,\frac12\right)\\
 &\qquad=\frac{3s}{2}x-\left(2+\frac{s}{2}\right)x^2+sx^3-\frac{s}{2}x^4.
-\end{aligned}
-$$
+\end{aligned}$$
 
 Maximizing this expression gives
 
@@ -374,13 +356,11 @@ $$\Delta(s)=\frac{9}{32}s^2+O(s^3). \qquad \blacksquare$$
 
 The exact negative Hessian at the corner is
 
-$$
-A=-\nabla^2 f_s\left(\frac12,\frac12\right)=
+$$A=-\nabla^2 f_s\left(\frac12,\frac12\right)=
 \begin{pmatrix}
 2+\frac32s & -s\\
 -s & 2+\frac32s
-\end{pmatrix}.
-$$
+\end{pmatrix}.$$
 
 Its eigenvalue in the inward diagonal direction $(1,1)$ is
 

@@ -322,7 +322,7 @@ Correctness boundaries are explicit:
 | **Constructive binomial positivity (V.19)** | A mixed-sign binomial face initial form is certified positive in the relative interior by an explicit coordinate choice, turning an unresolved existence condition into an executable witness | [`FORMAL_BINOMIAL_POSITIVITY_WITNESS.md`](docs/FORMAL_BINOMIAL_POSITIVITY_WITNESS.md) |
 | **Exact ambient-to-face compiler (V.20)** | Active constraints are converted to an exact edge chart; ambient polynomials are transported with rational arithmetic; cancellation, lineage, and geometric suppression remain auditable | [`FORMAL_AMBIENT_FACE_TRANSPORT.md`](docs/FORMAL_AMBIENT_FACE_TRANSPORT.md) |
 | **Phase fan and discovery engine (V.17, V.21)** | Finite perturbation families are partitioned into exponent and mechanism classes; exact walls locate dominance, criticality, and cancellation transitions | [`FORMAL_FACE_SELECTION_PHASE_FAN.md`](docs/FORMAL_FACE_SELECTION_PHASE_FAN.md) and [`FORMAL_EXPONENT_DISCOVERY_ENGINE.md`](docs/FORMAL_EXPONENT_DISCOVERY_ENGINE.md) |
-| **Curved-channel quadratic elimination (V.22)** | Exact square completion resolves a certified family of signed perturbations missed by first-layer coordinate-face selection, including sharp coefficients and reduced-layer cancellation | [`FORMAL_CURVED_REDUCTION.md`](docs/FORMAL_CURVED_REDUCTION.md) and [`MATHEMATICAL_AUDIT.md`](docs/MATHEMATICAL_AUDIT.md) |
+| **Curved-channel quadratic elimination (V.22)** | Exact square completion resolves a certified family of signed perturbations missed by first-layer coordinate-face selection, including sharp coefficients and reduced-layer cancellation | [`FORMAL_CURVED_REDUCTION.md`](docs/FORMAL_CURVED_REDUCTION.md), [`CURVED_FINITE_SCALE.md`](docs/CURVED_FINITE_SCALE.md) and [`MATHEMATICAL_AUDIT.md`](docs/MATHEMATICAL_AUDIT.md) |
 | **First-class backend** | Python and JSON interfaces expose analysis, discovery, portfolios, phase diagrams, evidence, and fail-closed theorem licensing | [`FACE_SELECTION_BACKEND.md`](docs/FACE_SELECTION_BACKEND.md) |
 
 The progression is deliberate: V.15 gives the weighted law on an orthant;
@@ -331,9 +331,17 @@ compiles ambient problems into that theorem exactly; and V.21 applies the
 compiler across families to discover and classify new exponent laws; V.22
 resolves a signed curved-channel family by exact elimination.
 
+The V.22 statement is asymptotic in `s` with the coefficients held
+fixed. [`CURVED_FINITE_SCALE.md`](docs/CURVED_FINITE_SCALE.md) certifies
+objective bounds at a requested finite scale, and
+[`RESEARCH_ACTIVATION_CONTACT_LAW.md`](docs/RESEARCH_ACTIVATION_CONTACT_LAW.md)
+determines the activation boundary for the case a coefficient itself
+approaches cancellation. The latter is a mathematical extension with an
+exact verification script, not yet a backend capability.
+
 ```bash
 python experiments/run_all.py            # quadratic + nonlinear JSON + figures
-python -m pytest -q                       # 524 tests + 24 subtests in the current suite
+python -m pytest -q                       # 624 tests + 24 subtests in the current suite
 pip install -e ".[dev]"                  # optional matplotlib, pytest
 ```
 
@@ -445,6 +453,8 @@ python -m categorical_polytope
 | `face_selection.py` | Exact face restriction, admissibility, weighted selection, and scaling |
 | `ambient_face_compiler.py` | Exact ambient-to-edge polynomial transport and term lineage |
 | `face_selection_phase.py` | Parametric Newton-weight chambers, walls, and transitions |
+| `curved_reduction.py` | Exact quadratic elimination of a curved channel (V.22) |
+| `curved_finite_scale.py` | Rational Bernstein bounds certifying the reduction at a finite scale |
 | `adjudication/polyhedra/backend.py` | Stable Python/JSON backend, discovery, portfolio, and audit contracts |
 | `vertex_threshold.py` | Vertex localization, weighted displacement, and gap laws |
 | `interaction_search.py` | Locally verified perturbation and interaction screening |

@@ -175,6 +175,16 @@ face-selection operation retains its separate scope and audit.
 
 Example: [`curved_reduction_request.json`](../experiments/curved_reduction_request.json).
 
+Add `"finite_scale": {"s": "1e-12", "relative_tolerance": "1/10"}` to request
+a rigorous interval for the actual response and an accuracy decision at that
+scale. The additive `finite_scale` response reports `within_tolerance`,
+`outside_tolerance`, or `not_resolved` separately from the asymptotic license.
+Without this option it reports `not_requested`; a reduction outside V.22's
+scope reports `not_available` when the option was supplied. The scaling block
+explicitly states that polynomial coefficients are fixed in its limiting law.
+See the [finite-scale contract and proof](CURVED_FINITE_SCALE.md) for exact
+arithmetic, feasibility evidence, resource limits, and a cancellation example.
+
 ## Face-selection status semantics
 
 ### `licensed`

@@ -1,0 +1,18 @@
+[
+  {
+    "request_id": "cancellation-crossover",
+    "operation": "curved_reduction",
+    "system": "([[-1,0],[0,-1],[1,0],[0,1]], [0,0,1,1])",
+    "base": "-(x0**6+x1**6)",
+    "perturbation": "-x0**2+x0*x1**2-x1**4/4+x1**4/1000000000+x1**5",
+    "finite_scale": {"s": "1e-9", "relative_tolerance": "1/10"}
+  },
+  {
+    "request_id": "cancellation-asymptotic-range",
+    "operation": "curved_reduction",
+    "system": "([[-1,0],[0,-1],[1,0],[0,1]], [0,0,1,1])",
+    "base": "-(x0**6+x1**6)",
+    "perturbation": "-x0**2+x0*x1**2-x1**4/4+x1**4/1000000000+x1**5",
+    "finite_scale": {"s": "1e-12", "relative_tolerance": "1/10"}
+  }
+]

@@ -42,6 +42,7 @@ from ...ambient_face_compiler import (
 )
 from ...face_selection import BasePower, EdgeCoordinateChart, WeightedPrincipalPart
 from ...face_selection_phase import problem_from_mapping as phase_problem_from_mapping
+from ...curved_finite_scale import FiniteScaleRequest
 from .domain import PolyhedronDomain
 from .curved import OPERATION as CURVED_OPERATION, analyze_curved_polyhedron
 from .predict import (
@@ -259,6 +260,9 @@ class FaceSelectionBackend:
             return self.handle_portfolio(payload)
         try:
             request = FaceSelectionRequest.from_mapping(payload)
+            finite_scale = None
+            if payload.get("operation") in {"curved_reduction", CURVED_OPERATION} and "finite_scale" in payload:
+                finite_scale = FiniteScaleRequest.from_mapping(payload["finite_scale"])
         except (RequestValidationError, TypeError, ValueError) as exc:
             return _error_response("invalid_request", str(exc), request_id=request_id)
         try:
@@ -266,6 +270,7 @@ class FaceSelectionBackend:
                 return analyze_curved_polyhedron(
                     request.system, request.base, request.perturbation,
                     request_id=request.request_id,
+                    finite_scale=finite_scale,
                 )
             return self.analyze(request)
         except Exception as exc:  # the backend boundary must remain total

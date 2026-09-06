@@ -26,8 +26,8 @@ turn out to have clean closed-form answers.
 
 Throughout, place the degenerate corner at `x = 0` in inward coordinates `x_i ≥ 0`, so
 
-$$f(x) = -\sum_i A_i x_i^{\beta_i} \quad+\quad s P(x),\qquad A_i>0,\ \beta_i>1,\qquad
-P(x)=\sum_j \gamma_j \prod_i x_i^{\alpha_{ij}},\ \ \gamma_j>0,$$
+$$f(x) = -\sum_i A_i x_i^{\beta_i} \quad+\quad s P(x),\qquad A_i\gt 0,\ \beta_i\gt 1,\qquad
+P(x)=\sum_j \gamma_j \prod_i x_i^{\alpha_{ij}},\ \ \gamma_j\gt 0,$$
 
 and the gap is `Δ(s) = max_{x≥0} f(x)` with `f(0)=0`.
 
@@ -81,7 +81,7 @@ the cross terms are `O(s·)` of higher order, so `C = Σ_i C_i`.
 
 Let `q_j = Σ_i α_{ij}/β_i` be the **base-weighted degree** of monomial `j`, and
 
-$$q^\star=\min_{j: q_j<1} q_j.$$
+$$q^\star=\min_{j: q_j\lt 1} q_j.$$
 
 Then
 
@@ -95,7 +95,7 @@ face of `P`'s Newton polytope under the weight vector `(1/β_i)`. Every term wit
 base drop becomes `t·Q(z)` with `Q(z)=Σ_i A_i z_i^{β_i}` (order `t`). Monomial `j`
 becomes `γ_j t^{q_j}∏_i z_i^{α_{ij}}` (order `t^{q_j}`). Hence
 
-$$f = -t Q(z) + s\Big(t^{q^\star}W(z) + \sum_{q_j>q^\star} t^{q_j}(\cdots)\Big),\qquad
+$$f = -t Q(z) + s\Big(t^{q^\star}W(z) + \sum_{q_j\gt q^\star} t^{q_j}(\cdots)\Big),\qquad
 W(z)= \sum_{j: q_j=q^\star} \gamma_j\prod_i z_i^{\alpha_{ij}}.$$
 
 Fix a direction `z` with `W(z)>0` and maximise `-tQ + s t^{q^\star}W` over `t`:

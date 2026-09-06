@@ -27,8 +27,8 @@ $$
 \lbrace
 j:
 F_j\text{ is geometrically admitted},\quad
-c_j(\theta)>0,\quad
-0<q_j(\theta)<1
+c_j(\theta)\gt 0,\quad
+0\lt q_j(\theta)\lt 1
 \rbrace.
 $$
 
@@ -114,14 +114,14 @@ $$
 q_B=\frac12,qquad c_B=1.
 $$
 
-For $\theta<1/3$, $A$ is non-positive and $B$ controls:
+For $\theta\lt 1/3$, $A$ is non-positive and $B$ controls:
 
 $$
 q_\ast=\frac12,qquad \gamma=2.
 $$
 
 At $\theta=1/3$, $A$ cancels exactly, so $B$ still controls. For
-$\theta>1/3$, $A$ becomes positive and its lower weighted degree wins:
+$\theta\gt 1/3$, $A$ becomes positive and its lower weighted degree wins:
 
 $$
 q_\ast=\frac14,qquad \gamma=\frac43.
@@ -136,12 +136,12 @@ alone: the two degrees never cross. It is exposed only by qualified selection.
 
 At every queried parameter, the backend classifies each mechanism as one of:
 
-- `qualified` — positive with $0<q<1$;
+- `qualified` — positive with $0\lt q\lt 1$;
 - `cancelled` — the combined coefficient is exactly zero;
 - `non_positive` — the coefficient is negative;
 - `zero_weight` — $q\le0$;
 - `critical` — $q=1$;
-- `subleading` — $q>1$; or
+- `subleading` — $q\gt 1$; or
 - `geometry_filtered` — the face mechanism was not admitted.
 
 Only `qualified` mechanisms enter the minimum. The response contains the full

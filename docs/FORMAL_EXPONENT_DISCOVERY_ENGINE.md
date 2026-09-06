@@ -38,7 +38,7 @@ possible perturbations.
 
 ## Exponent-law candidates
 
-For each relevant class with $0<q_\ast<1$, the engine emits the candidate law
+For each relevant class with $0\lt q_\ast\lt 1$, the engine emits the candidate law
 
 \[
 \Delta(s)=\Theta\!\left(s^{\gamma}\right),

@@ -21,7 +21,7 @@ $$
 Then the selected degree is the lower envelope
 
 $$
-q_\ast(\theta)=\min_{j:0<q_j(\theta)<1}q_j(\theta),
+q_\ast(\theta)=\min_{j:0\lt q_j(\theta)\lt 1}q_j(\theta),
 $$
 
 and every change of winning face lies on one of the affine walls
@@ -65,9 +65,9 @@ $$
 
 On every connected component $C$ of $\Omega\setminus\mathcal H$:
 
-- the relevance status $0<q_j<1$ of every mechanism is constant;
+- the relevance status $0\lt q_j\lt 1$ of every mechanism is constant;
 - the strict ordering of all nonidentical degree laws is constant;
-- the winning set $\mathop{\mathrm{argmin}}_{0<q_j<1}q_j$ is constant;
+- the winning set $\mathop{\mathrm{argmin}}_{0\lt q_j\lt 1}q_j$ is constant;
 - $q_\ast$ is one affine function on $C$; and
 - the gap law is
   $\Delta(s;\theta)=\Theta(s^{\gamma(\theta)})$ with
@@ -81,7 +81,7 @@ exchange lower-envelope dominance.
 ### Proof
 
 For every pair $i,j$, the sign of $q_i-q_j$ can change only on the affine
-hyperplane $q_i=q_j$.  Likewise, the truth values of $q_i>0$ and $q_i<1$ can
+hyperplane $q_i=q_j$.  Likewise, the truth values of $q_i\gt 0$ and $q_i\lt 1$ can
 change only on $q_i=0$ and $q_i=1$.  All these signs are therefore constant on
 each connected component of the complement of $\mathcal H$.  The relevant
 candidate set and its ordering are constant there, so its argmin is constant.
@@ -127,8 +127,8 @@ The unique crossing is $t=1/4$, where $q_A=q_B=3/8$.  Therefore
 $$
 q_\ast(t)=
 \begin{cases}
-\frac14+\frac12t,&0<t<\frac14,\cr
-\frac12-\frac12t,&\frac14<t<\frac34,
+\frac14+\frac12t,&0\lt t\lt \frac14,\cr
+\frac12-\frac12t,&\frac14\lt t\lt \frac34,
 \end{cases}
 $$
 
@@ -137,8 +137,8 @@ with both mechanisms active at the wall.  The exponent law is
 $$
 \gamma(t)=
 \begin{cases}
-\displaystyle\frac{1}{3/4-t/2},&0<t<\frac14,\cr
-\displaystyle\frac{1}{1/2+t/2},&\frac14<t<\frac34.
+\displaystyle\frac{1}{3/4-t/2},&0\lt t\lt \frac14,\cr
+\displaystyle\frac{1}{1/2+t/2},&\frac14\lt t\lt \frac34.
 \end{cases}
 $$
 
@@ -209,7 +209,7 @@ $$
 
 where $\mathcal T$ is the set of walls at which the selected universality
 mechanism actually changes. Then every parameter perturbation
-$|\delta|<\rho(\theta_0)$ preserves the winning mechanism. The backend reports
+$|\delta|\lt \rho(\theta_0)$ preserves the winning mechanism. The backend reports
 $\rho$ exactly, together with the closest transition on either side. Candidate
 walls that do not alter the lower envelope do not falsely reduce this margin.
 

@@ -94,7 +94,7 @@ is reliable only after checking both:
 Consider the objective
 
 $$\begin{aligned}
-C_s(\theta)={}& b+k+\left[1-(1-\lambda)^2\right]+\left[1-\sigma^2\right]\cr 
+C_s(\theta)={}& b+k+\left[1-(1-\lambda)^2\right]+\left[1-\sigma^2\right]\cr
 &+s\left(1-\left(\lambda-\tfrac12\right)^2\right)\left(1-\left(\sigma-\tfrac12\right)^2\right),
 \end{aligned}$$
 
@@ -178,7 +178,7 @@ that the maximizer lies on the diagonal $u=w$.
 
 $$\nabla^2 f_s(u,w)=
 \begin{pmatrix}
--2-2s(1-w^2) & 4suw\cr 
+-2-2s(1-w^2) & 4suw\cr
 4suw & -2-2s(1-u^2)
 \end{pmatrix}.$$
 
@@ -186,7 +186,7 @@ Therefore,
 
 $$-\nabla^2 f_s(u,w)=
 \begin{pmatrix}
-2+2s(1-w^2) & -4suw\cr 
+2+2s(1-w^2) & -4suw\cr
 -4suw & 2+2s(1-u^2)
 \end{pmatrix}.$$
 
@@ -200,13 +200,13 @@ $$|4suw|\leq s$$
 
 and
 
-$$1-u^2,\thickspace 1-w^2\geq \frac34.$$
+$$1-u^2,\quad 1-w^2\geq \frac34.$$
 
 Consequently,
 
 $$\begin{aligned}
 \det(-\nabla^2 f_s)
-&\geq\left(2+\frac{3s}{2}\right)^2-s^2\cr 
+&\geq\left(2+\frac{3s}{2}\right)^2-s^2\cr
 &=4+6s+\frac{5s^2}{4}>0.
 \end{aligned}$$
 
@@ -227,7 +227,7 @@ $\blacksquare$
 > The unique maximizer is
 > $$u^{\ast}=w^{\ast}=t^{\ast}(s),$$
 > where $t^{\ast}(s)$ is the unique root in $[0,1/2]$ of
-> $$2s\thinspace t^3-2(1+s)t+1=0.$$
+> $$2s t^3-2(1+s)t+1=0.$$
 > At $s=0$,
 > $$t^{\ast}(0)=\frac12.$$
 > For every $s>0$,
@@ -256,7 +256,7 @@ $$1-2t-2st(1-t^2)=0,$$
 
 or equivalently
 
-$$2s\thinspace t^3-2(1+s)t+1=0.$$
+$$2s t^3-2(1+s)t+1=0.$$
 
 Strict concavity guarantees that the stationary point is the unique global
 maximizer. $\blacksquare$
@@ -346,7 +346,7 @@ $$u=w=\frac12-x,$$
 the exact objective difference from the corner is
 
 $$\begin{aligned}
-&f_s\left(\frac12-x,\frac12-x\right)-f_s\left(\frac12,\frac12\right)\cr 
+&f_s\left(\frac12-x,\frac12-x\right)-f_s\left(\frac12,\frac12\right)\cr
 &\qquad=\frac{3s}{2}x-\left(2+\frac{s}{2}\right)x^2+sx^3-\frac{s}{2}x^4.
 \end{aligned}$$
 
@@ -358,7 +358,7 @@ The exact negative Hessian at the corner is
 
 $$A=-\nabla^2 f_s\left(\frac12,\frac12\right)=
 \begin{pmatrix}
-2+\frac32s & -s\cr 
+2+\frac32s & -s\cr
 -s & 2+\frac32s
 \end{pmatrix}.$$
 
@@ -484,7 +484,7 @@ $$P(\theta_c+x)=P(\theta_c)+g^\top x+o(\Vert x\Vert).$$
 
 The leading-order optimization problem is
 
-$$\max_{x\geq0}\left\lbrace s\thinspace g^\top x-\frac12x^\top Qx\right\rbrace .$$
+$$\max_{x\geq0}\left\lbrace s g^\top x-\frac12x^\top Qx\right\rbrace .$$
 
 Ignoring active-cone constraints, the optimizer is
 
@@ -540,7 +540,7 @@ $$x=Rd.$$
 If the base loss is quadratic and $P$ is positively homogeneous of degree one,
 then
 
-$$C_0(\theta_c+Rd)+sP(\theta_c+Rd)=C_0(\theta_c)-\frac{R^2}{2}d^\top Qd+sR\thinspace D_dP+\cdots.$$
+$$C_0(\theta_c+Rd)+sP(\theta_c+Rd)=C_0(\theta_c)-\frac{R^2}{2}d^\top Qd+sR D_dP+\cdots.$$
 
 Optimizing over $R$ gives
 

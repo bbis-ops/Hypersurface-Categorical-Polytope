@@ -12,6 +12,7 @@ from ...ambient_face_compiler import (
     transport_ambient_polynomial,
 )
 from ...curved_reduction import ReductionNotApplicable, reduce_quadratic_channel
+from ...curved_finite_scale import FiniteScaleRequest, certify_finite_scale
 from .domain import PolyhedronDomain
 
 
@@ -42,7 +43,7 @@ def _bounded_in_edge_chart(rows: Sequence[Sequence[Fraction]]) -> bool:
 
 def analyze_curved_polyhedron(
     system: str, base_expression: str, perturbation_expression: str,
-    *, request_id: str | None = None,
+    *, request_id: str | None = None, finite_scale: FiniteScaleRequest | None = None,
 ) -> dict[str, Any]:
     """License the reduction only after exact global and local checks.
 
@@ -59,6 +60,9 @@ def analyze_curved_polyhedron(
         "answered": False,
         "licensed": False,
         "scope": {"licensed": False, "blockers": []},
+        "finite_scale": ({"status": "not_requested"} if finite_scale is None else
+                         {"status": "not_available", "bounds_certified": False,
+                          "reason": "quadratic_reduction_not_licensed"}),
     }
     if poly.dim != 2:
         result["scope"]["blockers"] = ["quadratic elimination currently requires dimension two"]
@@ -96,6 +100,9 @@ def analyze_curved_polyhedron(
             attempts.append({"vertex_exact": [str(x) for x in vertex], "reason": str(exc)})
             continue
         evidence = certificate.to_dict()
+        finite_evidence = result["finite_scale"] if finite_scale is None else certify_finite_scale(
+            certificate, finite_scale, chart_rows=chart_rows, chart_rhs=slacks, axes=axes,
+        )
         return {
             **result,
             "status": "licensed",
@@ -111,8 +118,11 @@ def analyze_curved_polyhedron(
                 "perturbation_vertex_value_exact": str(perturbation.polynomial.get((0, 0), Fraction(0))),
             },
             "reduction": evidence,
+            "finite_scale": finite_evidence,
             "scaling": {
                 "kind": "asymptotic_equivalent",
+                "limit": "s -> 0+ with the polyhedron and all polynomial coefficients fixed",
+                "uniform_in_coefficients": False,
                 "response_exponent": float(certificate.exponent),
                 "response_exponent_exact": str(certificate.exponent),
                 "effective_weight_exact": str(certificate.effective_weight),

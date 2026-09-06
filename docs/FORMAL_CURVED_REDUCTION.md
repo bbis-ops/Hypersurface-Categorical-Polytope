@@ -199,6 +199,12 @@ comes from elimination. The original face-selection operation continues to
 report unresolved cases under its own theorem; a curved certificate does
 not retroactively make its first-layer face calculation valid.
 
+The displayed asymptotic keeps all polynomial coefficients fixed. The optional
+[finite-scale certificate](CURVED_FINITE_SCALE.md) retains the full reduced
+polynomial, bounds its one-variable envelope with rational arithmetic, and
+checks a feasible witness at a supplied positive $s$. It reports approximation
+accuracy separately from this theorem's asymptotic license.
+
 ## Reproduce
 
 ```bash

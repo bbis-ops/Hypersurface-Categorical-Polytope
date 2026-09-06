@@ -1,7 +1,8 @@
 """Scope-aware codification of the polyhedral face-selection law.
 
 The module implements the finite algebraic part of the law from
-``docs/face_selection_noteBrisen15.pdf``:
+``docs/FORMAL_FACE_SELECTION.md`` (typeset from
+``docs/FORMAL_FACE_SELECTION.tex``):
 
     edge chart -> weighted principal part -> face restrictions -> initial forms
     -> admissibility -> q_star -> gamma = 1 / (1 - q_star).

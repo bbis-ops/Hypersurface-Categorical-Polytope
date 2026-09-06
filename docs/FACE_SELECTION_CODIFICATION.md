@@ -1,9 +1,10 @@
 # Face-selection codification
 
-This document is the implementation map for the concepts in
-`face_selection_noteBrisen15.pdf`. The executable source of record is
-`categorical_polytope/face_selection.py`; the formal mathematical statement
-remains `FORMAL_FACE_SELECTION.md`.
+This document is the implementation map for the face-selection law. The
+executable source of record is `categorical_polytope/face_selection.py`;
+the formal mathematical statement remains
+[`FORMAL_FACE_SELECTION.md`](FORMAL_FACE_SELECTION.md), typeset from
+`FORMAL_FACE_SELECTION.tex`.
 
 ## The conceptual pipeline
 

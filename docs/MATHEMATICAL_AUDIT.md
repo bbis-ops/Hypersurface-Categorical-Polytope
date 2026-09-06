@@ -92,7 +92,7 @@ the additional condition
 
 $$
 R(c)_+:=\max(R(c),0)\le K D_0(c)^{q_*}
-\quad\text{throughout a neighborhood of the vertex.}\qquad\text{(U)}
+\quad\text{throughout a neighborhood of the vertex.}\tag{U}
 $$
 
 Then

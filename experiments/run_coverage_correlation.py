@@ -15,7 +15,6 @@ sys.path.insert(0, str(ROOT))
 COMBINED_JSON = ROOT / "experiments" / "combined_law.json"
 SAFETY_MD = ROOT / "experiments" / "SAFETY_INSTANCES.md"
 OUT_MD = ROOT / "docs" / "COVERAGE_CORRELATION.md"
-OUT_TXT = ROOT / "docs" / "COVERAGE_CORRELATION.txt"
 OUT_JSON = ROOT / "experiments" / "coverage_correlation.json"
 REGISTERED_JSON = ROOT / "experiments" / "candidate_coverage_certificate.json"
 
@@ -264,12 +263,8 @@ Classical high-dimensional sphere-covering context appears in
 
     OUT_MD.parent.mkdir(parents=True, exist_ok=True)
     OUT_MD.write_text(body, encoding="utf-8")
-    plain = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", body)
-    plain = re.sub(r"^#+\s*", "", plain, flags=re.MULTILINE).replace("**", "").replace("`", "")
-    OUT_TXT.write_text(plain, encoding="utf-8")
     OUT_JSON.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     print(f"Wrote {OUT_MD}")
-    print(f"Wrote {OUT_TXT}")
     print(f"Wrote {OUT_JSON}")
 
 

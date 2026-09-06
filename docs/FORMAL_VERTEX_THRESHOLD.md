@@ -484,7 +484,7 @@ $$P(\theta_c+x)=P(\theta_c)+g^\top x+o(\Vert x\Vert).$$
 
 The leading-order optimization problem is
 
-$$\max_{x\geq0}\left\lbrace s g^\top x-\frac12x^\top Qx\right\rbrace.$$
+$$\max_{x\geq0}\lbrace s g^\top x-\frac12x^\top Qx\rbrace.$$
 
 Ignoring active-cone constraints, the optimizer is
 

@@ -24,12 +24,12 @@ define the qualified set
 
 $$
 \mathcal Q(\theta)=
-\left\lbrace
+\lbrace
 j:
 F_j\text{ is geometrically admitted},\quad
 c_j(\theta)>0,\quad
 0<q_j(\theta)<1
-\right\rbrace.
+\rbrace.
 $$
 
 The selected degree is

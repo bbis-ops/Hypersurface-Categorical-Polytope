@@ -54,8 +54,10 @@ one that fails only in that ball.
 
 For **arbitrary** sample placement, a volume argument gives
 
-$$\rho(S) \ge \left(\frac{1}{n v_d}\right)^{1/d}, \qquad
-v_d=\frac{\pi^{d/2}}{\Gamma(d/2+1)}.$$
+$$
+\rho(S) \ge \left(\frac{1}{n v_d}\right)^{1/d}, \qquad
+v_d=\frac{\pi^{d/2}}{\Gamma(d/2+1)}.
+$$
 
 For an endpoint-including Cartesian grid with `m` points per axis (`n=m^d`),
 the exact radius is `√d/(2(m-1))`. To make that grid radius at most `δ` requires

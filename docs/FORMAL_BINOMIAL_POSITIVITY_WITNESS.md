@@ -84,7 +84,7 @@ $z\in\mathrm{relint}(F)$. ∎
 Once the witness is constructed, the binomial face enters qualified selection:
 
 $$
-q_\ast=min_{F\text{ qualified}}q_F.
+q_\ast=\min_{F\text{ qualified}}q_F.
 $$
 
 If the localization, uniform-remainder, isolation, and positive-gain
@@ -104,7 +104,7 @@ exclude uncontrolled higher layers on other non-positive faces; see
 For the implemented example
 
 $$
-W(x,y)=-2x+y^2,qquad
+W(x,y)=-2x+y^2,\qquad
 D_0(x,y)=x^2+y^4,
 $$
 

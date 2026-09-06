@@ -29,14 +29,21 @@ face selection is the exact pullback
 
 after like monomials have been combined. It is not, in general, the data
 obtained by probing ambient coordinate axes. For each nonempty orthant face
-$F$, restrict $\widehat R$ to $F$, take its first positive qualified
-weighted layer of degree $q_F$, and then select
+$F$, restrict $\widehat R$ to $F$ and take its first nonzero weighted layer,
+of degree $q_F$. Qualify that layer only if $0\lt q_F\lt 1$ and it is positive
+somewhere in the relative interior of $F$; do not skip an earlier negative
+layer in search of a positive one. When qualified faces exist, select
 
 \[
 q_*=\min_{F\text{ qualified}}q_F,
 \qquad
 \gamma=\frac1{1-q_*}.
 \]
+
+The exponent is a theorem consequence only under the corrected
+face-selection hypotheses, including the uniform positive-gain upper
+envelope. Exact transport alone does not control higher layers near zeros
+of a non-positive initial form; see [the mathematical audit](MATHEMATICAL_AUDIT.md).
 
 Thus the authoritative hierarchy is
 

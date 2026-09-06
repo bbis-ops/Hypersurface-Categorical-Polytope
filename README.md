@@ -68,6 +68,11 @@ subleading, and returns an exact exponent and sharp coefficient. It resolves
 the example above to `gamma=3`, `C=1/432`, and detects cancellations that
 expose a different exponent on the curved channel.
 
+An optional [finite-scale certificate](docs/CURVED_FINITE_SCALE.md) bounds the
+actual response at a requested `s` using the full reduced polynomial and an
+exactly feasible witness. It separately reports whether the leading power law
+meets a requested relative tolerance, including near coefficient cancellation.
+
 ## The three-layer selection principle
 
 The theorem and backend share one end-to-end architecture:
@@ -313,9 +318,10 @@ Correctness boundaries are explicit:
 |---|---|---|
 | **Vertex localization and weighted scaling (V.1–V.14)** | Zero interaction threshold, displacement and gap laws, anisotropic balance `q = sum_i alpha_i/beta_i`, saturation ceilings, and explicit failure regimes | [`FORMAL_VERTEX_THRESHOLD.md`](docs/FORMAL_VERTEX_THRESHOLD.md) |
 | **Orthant Newton–tropical law (V.15)** | Weighted monomial degrees determine the finite candidate set and convert by `q -> 1/(1-q)` into response exponents | [`FORMAL_NEWTON_TROPICAL.md`](docs/FORMAL_NEWTON_TROPICAL.md) |
-| **Qualified face-selection law (V.16)** | Tangent-cone localization, face restriction, non-circular admissibility, minimum admissible degree, candidate leading-channel constraints, and sharp reduced-face asymptotics | [`FORMAL_FACE_SELECTION.md`](docs/FORMAL_FACE_SELECTION.md) and [`FORMAL_QUALIFIED_SELECTION_STRATIFICATION.md`](docs/FORMAL_QUALIFIED_SELECTION_STRATIFICATION.md) |
+| **Qualified face-selection law (V.16, V.18)** | Tangent-cone localization, face restriction, non-circular admissibility, minimum admissible degree, candidate leading-channel constraints, and sharp reduced-face asymptotics | [`FORMAL_FACE_SELECTION.md`](docs/FORMAL_FACE_SELECTION.md) and [`FORMAL_QUALIFIED_SELECTION_STRATIFICATION.md`](docs/FORMAL_QUALIFIED_SELECTION_STRATIFICATION.md) |
+| **Constructive binomial positivity (V.19)** | A mixed-sign binomial face initial form is certified positive in the relative interior by an explicit coordinate choice, turning an unresolved existence condition into an executable witness | [`FORMAL_BINOMIAL_POSITIVITY_WITNESS.md`](docs/FORMAL_BINOMIAL_POSITIVITY_WITNESS.md) |
 | **Exact ambient-to-face compiler (V.20)** | Active constraints are converted to an exact edge chart; ambient polynomials are transported with rational arithmetic; cancellation, lineage, and geometric suppression remain auditable | [`FORMAL_AMBIENT_FACE_TRANSPORT.md`](docs/FORMAL_AMBIENT_FACE_TRANSPORT.md) |
-| **Phase fan and discovery engine (V.21)** | Finite perturbation families are partitioned into exponent and mechanism classes; exact walls locate dominance, criticality, and cancellation transitions | [`FORMAL_FACE_SELECTION_PHASE_FAN.md`](docs/FORMAL_FACE_SELECTION_PHASE_FAN.md) and [`FORMAL_EXPONENT_DISCOVERY_ENGINE.md`](docs/FORMAL_EXPONENT_DISCOVERY_ENGINE.md) |
+| **Phase fan and discovery engine (V.17, V.21)** | Finite perturbation families are partitioned into exponent and mechanism classes; exact walls locate dominance, criticality, and cancellation transitions | [`FORMAL_FACE_SELECTION_PHASE_FAN.md`](docs/FORMAL_FACE_SELECTION_PHASE_FAN.md) and [`FORMAL_EXPONENT_DISCOVERY_ENGINE.md`](docs/FORMAL_EXPONENT_DISCOVERY_ENGINE.md) |
 | **Curved-channel quadratic elimination (V.22)** | Exact square completion resolves a certified family of signed perturbations missed by first-layer coordinate-face selection, including sharp coefficients and reduced-layer cancellation | [`FORMAL_CURVED_REDUCTION.md`](docs/FORMAL_CURVED_REDUCTION.md) and [`MATHEMATICAL_AUDIT.md`](docs/MATHEMATICAL_AUDIT.md) |
 | **First-class backend** | Python and JSON interfaces expose analysis, discovery, portfolios, phase diagrams, evidence, and fail-closed theorem licensing | [`FACE_SELECTION_BACKEND.md`](docs/FACE_SELECTION_BACKEND.md) |
 

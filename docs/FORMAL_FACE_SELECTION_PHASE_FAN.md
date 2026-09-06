@@ -15,13 +15,13 @@ the leading asymptotic mechanism.
 Let the finitely many admissible face mechanisms have weighted degrees
 
 $$
-q_j(\theta)=a_j+\langle b_j,\theta\rangle .
+q_j(\theta)=a_j+\langle b_j,\theta\rangle.
 $$
 
 Then the selected degree is the lower envelope
 
 $$
-q_*(\theta)=\min_{j:0<q_j(\theta)<1}q_j(\theta),
+q_\ast(\theta)=\min_{j:0<q_j(\theta)<1}q_j(\theta),
 $$
 
 and every change of winning face lies on one of the affine walls
@@ -36,7 +36,7 @@ universality class are constant.  The response exponent is determined
 throughout each chamber by
 
 $$
-\gamma(\theta)=\frac{1}{1-q_*(\theta)}.
+\gamma(\theta)=\frac{1}{1-q_\ast(\theta)}.
 $$
 
 Thus a finite Newton–tropical comparison generates a continuum of asymptotic
@@ -68,10 +68,10 @@ On every connected component $C$ of $\Omega\setminus\mathcal H$:
 - the relevance status $0<q_j<1$ of every mechanism is constant;
 - the strict ordering of all nonidentical degree laws is constant;
 - the winning set $\mathop{\mathrm{argmin}}_{0<q_j<1}q_j$ is constant;
-- $q_*$ is one affine function on $C$; and
+- $q_\ast$ is one affine function on $C$; and
 - the gap law is
   $\Delta(s;\theta)=\Theta(s^{\gamma(\theta)})$ with
-  $\gamma(\theta)=1/(1-q_*(\theta))$.
+  $\gamma(\theta)=1/(1-q_\ast(\theta))$.
 
 If several mechanisms have identical affine degree laws, they remain tied on
 the entire chamber.  If they agree only on a proper wall, that wall is an exact
@@ -125,7 +125,7 @@ $$
 The unique crossing is $t=1/4$, where $q_A=q_B=3/8$.  Therefore
 
 $$
-q_*(t)=
+q_\ast(t)=
 \begin{cases}
 \frac14+\frac12t,&0<t<\frac14,\cr
 \frac12-\frac12t,&\frac14<t<\frac34,

@@ -41,7 +41,7 @@ $$
 Every possible change is contained in the finite wall set
 
 $$
-q_i=q_j,qquad q_i=0,qquad q_i=1,qquad c_i=0.
+q_i=q_j,\qquad q_i=0,\qquad q_i=1,\qquad c_i=0.
 $$
 
 Thus qualification, selection, and scaling form one exact stratified law.
@@ -63,19 +63,22 @@ of localized face mechanisms. Assume:
 5. coefficient positivity is a valid certificate of positivity for each
    represented face initial form.
 
-Remove the points satisfying
+Remove the isolated roots of the nonconstant affine equations
 
 $$
 q_i=q_j,\quad q_i=0,\quad q_i=1,\quad\text{or}\quad c_i=0.
 $$
+
+Equations that hold identically add no wall. Identical degree laws remain
+tied; an identically zero coefficient remains cancelled throughout.
 
 On every remaining open chamber:
 
 - the sign of every coefficient is constant;
 - the relevance status of every degree is constant;
 - the qualified set $\mathcal Q$ is constant;
-- the strict degree ordering is constant;
-- the winning mechanism is constant; and
+- the strict ordering of nonidentical degree laws is constant;
+- the winning set, including any persistent ties, is constant; and
 - whenever $\mathcal Q$ is nonempty,
 
   $$
@@ -105,26 +108,26 @@ channel, so it is excluded before the minimum is taken. ∎
 Consider two already localized mechanisms:
 
 $$
-q_A=\frac14,qquad c_A(\theta)=\theta-\frac13,
+q_A=\frac14,\qquad c_A(\theta)=\theta-\frac13,
 $$
 
 and
 
 $$
-q_B=\frac12,qquad c_B=1.
+q_B=\frac12,\qquad c_B=1.
 $$
 
 For $\theta\lt 1/3$, $A$ is non-positive and $B$ controls:
 
 $$
-q_\ast=\frac12,qquad \gamma=2.
+q_\ast=\frac12,\qquad \gamma=2.
 $$
 
 At $\theta=1/3$, $A$ cancels exactly, so $B$ still controls. For
 $\theta\gt 1/3$, $A$ becomes positive and its lower weighted degree wins:
 
 $$
-q_\ast=\frac14,qquad \gamma=\frac43.
+q_\ast=\frac14,\qquad \gamma=\frac43.
 $$
 
 This transition is invisible to a phase diagram that compares degree laws

@@ -347,7 +347,7 @@ the exact objective difference from the corner is
 
 $$\begin{aligned}
 &f_s\left(\frac12-x,\frac12-x\right)-f_s\left(\frac12,\frac12\right)\cr
-&\qquad=\frac{3s}{2}x-\left(2+\frac{s}{2}\right)x^2+sx^3-\frac{s}{2}x^4.
+&\qquad=\frac{3s}{2}x-\left(2+\frac{s}{2}\right)x^2-2sx^3+sx^4.
 \end{aligned}$$
 
 Maximizing this expression gives
@@ -386,10 +386,10 @@ It matches the first-order expansion but is not exact for finite $s$.
 
 ## 8. Why Grid Searches Missed the Failure
 
-Let $x$ denote the inward distance from the corner along the diagonal. The exact
-crossing distance $x_c(s)$ is the positive root of
+Let $x$ denote the inward distance from the corner along the diagonal. For
+$s\gt 0$, the exact crossing distance $x_c(s)$ is the unique root in $(0,1)$ of
 
-$$\frac{3s}{2}-\left(2+\frac{s}{2}\right)x+sx^2-\frac{s}{2}x^3=0.$$
+$$\frac{3s}{2}-\left(2+\frac{s}{2}\right)x-2sx^2+sx^3=0.$$
 
 An interior grid point beats the corner whenever
 
@@ -472,6 +472,10 @@ actually a global maximizer of $C_0$.
 
 ## 10. Smooth Perturbations on a Quadratically Flat Face
 
+In Sections 10–15, $\Delta(s)$ denotes the gain over the candidate vertex in a
+fixed sufficiently small feasible neighborhood. A global interpretation also
+requires localization of the global maximizers to that neighborhood.
+
 Suppose the base objective has local quadratic loss
 
 $$C_0(\theta_c+x)=C_0(\theta_c)-\frac12x^\top Qx+o(\Vert x\Vert^2),$$
@@ -486,20 +490,23 @@ The leading-order optimization problem is
 
 $$\max_{x\geq0}\lbrace s g^\top x-\frac12x^\top Qx\rbrace.$$
 
-Ignoring active-cone constraints, the optimizer is
+When $Q^{-1}g\geq0$, the unconstrained quadratic optimizer is feasible, and
+the local optimizer satisfies
 
-$$x^{\ast}=sQ^{-1}g+O(s^2),$$
+$$x^{\ast}=sQ^{-1}g+o(s),$$
 
 and the gap is
 
-$$\Delta(s)=\frac12s^2g^\top Q^{-1}g+O(s^3).$$
+$$\Delta(s)=\frac12s^2g^\top Q^{-1}g+o(s^2).$$
 
-If $Q$ is diagonal and the perturbation is separable, this becomes
+If $Q$ is diagonal with $Q_{ii}=c_i$ and $g_i=\gamma_i\geq0$, this becomes
 
-$$\Delta(s)=s^2\sum_i\frac{\gamma_i^2}{2c_i}+O(s^3).$$
+$$\Delta(s)=s^2\sum_i\frac{\gamma_i^2}{2c_i}+o(s^2).$$
 
-For coupled perturbations or coupled base curvature, the full quadratic form must
-be retained.
+If $Q^{-1}g$ is infeasible, retain the cone constraint: the leading coefficient
+is $\max_{u\geq0}(g^\top u-u^\top Qu/2)$. The stronger error bounds
+$O(s^2)$ for displacement and $O(s^3)$ for value require stronger Taylor
+remainder assumptions than the little-oh expansions stated here.
 
 ---
 
@@ -507,11 +514,11 @@ be retained.
 
 Let the base loss be quadratic,
 
-$$-Ax^2,$$
+$$-Ax^2,\qquad A\gt 0,$$
 
 and suppose the perturbation behaves locally as
 
-$$P(x)-P(0)\sim\gamma x^\alpha,\qquad 0\lt \alpha\lt 2.$$
+$$P(x)-P(0)\sim\gamma x^\alpha,\qquad \gamma\gt 0,\quad 0\lt \alpha\lt 2.$$
 
 The local objective is
 
@@ -537,23 +544,24 @@ true gap. Let $d$ be an inward direction and write
 
 $$x=Rd.$$
 
-If the base loss is quadratic and $P$ is positively homogeneous of degree one,
-then
+If the base loss has positive definite quadratic form $Q$ and the continuous
+perturbation increment is positively homogeneous of degree one, then
 
-$$C_0(\theta_c+Rd)+sP(\theta_c+Rd)=C_0(\theta_c)-\frac{R^2}{2}d^\top Qd+sR D_dP+\cdots.$$
+$$C_s(\theta_c+Rd)-C_s(\theta_c)=-\frac{R^2}{2}d^\top Qd+sR D_dP+o(R^2).$$
 
-Optimizing over $R$ gives
+Optimizing over $R\geq0$ gives
 
-$$\Delta(s)=s^2\max_{d\in\mathcal K}\frac{(D_dP)^2}{2d^\top Qd}+o(s^2),$$
+$$\Delta(s)=s^2\max_{d\in\mathcal K,\ d\ne0}\frac{((D_dP)_+)^2}{2d^\top Qd}+o(s^2),$$
 
-where $\mathcal K$ is the inward direction cone.
+where $\mathcal K$ is the inward direction cone and $(a)_+=\max(a,0)$.
+A non-positive inward slope gives no gain along that ray.
 
 This formulation allows for multiple maximizing directions. It does not require
 the leading-order optimizer to lie on a unique ray.
 
 For isotropic curvature $Q=cI$,
 
-$$\Delta(s)=\frac{s^2}{2c}\max_{\substack{\Vert d\Vert=1\cr d\in\mathcal K}}(D_dP)^2+o(s^2).$$
+$$\Delta(s)=\frac{s^2}{2c}\max_{\substack{\Vert d\Vert=1\cr d\in\mathcal K}}((D_dP)_+)^2+o(s^2).$$
 
 ---
 
@@ -589,11 +597,11 @@ $$P(\theta_c+x)-P(\theta_c)\sim \gamma x^\alpha,$$
 
 with
 
-$$0\lt \alpha\lt \beta.$$
+$$A,\gamma\gt 0,\qquad 0\lt \alpha\lt \beta.$$
 
 Then
 
-$$\max_x\lbrace-Ax^\beta+s\gamma x^\alpha\rbrace$$
+$$\max_{x\geq0}\lbrace-Ax^\beta+s\gamma x^\alpha\rbrace$$
 
 has optimizer
 
@@ -618,21 +626,28 @@ Suppose different coordinates have different base flatness orders:
 
 $$C_0(\theta_c)-C_0(\theta_c+x)\asymp\sum_i A_i x_i^{\beta_i}.$$
 
+Assume $A_i\gt 0$, $\beta_i\gt 1$, and uniform two-sided bounds near the
+vertex. Write $D_0(x)=\sum_i A_i x_i^{\beta_i}$ in inward coordinates.
+
 Use the base-adapted dilation
 
 $$D_t x=\left(t^{1/\beta_i}x_i\right)_i.$$
 
-Suppose the leading perturbation is weighted-homogeneous:
+Suppose the leading perturbation has a continuous weighted-homogeneous
+initial form $W$:
 
-$$P(D_t x)-P(0)=t^q(P(x)-P(0))+o(t^q),\qquad 0\lt q\lt 1.$$
+$$P(D_t z)-P(0)=t^q W(z)+o(t^q),\qquad 0\lt q\lt 1.$$
 
-Then
+Require the remainder to be uniform on the compact closed section
+$D_0(z)=1$, $z\geq0$, and require $W(z)\gt 0$ at some point of that section.
+These assumptions give both a uniform upper bound and a positive feasible
+lower-bound witness. Then
 
 $$\boxed{\Delta(s)=\Theta\left(s^{1/(1-q)}\right).}$$
 
-For a monomial
+For a positive monomial
 
-$$P(x)=\gamma\prod_i x_i^{\alpha_i},$$
+$$P(x)=\gamma\prod_i x_i^{\alpha_i},\qquad \gamma\gt 0,$$
 
 the weighted degree is
 

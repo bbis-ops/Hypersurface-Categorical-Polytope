@@ -60,8 +60,11 @@ The powers of `s` collect to `α/(β-α)+1 = β/(β-α) = p`; the `s`-free prefa
 `φ''(x_*) = -Aβ(β-1)x_*^{β-2} + sγα(α-1)x_*^{α-2} < 0` after substituting the
 stationary relation (since `β>α`), so `x_*` is the interior maximum. ∎
 
-**Independent axes add.** When the base is flat on several axes and `P` is separable,
-the cross terms are `O(s·)` of higher order, so `C = Σ_i C_i`.
+**Independent axes add.** When the base and perturbation are separable, the
+individual gaps add: `Δ(s) = Σ_i C_i s^{p_i}` for the exact power-law models.
+The leading exponent is `p = min_i p_i`, and its coefficient is
+`C = Σ_{i:p_i=p} C_i`. All axis constants contribute to that coefficient
+only when their exponents tie.
 
 **Sanity checks (all exact in the module and tests).**
 
@@ -83,7 +86,9 @@ Let `q_j = Σ_i α_{ij}/β_i` be the **base-weighted degree** of monomial `j`, a
 
 $$q^\star=\min_{j: q_j\lt 1} q_j.$$
 
-Then
+Assume the set in this minimum is nonempty. Since the perturbation vanishes
+at the origin and has nonnegative monomial exponents, its weighted degrees
+are positive. Then
 
 $$\boxed{\quad \Delta(s)=\Theta \big(s^{ 1/(1-q^\star)}\big),\quad}$$
 
@@ -102,8 +107,11 @@ Fix a direction `z` with `W(z)>0` and maximise `-tQ + s t^{q^\star}W` over `t`:
 `t_* = (s q^\star W/Q)^{1/(1-q^\star)} = \Theta(s^{1/(1-q^\star)})`. Both retained terms
 are `Θ(s^{1/(1-q^\star)})` there, while each discarded term obeys
 `t_*^{q_j}/t_*^{q^\star} = t_*^{\,q_j-q^\star}\to 0`, so it is of strictly higher order
-in `s`. Maximising over `z` gives the lower bound; the base's uniform two-sided local
-bounds give the matching upper bound. ∎
+in `s`. A fixed positive direction gives the lower bound. For the upper
+bound, normalize directions to the compact closed section `Q(z)=1`.
+Every monomial is bounded there, so uniformly `P(x) ≤ K Q(x)^{q^\star}`
+when `Q(x) ≤ 1`. Maximizing `-t+sK t^{q^\star}` bounds the local gap above
+at the same power of `s`; localization then gives the claimed gap law. ∎
 
 ### The mind-bending part: mixing is winner-take-all, not averaging
 
@@ -140,7 +148,7 @@ contradict smooth intuition, where independent effects add:
 `separable` or `coupled`); `tropical_gap_leading` then gives the **sharp** gap — the
 closed-form V.15 sum on a separable face, or the reduced projective maximization
 
-$$C=\frac{1-q^\star}{q^\star} (q^\star)^{p}\Big[\max_{z\ge 0}\frac{W(z)}{Q(z)^{q^\star}}\Big]^{p}$$
+$$C=\frac{1-q^\star}{q^\star} (q^\star)^{p}\Big[\max_{z\ge 0,\ z\ne0}\frac{W(z)}{Q(z)^{q^\star}}\Big]^{p}$$
 
 on a coupled face (the ratio `W/Q^{q^\star}` is invariant under the base dilation, so
 the maximum is over a projective orthant).

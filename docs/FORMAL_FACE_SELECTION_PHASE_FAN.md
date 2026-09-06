@@ -49,7 +49,7 @@ predictions and all of its possible universality transitions.
 Let $\Omega\subset\mathbb R^m$ be a parameter domain.  Suppose:
 
 1. the localized tangent-cone geometry is fixed on $\Omega$;
-2. there are finitely many face mechanisms $j\in J$;
+2. $J$ indexes finitely many admitted face mechanisms with positive initial forms;
 3. their admissibility and positivity status are fixed on $\Omega$;
 4. every weighted degree is affine,
    $q_j(\theta)=a_j+\langle b_j,\theta\rangle$; and
@@ -63,15 +63,21 @@ $$
 \lbrace q_i=q_j:i\ne j\rbrace\cup\lbrace q_i=0:i\in J\rbrace\cup\lbrace q_i=1:i\in J\rbrace.
 $$
 
+Here the arrangement contains only proper nonempty hyperplanes. An affine
+equation that holds identically contributes no wall; identical degree laws
+remain tied, and degrees identically zero or one remain excluded.
+
 On every connected component $C$ of $\Omega\setminus\mathcal H$:
 
 - the relevance status $0\lt q_j\lt 1$ of every mechanism is constant;
 - the strict ordering of all nonidentical degree laws is constant;
 - the winning set $\mathop{\mathrm{argmin}}_{0\lt q_j\lt 1}q_j$ is constant;
-- $q_\ast$ is one affine function on $C$; and
-- the gap law is
+- whenever the relevant set is nonempty, $q_\ast$ is one affine function on $C$; and
+- on those nonempty-selection chambers, the gap law is
   $\Delta(s;\theta)=\Theta(s^{\gamma(\theta)})$ with
   $\gamma(\theta)=1/(1-q_\ast(\theta))$.
+
+An empty relevant set has no selected degree or exponent under this theorem.
 
 If several mechanisms have identical affine degree laws, they remain tied on
 the entire chamber.  If they agree only on a proper wall, that wall is an exact
@@ -85,7 +91,8 @@ hyperplane $q_i=q_j$.  Likewise, the truth values of $q_i\gt 0$ and $q_i\lt 1$ c
 change only on $q_i=0$ and $q_i=1$.  All these signs are therefore constant on
 each connected component of the complement of $\mathcal H$.  The relevant
 candidate set and its ordering are constant there, so its argmin is constant.
-The selected degree equals the affine law of the winner.  Composing with the
+When the relevant set is nonempty, the selected degree equals the affine law
+of a winner. Composing with the
 face-selection scaling map $q\mapsto1/(1-q)$ proves the response formula. ∎
 
 ---
@@ -100,6 +107,9 @@ t_{ij}=\frac{a_j-a_i}{b_i-b_j},\qquad
 t_{i,0}=\frac{-a_i}{b_i},\qquad
 t_{i,1}=\frac{1-a_i}{b_i}.
 $$
+
+Each formula applies only when its denominator is nonzero. Constant
+equations either never hold or hold identically and add no isolated wall.
 
 The implementation sorts these exact values, selects at one rational midpoint
 of every open chamber, and separately evaluates every wall.  No numerical grid
@@ -118,8 +128,8 @@ before coincidences and out-of-domain walls are removed.
 Take
 
 $$
-q_A(t)=\frac14+\frac12t,qquad
-q_B(t)=\frac12-\frac12t,qquad 0\le t\le\frac34.
+q_A(t)=\frac14+\frac12t,\qquad
+q_B(t)=\frac12-\frac12t,\qquad 0\le t\le\frac34.
 $$
 
 The unique crossing is $t=1/4$, where $q_A=q_B=3/8$.  Therefore
@@ -200,17 +210,20 @@ callers do not need to calculate or numerically estimate the degree laws.
 
 ### Transition robustness
 
-For a query point $\theta_0$, define the phase robustness margin
+For a query point $\theta_0\in(L,U)$, define the phase robustness margin
 
 $$
 \rho(\theta_0)=
 \min_{\tau\in\mathcal T}|\theta_0-\tau|,
 $$
 
-where $\mathcal T$ is the set of walls at which the selected universality
+where $\mathcal T$ is the set of interior walls at which the selected universality
 mechanism actually changes. Then every parameter perturbation
-$|\delta|\lt \rho(\theta_0)$ preserves the winning mechanism. The backend reports
-$\rho$ exactly, together with the closest transition on either side. Candidate
+$|\delta|\lt \rho(\theta_0)$ that remains in $(L,U)$ preserves
+the winning mechanism. If there are no transitions, the mathematical margin
+is infinite (reported as `null` by the backend). Endpoint qualification is
+evaluated separately. For finite margins, the backend reports $\rho$ exactly,
+together with the closest transition on either side. Candidate
 walls that do not alter the lower envelope do not falsely reduce this margin.
 
 ---
@@ -232,7 +245,8 @@ The correct general extension is stratified:
 The backend therefore computes the diagram even when the hypotheses are not
 asserted, but labels it `unlicensed`. A theorem-licensed response requires
 fixed admissibility, verified affine degrees, and uniform local maximality,
-principal-remainder control, and global isolation. V.18 additionally derives
+principal-remainder control, global isolation, and the corrected theorem's
+positive-gain upper envelope. V.18 additionally derives
 affine coefficient-qualification walls.
 
 ---

@@ -67,7 +67,7 @@ On every connected component $C$ of $\Omega\setminus\mathcal H$:
 
 - the relevance status $0<q_j<1$ of every mechanism is constant;
 - the strict ordering of all nonidentical degree laws is constant;
-- the winning set $\operatorname*{argmin}_{0<q_j<1}q_j$ is constant;
+- the winning set $\operatorname{argmin}_{0<q_j<1}q_j$ is constant;
 - $q_*$ is one affine function on $C$; and
 - the gap law is
   $\Delta(s;\theta)=\Theta(s^{\gamma(\theta)})$ with

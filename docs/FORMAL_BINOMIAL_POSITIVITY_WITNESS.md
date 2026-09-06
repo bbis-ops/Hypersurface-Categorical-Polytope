@@ -36,7 +36,7 @@ $$
 \qquad 0<q<1.
 $$
 
-Then there exists $z\in\operatorname{relint}(F)$ such that $W_F(z)>0$.
+Then there exists $z\in\mathrm{relint}(F)$ such that $W_F(z)>0$.
 Consequently the face satisfies the positivity qualification required by the
 face-selection law.
 
@@ -75,7 +75,7 @@ W_F(z)=a z^\alpha-b z^\beta=3b z^\beta>0.
 $$
 
 All face coordinates remain strictly positive, hence
-$z\in\operatorname{relint}(F)$. ∎
+$z\in\mathrm{relint}(F)$. ∎
 
 ---
 
@@ -84,7 +84,7 @@ $z\in\operatorname{relint}(F)$. ∎
 Once the witness is constructed, the binomial face enters qualified selection:
 
 $$
-q_*=min_{F\text{ qualified}}q_F.
+q_\ast=min_{F\text{ qualified}}q_F.
 $$
 
 If the localization, uniform-remainder, isolation, and positive-gain
@@ -92,7 +92,7 @@ upper-envelope hypotheses are licensed,
 the backend may therefore return
 
 $$
-\Delta(s)=\Theta\!\left(s^{1/(1-q_*)}\right)
+\Delta(s)=\Theta \left(s^{1/(1-q_\ast)}\right)
 $$
 
 instead of withholding the result because positivity was unresolved.

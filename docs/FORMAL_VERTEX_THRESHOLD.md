@@ -438,7 +438,7 @@ is a tolerance-based numerical flag, not a mathematical certificate.
 Let $x_i\geq0$ denote inward slack coordinates from a candidate vertex
 $\theta_c$. Suppose the base objective has the local expansion
 
-$$C_0(\theta_c+x)=C_0(\theta_c)-\sum_i a_i x_i-\frac12x^\top Qx+o(\Vert x\Vert ^2),$$
+$$C_0(\theta_c+x)=C_0(\theta_c)-\sum_i a_i x_i-\frac12x^\top Qx+o(\Vert x\Vert^2),$$
 
 with $a_i\geq0$.
 
@@ -474,7 +474,7 @@ actually a global maximizer of $C_0$.
 
 Suppose the base objective has local quadratic loss
 
-$$C_0(\theta_c+x)=C_0(\theta_c)-\frac12x^\top Qx+o(\Vert x\Vert ^2),$$
+$$C_0(\theta_c+x)=C_0(\theta_c)-\frac12x^\top Qx+o(\Vert x\Vert^2),$$
 
 where $Q$ is positive definite.
 
@@ -484,7 +484,7 @@ $$P(\theta_c+x)=P(\theta_c)+g^\top x+o(\Vert x\Vert).$$
 
 The leading-order optimization problem is
 
-$$\max_{x\geq0}\left\lbrace s g^\top x-\frac12x^\top Qx\right\rbrace .$$
+$$\max_{x\geq0}\left\lbrace s g^\top x-\frac12x^\top Qx\right\rbrace.$$
 
 Ignoring active-cone constraints, the optimizer is
 
@@ -553,7 +553,7 @@ the leading-order optimizer to lie on a unique ray.
 
 For isotropic curvature $Q=cI$,
 
-$$\Delta(s)=\frac{s^2}{2c}\max_{\substack{\Vert d\Vert =1\cr d\in\mathcal K}}(D_dP)^2+o(s^2).$$
+$$\Delta(s)=\frac{s^2}{2c}\max_{\substack{\Vert d\Vert=1\cr d\in\mathcal K}}(D_dP)^2+o(s^2).$$
 
 ---
 
@@ -593,7 +593,7 @@ $$0<\alpha<\beta.$$
 
 Then
 
-$$\max_x\lbrace -Ax^\beta+s\gamma x^\alpha\rbrace $$
+$$\max_x\lbrace-Ax^\beta+s\gamma x^\alpha\rbrace$$
 
 has optimizer
 

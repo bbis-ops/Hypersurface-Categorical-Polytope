@@ -11,16 +11,40 @@ license: MIT
 repository-code: "https://github.com/bbis-ops/Hypersurface-Categorical-Polytope"
 url: "https://github.com/bbis-ops/Hypersurface-Categorical-Polytope"
 abstract: >-
-  Software and formal results for Fisher-controlled extremal probes and
-  coproduct factorization on a bounded box, including the V.1-V.14 series on
-  vertex localization: the interaction-strength threshold is exactly zero, with
-  exact displacement and objective-gap laws, a directional law for coupled
-  perturbations, an amplitude ceiling for saturating ridges, and a weighted
-  anisotropic master law for the gap exponent. Model-proposed candidates are
-  treated as untrusted data and adjudicated locally.
+  Software and formal results for Newton-tropical face selection at simple
+  polyhedral vertices. The central law turns local geometry, weighted
+  polynomial order, and active constraints into a finite prediction of the
+  winning face and the response exponent, converting a weighted degree q into
+  a gap exponent by q -> 1/(1-q). The series covers exact vertex localization
+  on a bounded box (V.1-V.14), where the interaction-strength threshold is
+  exactly zero and displacement, objective-gap, directional, and saturation
+  laws are given in closed form; the orthant Newton-tropical law (V.15);
+  qualified face selection with tangent-cone localization and non-circular
+  admissibility (V.16); an exact ambient-to-face compiler that transports
+  polynomials in rational arithmetic with auditable cancellation and lineage
+  (V.20); a universality phase fan whose exact affine walls locate every
+  change of winning mechanism over a parameter domain (V.17), together with
+  the discovery engine that partitions finite perturbation families into
+  exponent and mechanism classes (V.21); and certified quadratic elimination
+  of curved channels,
+  resolving signed perturbations that first-layer coordinate-face selection
+  cannot decide (V.22). All structural computation is exact rational
+  arithmetic. Model-proposed candidates are treated as untrusted data,
+  screened under a syntax-tree whitelist and adjudicated locally, so results
+  do not depend on which model produced them; the backend fails closed,
+  declining to license a theorem whose hypotheses are unverified. The
+  categorical work on coexponentials and Fisher-controlled factorization is
+  the historical origin of the project.
 keywords:
-  - coexponential
-  - Fisher information
+  - Newton polytope
+  - tropical geometry
+  - singular asymptotics
+  - face selection
+  - polyhedral geometry
+  - asymptotic expansion
+  - exact rational arithmetic
   - vertex localization
+  - Fisher information
+  - coexponential
   - category theory
   - optimization

@@ -41,7 +41,7 @@ J_s=\frac{s^3}{432}
 $$
 
 Every subtracted term is nonnegative. At
-$y=\sqrt{s/6}$ and $x=s/12$, which are feasible for $0<s\le6$,
+$y=\sqrt{s/6}$ and $x=s/12$, which are feasible for $0\lt s\le6$,
 the two squares vanish. Thus
 
 $$
@@ -71,7 +71,7 @@ W(z)\le0,\quad \sup_Z|e(\tau,z)|\to0
 $$
 
 It fails at zeros of $W$ and near such zeros. Even strict negativity on
-the relative interior is insufficient: $-x^2<0$ there, but its normalized
+the relative interior is insufficient: $-x^2\lt 0$ there, but its normalized
 values approach zero near the $y$ axis. The normalized **closed** face
 $Z_S=\lbrace z\in C_S:D_0(z)=1\rbrace$ is compact; its relative-interior portion
 generally is not. Maximizing directions can approach the boundary at a rate
@@ -79,7 +79,7 @@ depending on $s$.
 
 Interior zero sets cause the same problem. With $D_0=x^4+y^4$ and
 $R=-(x-y)^2+x^3$, both axis initial forms are negative and the full initial
-form is non-positive, but $x=y=3s/8$ gives $27s^4/2048>0$.
+form is non-positive, but $x=y=3s/8$ gives $27s^4/2048\gt 0$.
 The existing mixed-sign positivity check already leaves this latter case
 unresolved; the all-negative initial form in the first example needed a new
 check on higher layers.
@@ -102,7 +102,7 @@ $$
 $$
 
 **Proof.** On the compact section $D_0(z)=1$, the uniform base remainder
-gives $D(c)\ge aD_0(c)$ for some $a>0$ near the origin. Put
+gives $D(c)\ge aD_0(c)$ for some $a\gt 0$ near the origin. Put
 $t=D_0(c)$. Condition (U) gives
 
 $$
@@ -112,8 +112,8 @@ $$
 The supremum of the right side for $t\ge0$ is a finite constant times
 $s^{1/(1-q_\ast)}$. For the lower bound choose a fixed positive witness on a
 qualified minimizing face and use the weighted dilation with
-$\tau=d s^{1/(1-q_\ast)}$. Choose a fixed sufficiently small $d>0$ so that
-$-dD_0(z)+d^{q_\ast}W(z)>0$. The remainders are little-oh of this scale.
+$\tau=d s^{1/(1-q_\ast)}$. Choose a fixed sufficiently small $d\gt 0$ so that
+$-dD_0(z)+d^{q_\ast}W(z)\gt 0$. The remainders are little-oh of this scale.
 Global isolation then identifies the local and global maxima. ∎
 
 Condition (U) depends only on the local polynomial and base data, not on an
@@ -132,7 +132,7 @@ The obstruction persists for
 
 $$
 D_0=x^p+y^q,\qquad R=-a x^2+bxy^r,
-\quad a,b>0,\quad q>2r,\quad rp>q,
+\quad a,b\gt 0,\quad q\gt 2r,\quad rp\gt q,
 $$
 
 with positive integer orders. Put $B=b^2/(4a)$. Completing the square gives
@@ -157,8 +157,8 @@ s^{q/(q-2r)}.
 $$
 
 The omitted cost has order $s^{rp/(q-2r)}$, which is strictly higher by
-$rp>q$. Yet the full-face initial form is $-a x^2$, because
-$2/p<1/p+r/q$. Every original coordinate face is unqualified. This gives
+$rp\gt q$. Yet the full-face initial form is $-a x^2$, because
+$2/p\lt 1/p+r/q$. Every original coordinate face is unqualified. This gives
 a systematic source of regression examples and motivates elimination or
 weighted blow-ups beyond the existing face enumeration.
 
@@ -210,7 +210,7 @@ x_s=(s/4)^{1/3},\quad y_s=(s/2)^{1/2},\quad
 \Delta(s)=\frac{3}{4^{4/3}}s^{4/3}+\frac14s^2.
 $$
 
-Both coordinates are positive for every small $s>0$. Only the leading
+Both coordinates are positive for every small $s\gt 0$. Only the leading
 rescaled profile lies on the $x$ axis. Reports of released and binding
 constraints based solely on minimal winning faces describe candidate
 leading channels; identifying the optimizer's exact support requires the

@@ -24,7 +24,7 @@ Let $F$ be a positive-dimensional orthant face and let
 
 $$
 W_F(x)=a x^\alpha-b x^\beta,
-\qquad a,b>0,
+\qquad a,b\gt 0,
 $$
 
 where $\alpha\ne\beta$ are nonnegative integer exponent vectors supported on
@@ -33,10 +33,10 @@ $F$. Assume the two terms belong to the same weighted initial layer:
 $$
 \langle w,\alpha\rangle
 =\langle w,\beta\rangle=q,
-\qquad 0<q<1.
+\qquad 0\lt q\lt 1.
 $$
 
-Then there exists $z\in\mathrm{relint}(F)$ such that $W_F(z)>0$.
+Then there exists $z\in\mathrm{relint}(F)$ such that $W_F(z)\gt 0$.
 Consequently the face satisfies the positivity qualification required by the
 face-selection law.
 
@@ -56,13 +56,13 @@ $$
 =\frac ab z_k^\delta.
 $$
 
-If $\delta>0$, choose
+If $\delta\gt 0$, choose
 
 $$
 z_k=\left(\frac{4b}{a}\right)^{1/\delta}.
 $$
 
-If $\delta<0$, choose
+If $\delta\lt 0$, choose
 
 $$
 z_k=\left(\frac{4b}{a}\right)^{-1/|\delta|}.
@@ -71,7 +71,7 @@ $$
 In either case the ratio equals four, so
 
 $$
-W_F(z)=a z^\alpha-b z^\beta=3b z^\beta>0.
+W_F(z)=a z^\alpha-b z^\beta=3b z^\beta\gt 0.
 $$
 
 All face coordinates remain strictly positive, hence
@@ -108,7 +108,7 @@ W(x,y)=-2x+y^2,qquad
 D_0(x,y)=x^2+y^4,
 $$
 
-both monomials have $q=1/2$. The constructed full-face witness makes $W>0$,
+both monomials have $q=1/2$. The constructed full-face witness makes $W\gt 0$,
 and the qualified consequence is
 
 $$

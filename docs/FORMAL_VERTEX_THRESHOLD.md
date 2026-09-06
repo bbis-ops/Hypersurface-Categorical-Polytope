@@ -67,7 +67,7 @@ is a maximizer. However, the inward derivatives in the $\lambda$ and $\sigma$
 directions are both zero. The vertex is therefore not first-order robust.
 
 The `face_bowl` perturbation gives each of these directions an inward slope of
-$3s/4$. Thus, for every $s>0$, an inward move increases the objective. The vertex
+$3s/4$. Thus, for every $s\gt 0$, an inward move increases the objective. The vertex
 immediately ceases to be a local maximizer.
 
 The main conclusions are
@@ -207,7 +207,7 @@ Consequently,
 $$\begin{aligned}
 \det(-\nabla^2 f_s)
 &\geq\left(2+\frac{3s}{2}\right)^2-s^2\cr
-&=4+6s+\frac{5s^2}{4}>0.
+&=4+6s+\frac{5s^2}{4}\gt 0.
 \end{aligned}$$
 
 Thus $-\nabla^2 f_s$ is positive definite, so $f_s$ is strictly concave.
@@ -230,8 +230,8 @@ $\blacksquare$
 > $$2s t^3-2(1+s)t+1=0.$$
 > At $s=0$,
 > $$t^{\ast}(0)=\frac12.$$
-> For every $s>0$,
-> $$0<t^{\ast}(s)<\frac12.$$
+> For every $s\gt 0$,
+> $$0\lt t^{\ast}(s)\lt \frac12.$$
 
 **Proof.** The stationarity equations are
 
@@ -271,11 +271,11 @@ b^{\ast}=2,
 \qquad
 k^{\ast}=3.$$
 
-Hence, for every $s>0$,
+Hence, for every $s\gt 0$,
 
-$$\lambda^{\ast}<1,
+$$\lambda^{\ast}\lt 1,
 \qquad
-\sigma^{\ast}>0.$$
+\sigma^{\ast}\gt 0.$$
 
 The optimizer immediately leaves the vertex $(1,0,2,3)$.
 
@@ -286,7 +286,7 @@ The optimizer immediately leaves the vertex $(1,0,2,3)$.
 > **Theorem 6.1 (Zero vertex-localization threshold).**
 > The vertex
 > $$\theta_c=(1,0,2,3)$$
-> is optimal at $s=0$, but it ceases to be locally optimal for every $s>0$.
+> is optimal at $s=0$, but it ceases to be locally optimal for every $s\gt 0$.
 > Therefore,
 > $$\boxed{s^{\ast}=0}.$$
 
@@ -303,7 +303,7 @@ Similarly,
 
 $$D_w^{\mathrm{in}}f_s=\frac{3s}{4}.$$
 
-Both inward derivatives are strictly positive whenever $s>0$. Therefore an inward
+Both inward derivatives are strictly positive whenever $s\gt 0$. Therefore an inward
 move increases the objective, and the corner cannot be a local maximizer for any
 positive $s$. $\blacksquare$
 
@@ -393,7 +393,7 @@ $$\frac{3s}{2}-\left(2+\frac{s}{2}\right)x+sx^2-\frac{s}{2}x^3=0.$$
 
 An interior grid point beats the corner whenever
 
-$$\frac{1}{n-1}<x_c(s).$$
+$$\frac{1}{n-1}\lt x_c(s).$$
 
 For small $s$,
 
@@ -450,11 +450,11 @@ The perturbed first-order coefficient in coordinate $i$ is
 
 $$-a_i+sp_i.$$
 
-If $p_i>0$, the first-order stability limit on that axis is
+If $p_i\gt 0$, the first-order stability limit on that axis is
 
 $$s_i=\frac{a_i}{p_i}.$$
 
-If $a_i=0$ and $p_i>0$, then
+If $a_i=0$ and $p_i\gt 0$, then
 
 $$s_i=0.$$
 
@@ -511,7 +511,7 @@ $$-Ax^2,$$
 
 and suppose the perturbation behaves locally as
 
-$$P(x)-P(0)\sim\gamma x^\alpha,\qquad 0<\alpha<2.$$
+$$P(x)-P(0)\sim\gamma x^\alpha,\qquad 0\lt \alpha\lt 2.$$
 
 The local objective is
 
@@ -589,7 +589,7 @@ $$P(\theta_c+x)-P(\theta_c)\sim \gamma x^\alpha,$$
 
 with
 
-$$0<\alpha<\beta.$$
+$$0\lt \alpha\lt \beta.$$
 
 Then
 
@@ -624,7 +624,7 @@ $$D_t x=\left(t^{1/\beta_i}x_i\right)_i.$$
 
 Suppose the leading perturbation is weighted-homogeneous:
 
-$$P(D_t x)-P(0)=t^q(P(x)-P(0))+o(t^q),\qquad 0<q<1.$$
+$$P(D_t x)-P(0)=t^q(P(x)-P(0))+o(t^q),\qquad 0\lt q\lt 1.$$
 
 Then
 
@@ -663,7 +663,7 @@ an $s^{\ast}=0$ perturbation phenomenon; it is a failure of the base model.
 
 The appropriate diagnostic is global -- the predicate `base_self_fails` is
 
-$$\left[\max_H C_0>\max_{\theta\in\mathrm{ext}(H)}C_0\right].$$
+$$\left[\max_H C_0\gt \max_{\theta\in\mathrm{ext}(H)}C_0\right].$$
 
 This test should be performed before any local margin analysis.
 
@@ -711,7 +711,7 @@ The test suite should verify:
 
 1. the sign of the inward directional derivative;
 2. the negative off-diagonal signs in $-\nabla^2f_s$;
-3. interior displacement for every $s>0$;
+3. interior displacement for every $s\gt 0$;
 4. $\dfrac{\delta(s)}{s}\longrightarrow\dfrac38$;
 5. $\dfrac{\Delta(s)}{s^2}\longrightarrow\dfrac{9}{32}$;
 6. the distinction between the exact grid-crossing distance and $2\delta(s)$;

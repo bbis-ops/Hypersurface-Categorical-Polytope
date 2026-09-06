@@ -22,24 +22,24 @@ D(x,y)=A x^p+B y^q,\qquad
 R(x,y)=-a x^2+xH(y)+K(y),
 $$
 
-where $A,B,a>0$, $p,q>1$ are integers, and $H,K$ are polynomials with
+where $A,B,a\gt 0$, $p,q\gt 1$ are integers, and $H,K$ are polynomials with
 $H(0)=K(0)=0$. Write
 
 $$
-H(y)=h_r y^r+O(y^{r+1}),\qquad h_r>0,
+H(y)=h_r y^r+O(y^{r+1}),\qquad h_r\gt 0,
 $$
 
 and combine the coefficients of the reduced polynomial **exactly**:
 
 $$
 S(y)=\frac{H(y)^2}{4a}+K(y)
-    =C y^\alpha+O(y^{\alpha+1}).
+ =C y^\alpha+O(y^{\alpha+1}).
 $$
 
 Assume
 
 $$
-C>0,\qquad 0<\alpha<q,\qquad pr>q.
+C\gt 0,\qquad 0\lt \alpha\lt q,\qquad pr\gt q.
 $$
 
 Then, with $M(s)=\max_P(F+sG)$,
@@ -84,18 +84,18 @@ $$
 Consequently, throughout the local feasible region,
 
 $$
--D+sR\le -B y^q+sS(y).
+-D+sR\le-B y^q+sS(y).
 $$
 
-For every $\varepsilon>0$ sufficiently small, after shrinking the
+For every $\varepsilon\gt 0$ sufficiently small, after shrinking the
 neighborhood, $S(y)\le(C+\varepsilon)y^\alpha$ for $y\ge0$ there.
 Maximizing $-B y^q+s(C+\varepsilon)y^\alpha$ on the nonnegative axis
 gives $L(C+\varepsilon)s^\gamma$, where $L(\cdot)$ is the displayed
 continuous coefficient formula. Localization therefore gives
 $\limsup\Delta(s)/s^\gamma\le L$ on letting $\varepsilon\downarrow0$.
 
-**Matching feasible lower bound.** Since $h_r>0$, the square-center curve
-$x=H(y)/(2a)$ has positive coordinates for all sufficiently small $y>0$.
+**Matching feasible lower bound.** Since $h_r\gt 0$, the square-center curve
+$x=H(y)/(2a)$ has positive coordinates for all sufficiently small $y\gt 0$.
 At a simple vertex, every sufficiently small nonnegative edge displacement
 is feasible. The proposed $(x_s,y_s)$ is therefore eventually in $P$ and
 annuls the square exactly. At this point,
@@ -110,7 +110,7 @@ $$
 A x_s^p=O\left(s^{pr/(q-\alpha)}\right)=o(s^\gamma)
 $$
 
-by $pr>q$. This proves the matching lower bound and the asymptotic
+by $pr\gt q$. This proves the matching lower bound and the asymptotic
 equivalence. ∎
 
 ## Why the omitted base condition matters
@@ -127,7 +127,7 @@ $$
 -u^3-v^6-u^2+uv^2.
 $$
 
-The term $-u^3$ survives and cannot be dropped. For $pr<q$, it can even
+The term $-u^3$ survives and cannot be dropped. For $pr\lt q$, it can even
 change the dominant balance. The resolver refuses both regimes instead of
 reusing a coefficient derived under strict subleading control.
 

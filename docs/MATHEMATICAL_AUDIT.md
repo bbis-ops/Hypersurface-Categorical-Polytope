@@ -73,7 +73,7 @@ $$
 It fails at zeros of $W$ and near such zeros. Even strict negativity on
 the relative interior is insufficient: $-x^2<0$ there, but its normalized
 values approach zero near the $y$ axis. The normalized **closed** face
-$Z_S=\{z\in C_S:D_0(z)=1\}$ is compact; its relative-interior portion
+$Z_S=\lbrace z\in C_S:D_0(z)=1\rbrace$ is compact; its relative-interior portion
 generally is not. Maximizing directions can approach the boundary at a rate
 depending on $s$.
 
@@ -87,18 +87,18 @@ check on higher layers.
 ## 3. A sufficient corrected selection theorem
 
 Retain the original localization and principal-part assumptions. Suppose
-the independently qualified faces have a minimum $q_*\in(0,1)$, and verify
+the independently qualified faces have a minimum $q_\ast \in(0,1)$, and verify
 the additional condition
 
 $$
-R(c)_+:=\max(R(c),0)\le K D_0(c)^{q_*}
+R(c)_+:=\max(R(c),0)\le K D_0(c)^{q_\ast}
 \quad\text{throughout a neighborhood of the vertex.}\tag{U}
 $$
 
 Then
 
 $$
-\Delta(s)=\Theta\bigl(s^{1/(1-q_*)}\bigr).
+\Delta(s)=\Theta\bigl(s^{1/(1-q_\ast)}\bigr).
 $$
 
 **Proof.** On the compact section $D_0(z)=1$, the uniform base remainder
@@ -106,14 +106,14 @@ gives $D(c)\ge aD_0(c)$ for some $a>0$ near the origin. Put
 $t=D_0(c)$. Condition (U) gives
 
 $$
-J_s(c)\le-at+sKt^{q_*}.
+J_s(c)\le-at+sKt^{q_\ast}.
 $$
 
 The supremum of the right side for $t\ge0$ is a finite constant times
-$s^{1/(1-q_*)}$. For the lower bound choose a fixed positive witness on a
+$s^{1/(1-q_\ast)}$. For the lower bound choose a fixed positive witness on a
 qualified minimizing face and use the weighted dilation with
-$\tau=d s^{1/(1-q_*)}$. Choose a fixed sufficiently small $d>0$ so that
-$-dD_0(z)+d^{q_*}W(z)>0$. The remainders are little-oh of this scale.
+$\tau=d s^{1/(1-q_\ast)}$. Choose a fixed sufficiently small $d>0$ so that
+$-dD_0(z)+d^{q_\ast}W(z)>0$. The remainders are little-oh of this scale.
 Global isolation then identifies the local and global maxima. ∎
 
 Condition (U) depends only on the local polynomial and base data, not on an
@@ -121,7 +121,7 @@ observed response. It is sufficient, and is not claimed necessary or a
 complete decision procedure for signed perturbations. Nonnegative combined
 coefficients automatically satisfy it. A positive witness for the full
 cone's lowest weighted layer also suffices, since then every term has
-degree at least $q_*$.
+degree at least $q_\ast$.
 
 If there is no qualified face, $R_+\le K D_0$ instead certifies no positive
 improvement for small $s$. Absence of a qualified face by itself does not.
@@ -172,7 +172,7 @@ sharp coefficient after independently checking its hypotheses.
 
 For a face with an all-negative initial layer, the selector combines all
 higher layers and checks each positive monomial below the candidate degree
-$q_*$ (or below $1$ when no face is selected). Such a term can be absorbed
+$q_\ast$ (or below $1$ when no face is selected). Such a term can be absorbed
 if a negative initial monomial divides it componentwise. The ratio is then
 a monomial of positive degree, tending uniformly to zero near the origin;
 finitely many such terms can be absorbed simultaneously. Terms at or above

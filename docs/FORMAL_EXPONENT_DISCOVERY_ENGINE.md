@@ -38,7 +38,7 @@ possible perturbations.
 
 ## Exponent-law candidates
 
-For each relevant class with $0<q_*<1$, the engine emits the candidate law
+For each relevant class with $0<q_\ast<1$, the engine emits the candidate law
 
 \[
 \Delta(s)=\Theta\!\left(s^{\gamma}\right),
@@ -50,7 +50,7 @@ A class absent from `known_class_ids` is labeled `unregistered`. This means
 only that it is absent from the caller-supplied registry. The backend reports
 it as a theorem candidate and explicitly does not claim literature novelty.
 
-Adjacent entries in the discrete exponent spectrum report gaps in $q_*$ and
+Adjacent entries in the discrete exponent spectrum report gaps in $q_\ast$ and
 $\gamma$. They are neighboring classes in the screened family, not continuous
 phase walls. A genuine phase wall requires the parametric V.17–V.18 engine.
 

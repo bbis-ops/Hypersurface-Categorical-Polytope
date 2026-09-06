@@ -24,18 +24,18 @@ define the qualified set
 
 $$
 \mathcal Q(\theta)=
-\left\{
+\left\lbrace
 j:
-F_j\text{ is geometrically admitted},\;
-c_j(\theta)>0,\;
+F_j\text{ is geometrically admitted},\quad
+c_j(\theta)>0,\quad
 0<q_j(\theta)<1
-\right\}.
+\right\rbrace.
 $$
 
 The selected degree is
 
 $$
-q_*(\theta)=\min_{j\in\mathcal Q(\theta)}q_j(\theta).
+q_\ast(\theta)=\min_{j\in\mathcal Q(\theta)}q_j(\theta).
 $$
 
 Every possible change is contained in the finite wall set
@@ -79,9 +79,9 @@ On every remaining open chamber:
 - whenever $\mathcal Q$ is nonempty,
 
   $$
-  \Delta(s;\theta)=
-  \Theta\!\left(s^{1/(1-q_*(\theta))}\right).
-  $$
+ \Delta(s;\theta)=
+ \Theta \left(s^{1/(1-q_\ast(\theta))}\right).
+ $$
 
 At a coefficient wall $c_j=0$, the corresponding weighted layer cancels. The
 selector removes that channel at the wall and exposes the next qualified layer
@@ -117,14 +117,14 @@ $$
 For $\theta<1/3$, $A$ is non-positive and $B$ controls:
 
 $$
-q_*=\frac12,qquad \gamma=2.
+q_\ast=\frac12,qquad \gamma=2.
 $$
 
 At $\theta=1/3$, $A$ cancels exactly, so $B$ still controls. For
 $\theta>1/3$, $A$ becomes positive and its lower weighted degree wins:
 
 $$
-q_*=\frac14,qquad \gamma=\frac43.
+q_\ast=\frac14,qquad \gamma=\frac43.
 $$
 
 This transition is invisible to a phase diagram that compares degree laws

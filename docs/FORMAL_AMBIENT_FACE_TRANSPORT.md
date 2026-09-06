@@ -5,7 +5,7 @@ Formal result **V.20** · backend asset `portable-principle.v8` · exact compile
 
 ## Statement
 
-Let $v$ be a simple vertex of $P=\{x:Ax\le b\}$, let $S$ be its active
+Let $v$ be a simple vertex of $P=\lbrace x:Ax\le b\rbrace$, let $S$ be its active
 constraint set, and define the inward edge chart
 
 \[
@@ -99,7 +99,7 @@ $u_0=(1,-1/2)$, $u_1=(0,-1/2)$. Then
 \]
 
 In both cases the feasible base orders are $(4,2)$, so the perturbation has
-$q_*=1/4$ and
+$q_\ast=1/4$ and
 
 \[
 \gamma=\frac1{1-1/4}=\frac43.

@@ -21,7 +21,7 @@ $$
 Then the selected degree is the lower envelope
 
 $$
-q_*(\theta)=\min_{j:\,0<q_j(\theta)<1}q_j(\theta),
+q_*(\theta)=\min_{j:0<q_j(\theta)<1}q_j(\theta),
 $$
 
 and every change of winning face lies on one of the affine walls
@@ -60,14 +60,14 @@ Form the hyperplane arrangement
 
 $$
 \mathcal H=
-\{q_i=q_j:i\ne j\}\cup\{q_i=0:i\in J\}\cup\{q_i=1:i\in J\}.
+\lbrace q_i=q_j:i\ne j\rbrace\cup\lbrace q_i=0:i\in J\rbrace\cup\lbrace q_i=1:i\in J\rbrace.
 $$
 
 On every connected component $C$ of $\Omega\setminus\mathcal H$:
 
 - the relevance status $0<q_j<1$ of every mechanism is constant;
 - the strict ordering of all nonidentical degree laws is constant;
-- the winning set $\operatorname*{argmin}_{0<q_j<1}q_j$ is constant;
+- the winning set $\mathop{\mathrm{argmin}}_{0<q_j<1}q_j$ is constant;
 - $q_*$ is one affine function on $C$; and
 - the gap law is
   $\Delta(s;\theta)=\Theta(s^{\gamma(\theta)})$ with
@@ -127,7 +127,7 @@ The unique crossing is $t=1/4$, where $q_A=q_B=3/8$.  Therefore
 $$
 q_*(t)=
 \begin{cases}
-\frac14+\frac12t,&0<t<\frac14,\\[2mm]
+\frac14+\frac12t,&0<t<\frac14,\cr
 \frac12-\frac12t,&\frac14<t<\frac34,
 \end{cases}
 $$
@@ -137,7 +137,7 @@ with both mechanisms active at the wall.  The exponent law is
 $$
 \gamma(t)=
 \begin{cases}
-\displaystyle\frac{1}{3/4-t/2},&0<t<\frac14,\\[3mm]
+\displaystyle\frac{1}{3/4-t/2},&0<t<\frac14,\cr
 \displaystyle\frac{1}{1/2+t/2},&\frac14<t<\frac34.
 \end{cases}
 $$

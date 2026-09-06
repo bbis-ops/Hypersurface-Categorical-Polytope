@@ -11,7 +11,7 @@ derivative along both of these directions. Consequently, every positive
 interaction strength, however small, moves the maximizer into the interior of the
 face. The true vertex-localization threshold is therefore
 
-$$s^{*}=0.$$
+$$s^{\ast}=0.$$
 
 The displacement from the vertex is linear in $s$, while the objective-value gap
 is quadratic:
@@ -72,7 +72,7 @@ immediately ceases to be a local maximizer.
 
 The main conclusions are
 
-$$\boxed{s^{*}=0},$$
+$$\boxed{s^{\ast}=0},$$
 
 $$\boxed{\delta(s)=\frac{3}{8}s+O(s^2)},$$
 
@@ -94,7 +94,7 @@ is reliable only after checking both:
 Consider the objective
 
 $$\begin{aligned}
-C_s(\theta)={}& b+k+\left[1-(1-\lambda)^2\right]+\left[1-\sigma^2\right]\\
+C_s(\theta)={}& b+k+\left[1-(1-\lambda)^2\right]+\left[1-\sigma^2\right]\cr 
 &+s\left(1-\left(\lambda-\tfrac12\right)^2\right)\left(1-\left(\sigma-\tfrac12\right)^2\right),
 \end{aligned}$$
 
@@ -104,7 +104,7 @@ $$\theta=(\lambda,\sigma,b,k)\in H.$$
 
 The variables $b$ and $k$ occur only in the separable term $b+k$. Therefore,
 
-$$b^{*}=2,\qquad k^{*}=3$$
+$$b^{\ast}=2,\qquad k^{\ast}=3$$
 
 at every maximizer.
 
@@ -151,7 +151,7 @@ $$f_s(u,w)=u+w-u^2-w^2+s(1-u^2)(1-w^2).$$
 
 > **Lemma 3.1 (Reduction to the symmetric face).**
 > The variables $b$ and $k$ attain their upper bounds at every maximizer:
-> $$b^{*}=2,\qquad k^{*}=3.$$
+> $$b^{\ast}=2,\qquad k^{\ast}=3.$$
 > The remaining objective is
 > $$f_s(u,w)=u+w-u^2-w^2+s(1-u^2)(1-w^2),$$
 > on
@@ -178,7 +178,7 @@ that the maximizer lies on the diagonal $u=w$.
 
 $$\nabla^2 f_s(u,w)=
 \begin{pmatrix}
--2-2s(1-w^2) & 4suw\\
+-2-2s(1-w^2) & 4suw\cr 
 4suw & -2-2s(1-u^2)
 \end{pmatrix}.$$
 
@@ -186,7 +186,7 @@ Therefore,
 
 $$-\nabla^2 f_s(u,w)=
 \begin{pmatrix}
-2+2s(1-w^2) & -4suw\\
+2+2s(1-w^2) & -4suw\cr 
 -4suw & 2+2s(1-u^2)
 \end{pmatrix}.$$
 
@@ -200,13 +200,13 @@ $$|4suw|\leq s$$
 
 and
 
-$$1-u^2,\;1-w^2\geq \frac34.$$
+$$1-u^2,\thickspace 1-w^2\geq \frac34.$$
 
 Consequently,
 
 $$\begin{aligned}
 \det(-\nabla^2 f_s)
-&\geq\left(2+\frac{3s}{2}\right)^2-s^2\\
+&\geq\left(2+\frac{3s}{2}\right)^2-s^2\cr 
 &=4+6s+\frac{5s^2}{4}>0.
 \end{aligned}$$
 
@@ -225,13 +225,13 @@ $\blacksquare$
 
 > **Theorem 5.1 (Exact maximizer).**
 > The unique maximizer is
-> $$u^{*}=w^{*}=t^{*}(s),$$
-> where $t^{*}(s)$ is the unique root in $[0,1/2]$ of
-> $$2s\,t^3-2(1+s)t+1=0.$$
+> $$u^{\ast}=w^{\ast}=t^{\ast}(s),$$
+> where $t^{\ast}(s)$ is the unique root in $[0,1/2]$ of
+> $$2s\thinspace t^3-2(1+s)t+1=0.$$
 > At $s=0$,
-> $$t^{*}(0)=\frac12.$$
+> $$t^{\ast}(0)=\frac12.$$
 > For every $s>0$,
-> $$0<t^{*}(s)<\frac12.$$
+> $$0<t^{\ast}(s)<\frac12.$$
 
 **Proof.** The stationarity equations are
 
@@ -256,26 +256,26 @@ $$1-2t-2st(1-t^2)=0,$$
 
 or equivalently
 
-$$2s\,t^3-2(1+s)t+1=0.$$
+$$2s\thinspace t^3-2(1+s)t+1=0.$$
 
 Strict concavity guarantees that the stationary point is the unique global
 maximizer. $\blacksquare$
 
 In the original coordinates,
 
-$$\lambda^{*}=\frac12+t^{*}(s),
+$$\lambda^{\ast}=\frac12+t^{\ast}(s),
 \qquad
-\sigma^{*}=\frac12-t^{*}(s),
+\sigma^{\ast}=\frac12-t^{\ast}(s),
 \qquad
-b^{*}=2,
+b^{\ast}=2,
 \qquad
-k^{*}=3.$$
+k^{\ast}=3.$$
 
 Hence, for every $s>0$,
 
-$$\lambda^{*}<1,
+$$\lambda^{\ast}<1,
 \qquad
-\sigma^{*}>0.$$
+\sigma^{\ast}>0.$$
 
 The optimizer immediately leaves the vertex $(1,0,2,3)$.
 
@@ -288,7 +288,7 @@ The optimizer immediately leaves the vertex $(1,0,2,3)$.
 > $$\theta_c=(1,0,2,3)$$
 > is optimal at $s=0$, but it ceases to be locally optimal for every $s>0$.
 > Therefore,
-> $$\boxed{s^{*}=0}.$$
+> $$\boxed{s^{\ast}=0}.$$
 
 **Proof.** At the face corner $(u,w)=(1/2,1/2)$,
 
@@ -317,13 +317,13 @@ derivatives, so those coordinates remain pinned at their upper bounds.
 
 Define the displacement
 
-$$\delta(s)=\frac12-t^{*}(s).$$
+$$\delta(s)=\frac12-t^{\ast}(s).$$
 
 > **Theorem 7.1 (Displacement and gap).**
 > As $s\to0^{+}$,
 > $$\delta(s)=\frac38s+O(s^2).$$
 > Furthermore, if
-> $$\Delta(s)=C_s(\theta^{*})-\max_{\theta\in\mathrm{ext}(H)}C_s(\theta),$$
+> $$\Delta(s)=C_s(\theta^{\ast})-\max_{\theta\in\mathrm{ext}(H)}C_s(\theta),$$
 > then
 > $$\Delta(s)=\frac{9}{32}s^2+O(s^3).$$
 
@@ -346,7 +346,7 @@ $$u=w=\frac12-x,$$
 the exact objective difference from the corner is
 
 $$\begin{aligned}
-&f_s\left(\frac12-x,\frac12-x\right)-f_s\left(\frac12,\frac12\right)\\
+&f_s\left(\frac12-x,\frac12-x\right)-f_s\left(\frac12,\frac12\right)\cr 
 &\qquad=\frac{3s}{2}x-\left(2+\frac{s}{2}\right)x^2+sx^3-\frac{s}{2}x^4.
 \end{aligned}$$
 
@@ -358,7 +358,7 @@ The exact negative Hessian at the corner is
 
 $$A=-\nabla^2 f_s\left(\frac12,\frac12\right)=
 \begin{pmatrix}
-2+\frac32s & -s\\
+2+\frac32s & -s\cr 
 -s & 2+\frac32s
 \end{pmatrix}.$$
 
@@ -438,7 +438,7 @@ is a tolerance-based numerical flag, not a mathematical certificate.
 Let $x_i\geq0$ denote inward slack coordinates from a candidate vertex
 $\theta_c$. Suppose the base objective has the local expansion
 
-$$C_0(\theta_c+x)=C_0(\theta_c)-\sum_i a_i x_i-\frac12x^\top Qx+o(\|x\|^2),$$
+$$C_0(\theta_c+x)=C_0(\theta_c)-\sum_i a_i x_i-\frac12x^\top Qx+o(\Vert x\Vert ^2),$$
 
 with $a_i\geq0$.
 
@@ -474,21 +474,21 @@ actually a global maximizer of $C_0$.
 
 Suppose the base objective has local quadratic loss
 
-$$C_0(\theta_c+x)=C_0(\theta_c)-\frac12x^\top Qx+o(\|x\|^2),$$
+$$C_0(\theta_c+x)=C_0(\theta_c)-\frac12x^\top Qx+o(\Vert x\Vert ^2),$$
 
 where $Q$ is positive definite.
 
 Let the perturbation have a positive inward linear term
 
-$$P(\theta_c+x)=P(\theta_c)+g^\top x+o(\|x\|).$$
+$$P(\theta_c+x)=P(\theta_c)+g^\top x+o(\Vert x\Vert).$$
 
 The leading-order optimization problem is
 
-$$\max_{x\geq0}\left\{s\,g^\top x-\frac12x^\top Qx\right\}.$$
+$$\max_{x\geq0}\left\lbrace s\thinspace g^\top x-\frac12x^\top Qx\right\rbrace .$$
 
 Ignoring active-cone constraints, the optimizer is
 
-$$x^{*}=sQ^{-1}g+O(s^2),$$
+$$x^{\ast}=sQ^{-1}g+O(s^2),$$
 
 and the gap is
 
@@ -519,7 +519,7 @@ $$-Ax^2+s\gamma x^\alpha.$$
 
 Its optimizer satisfies
 
-$$x^{*}=\left(\frac{\alpha\gamma s}{2A}\right)^{1/(2-\alpha)},$$
+$$x^{\ast}=\left(\frac{\alpha\gamma s}{2A}\right)^{1/(2-\alpha)},$$
 
 and the gap scales as
 
@@ -540,7 +540,7 @@ $$x=Rd.$$
 If the base loss is quadratic and $P$ is positively homogeneous of degree one,
 then
 
-$$C_0(\theta_c+Rd)+sP(\theta_c+Rd)=C_0(\theta_c)-\frac{R^2}{2}d^\top Qd+sR\,D_dP+\cdots.$$
+$$C_0(\theta_c+Rd)+sP(\theta_c+Rd)=C_0(\theta_c)-\frac{R^2}{2}d^\top Qd+sR\thinspace D_dP+\cdots.$$
 
 Optimizing over $R$ gives
 
@@ -553,7 +553,7 @@ the leading-order optimizer to lie on a unique ray.
 
 For isotropic curvature $Q=cI$,
 
-$$\Delta(s)=\frac{s^2}{2c}\max_{\substack{\|d\|=1\\d\in\mathcal K}}(D_dP)^2+o(s^2).$$
+$$\Delta(s)=\frac{s^2}{2c}\max_{\substack{\Vert d\Vert =1\cr d\in\mathcal K}}(D_dP)^2+o(s^2).$$
 
 ---
 
@@ -593,11 +593,11 @@ $$0<\alpha<\beta.$$
 
 Then
 
-$$\max_x\{-Ax^\beta+s\gamma x^\alpha\}$$
+$$\max_x\lbrace -Ax^\beta+s\gamma x^\alpha\rbrace $$
 
 has optimizer
 
-$$x^{*}=\Theta\left(s^{1/(\beta-\alpha)}\right)$$
+$$x^{\ast}=\Theta\left(s^{1/(\beta-\alpha)}\right)$$
 
 and gap
 
@@ -659,11 +659,11 @@ $$(\lambda,\sigma)=(0.75,0.35),$$
 which is strictly interior.
 
 A vertex search therefore returns the wrong point for every $s\geq0$. This is not
-an $s^{*}=0$ perturbation phenomenon; it is a failure of the base model.
+an $s^{\ast}=0$ perturbation phenomenon; it is a failure of the base model.
 
-The appropriate diagnostic is global:
+The appropriate diagnostic is global -- the predicate `base_self_fails` is
 
-$$\texttt{base\_self\_fails}=\left[\max_H C_0>\max_{\theta\in\mathrm{ext}(H)}C_0\right].$$
+$$\left[\max_H C_0>\max_{\theta\in\mathrm{ext}(H)}C_0\right].$$
 
 This test should be performed before any local margin analysis.
 
@@ -725,7 +725,7 @@ The test suite should verify:
 
 For the stated `face_bowl` objective,
 
-$$\boxed{s^{*}=0}.$$
+$$\boxed{s^{\ast}=0}.$$
 
 The vertex is the optimizer only at $s=0$. Every positive interaction strength
 moves the optimizer into the interior of the $(\lambda,\sigma)$ face.

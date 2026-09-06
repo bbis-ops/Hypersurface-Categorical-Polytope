@@ -26,8 +26,10 @@ turn out to have clean closed-form answers.
 
 Throughout, place the degenerate corner at `x = 0` in inward coordinates `x_i ≥ 0`, so
 
-$$f(x) = -\sum_i A_i x_i^{\beta_i} \;+\; s\,P(x),\qquad A_i>0,\ \beta_i>1,\qquad
-P(x)=\sum_j \gamma_j \prod_i x_i^{\alpha_{ij}},\ \ \gamma_j>0,$$
+$$
+f(x) = -\sum_i A_i x_i^{\beta_i} \;+\; s\,P(x),\qquad A_i>0,\ \beta_i>1,\qquad
+P(x)=\sum_j \gamma_j \prod_i x_i^{\alpha_{ij}},\ \ \gamma_j>0,
+$$
 
 and the gap is `Δ(s) = max_{x≥0} f(x)` with `f(0)=0`.
 
@@ -46,15 +48,19 @@ signed extension requires the additional uniform upper bound proved in
 
 On a single flat axis with base drop `A x^β` and perturbation `s γ x^α`, `0<α<β`:
 
-$$\boxed{\;\Delta(s) = C\,s^{p} + o(s^{p}),\qquad p=\frac{\beta}{\beta-\alpha},\qquad
-C=\gamma\,\frac{\beta-\alpha}{\beta}\left(\frac{\gamma\alpha}{A\beta}\right)^{\!\frac{\alpha}{\beta-\alpha}}.\;}$$
+$$
+\boxed{\;\Delta(s) = C\,s^{p} + o(s^{p}),\qquad p=\frac{\beta}{\beta-\alpha},\qquad
+C=\gamma\,\frac{\beta-\alpha}{\beta}\left(\frac{\gamma\alpha}{A\beta}\right)^{\!\frac{\alpha}{\beta-\alpha}}.\;}
+$$
 
 **Proof.** Maximise `φ(x) = -A x^β + s γ x^α` over `x>0`. Stationarity
 `A β x^{β-1} = s γ α x^{α-1}` gives `x_* = (sγα/(Aβ))^{1/(β-α)}`. Write
 `u = x_*^{β-α} = sγα/(Aβ)`, so `x_*^β = u\,x_*^α` and
 
-$$\varphi(x_*) = x_*^\alpha(-A u + s\gamma) = s\gamma\Big(1-\tfrac{\alpha}{\beta}\Big)x_*^\alpha
-= \gamma\frac{\beta-\alpha}{\beta}\Big(\frac{s\gamma\alpha}{A\beta}\Big)^{\!\alpha/(\beta-\alpha)} s.$$
+$$
+\varphi(x_*) = x_*^\alpha(-A u + s\gamma) = s\gamma\Big(1-\tfrac{\alpha}{\beta}\Big)x_*^\alpha
+= \gamma\frac{\beta-\alpha}{\beta}\Big(\frac{s\gamma\alpha}{A\beta}\Big)^{\!\alpha/(\beta-\alpha)} s.
+$$
 
 The powers of `s` collect to `α/(β-α)+1 = β/(β-α) = p`; the `s`-free prefactor is `C`.
 `φ''(x_*) = -Aβ(β-1)x_*^{β-2} + sγα(α-1)x_*^{α-2} < 0` after substituting the
@@ -95,8 +101,10 @@ face of `P`'s Newton polytope under the weight vector `(1/β_i)`. Every term wit
 base drop becomes `t·Q(z)` with `Q(z)=Σ_i A_i z_i^{β_i}` (order `t`). Monomial `j`
 becomes `γ_j t^{q_j}∏_i z_i^{α_{ij}}` (order `t^{q_j}`). Hence
 
-$$f = -t\,Q(z) + s\Big(t^{q^\star}W(z) + \sum_{q_j>q^\star} t^{q_j}(\cdots)\Big),\qquad
-W(z)=\!\!\sum_{j:\,q_j=q^\star}\!\!\gamma_j\prod_i z_i^{\alpha_{ij}}.$$
+$$
+f = -t\,Q(z) + s\Big(t^{q^\star}W(z) + \sum_{q_j>q^\star} t^{q_j}(\cdots)\Big),\qquad
+W(z)=\!\!\sum_{j:\,q_j=q^\star}\!\!\gamma_j\prod_i z_i^{\alpha_{ij}}.
+$$
 
 Fix a direction `z` with `W(z)>0` and maximise `-tQ + s t^{q^\star}W` over `t`:
 `t_* = (s q^\star W/Q)^{1/(1-q^\star)} = \Theta(s^{1/(1-q^\star)})`. Both retained terms

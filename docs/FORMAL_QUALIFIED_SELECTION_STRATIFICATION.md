@@ -81,10 +81,10 @@ On every remaining open chamber:
 - the winning set, including any persistent ties, is constant; and
 - whenever $\mathcal Q$ is nonempty,
 
-  $$
- \Delta(s;\theta)=
- \Theta \left(s^{1/(1-q_\ast(\theta))}\right).
- $$
+$$
+\Delta(s;\theta)=
+\Theta \left(s^{1/(1-q_\ast(\theta))}\right).
+$$
 
 At a coefficient wall $c_j=0$, the corresponding weighted layer cancels. The
 selector removes that channel at the wall and exposes the next qualified layer

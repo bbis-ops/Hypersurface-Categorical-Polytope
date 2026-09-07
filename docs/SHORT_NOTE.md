@@ -115,7 +115,7 @@ separate assumptions on summands do not suffice.
 **2 · What separation costs.** For the exact model
 $Q(\theta)=c^\top\theta-\tfrac12\theta^\top F\theta$ with $F\succ0$, any
 candidate $z$ has residual $r_z=c-Fz$. With a proved spectral lower bound
-$0<\mu\le\lambda_{\min}(F)$,
+$0\lt \mu\le\lambda_{\min}(F)$,
 
 $$
 \begin{aligned}
@@ -126,7 +126,7 @@ $$
 
 For the independent block solve $z_0=D^{-1}c$, where $D$ is the block-diagonal
 part of $F$, the normalized coupling
-$\rho=\|D^{-1/2}(F-D)D^{-1/2}\|_2<1$ gives the bound
+$\rho=\|D^{-1/2}(F-D)D^{-1/2}\|_2\lt 1$ gives the bound
 
 $$
 Q(F^{-1}c)-Q(z_0)
@@ -155,8 +155,8 @@ are counted separately.
 | Evidence available | Valid conclusion |
 | :--- | :--- |
 | Theorem 1 holds on the full box | Full vertex enumeration attains a global maximum |
-| Feasible quadratic candidate and proved $\mu>0$ | Compare its residual bound with the requested tolerance |
-| Independent block solve and $\rho<1$ | Use the stated separation bound, including its energy factor |
+| Feasible quadratic candidate and proved $\mu\gt 0$ | Compare its residual bound with the requested tolerance |
+| Independent block solve and $\rho\lt 1$ | Use the stated separation bound, including its energy factor |
 | Nonlinear objective or additional coupled constraints | Establish an applicable global upper bound or report an unresolved guarantee |
 
 The earlier cutoffs $0.10$ and $0.25$ are legacy demonstration settings,

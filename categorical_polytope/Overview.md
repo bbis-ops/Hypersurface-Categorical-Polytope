@@ -133,7 +133,7 @@ Q(\theta)=c^\top\theta-\frac12\theta^\top F\theta,\qquad F=F^\top\succ0.
 $$
 
 For any candidate $z$, define $r_z=c-Fz$. With an independently established
-$0<\mu\le\lambda_{\min}(F)$,
+$0\lt \mu\le\lambda_{\min}(F)$,
 
 $$
 \boxed{
@@ -152,7 +152,7 @@ Let $D$ be the block-diagonal part of $F$. The independent block solution is
 $z_0=D^{-1}c$. Define curvature-normalized coupling by
 
 $$
-\rho=\|D^{-1/2}(F-D)D^{-1/2}\|_2<1.
+\rho=\|D^{-1/2}(F-D)D^{-1/2}\|_2\lt 1.
 $$
 
 Then
@@ -259,7 +259,7 @@ but their fields must be read according to the quantities they compute.
 | :--- | :--- |
 | Theorem 1 verified for the full box objective | Enumerate vertices or certify pruning with a valid upper bound |
 | Positive-definite quadratic and known spectral lower bound | Compute the candidate residual and compare its bound with the requested tolerance |
-| Independent block solve and normalized coupling $\rho<1$ | Use the separation bound including its energy factor |
+| Independent block solve and normalized coupling $\rho\lt 1$ | Use the separation bound including its energy factor |
 | Coupled constraints | Work with the actual feasible geometry; filtering old box corners is insufficient |
 | Nonlinear objective with only a local Hessian estimate | Report a diagnostic until a global remainder or curvature bound is established |
 

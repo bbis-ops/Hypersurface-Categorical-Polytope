@@ -97,7 +97,7 @@ objective** $C$ is quasiconvex on every coordinate slice.
 **Conclusion.** At least one global maximizer is a vertex:
 
 $$
-\max_H C=\max_{v\in\operatorname{ext}(H)}C(v).
+\max_H C=\max_{v\in\mathrm{ext}(H)}C(v).
 $$
 
 <details>

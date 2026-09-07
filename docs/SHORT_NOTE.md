@@ -88,7 +88,7 @@ block solve does not by itself imply small coupling.
 | Block coupling | Off-diagonal terms of a specified quadratic model, assessed together with curvature |
 
 **The obstruction in one step.** If a set $L$ represented
-$\operatorname{Hom}(Y,A\sqcup-)$ for nonempty $A,Y$, evaluation at a singleton
+$\mathrm{Hom}(Y,A\sqcup-)$ for nonempty $A,Y$, evaluation at a singleton
 $1$ would give a bijection between the single map $L\to1$ and at least two
 constant maps $Y\to A\sqcup1$. The degenerate cases are stated in the
 [full proof](FORMAL_THEOREMS.md#0-the-categorical-obstruction-and-the-analogy).
@@ -105,7 +105,7 @@ constant maps $Y\to A\sqcup1$. The degenerate cases are stated in the
 separately quasiconvex on a compact box $H$, then
 
 $$
-\max_H C=\max_{v\in\operatorname{ext}(H)}C(v).
+\max_H C=\max_{v\in\mathrm{ext}(H)}C(v).
 $$
 
 At least one maximizing vertex exists. The claim is about the full objective;

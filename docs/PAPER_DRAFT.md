@@ -26,10 +26,10 @@ useful when a formally dual adjunction does not exist? The proposed answer
 is a selection procedure, rather than a representing object.
 
 The categorical obstruction is elementary. For nonempty $A,Y$, a representing
-set $L$ for $\operatorname{Hom}(Y,A\sqcup-)$ would satisfy, at a singleton $1$,
+set $L$ for $\mathrm{Hom}(Y,A\sqcup-)$ would satisfy, at a singleton $1$,
 
 $$
-\operatorname{Hom}(L,1)\cong\operatorname{Hom}(Y,A\sqcup1).
+\mathrm{Hom}(L,1)\cong\mathrm{Hom}(Y,A\sqcup1).
 $$
 
 The left side has one element; the right side has at least two. This also
@@ -50,7 +50,7 @@ For a continuous, separately quasiconvex **full objective** $C$ on a nonempty
 compact box $H$,
 
 $$
-\max_H C=\max_{\operatorname{ext}(H)}C.
+\max_H C=\max_{\mathrm{ext}(H)}C.
 $$
 
 A maximizer exists by compactness. Each coordinate can be replaced by an

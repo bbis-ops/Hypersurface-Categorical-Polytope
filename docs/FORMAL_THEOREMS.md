@@ -18,7 +18,7 @@ has its own theorems and hypotheses.
 For fixed nonempty sets $A,Y$, there is no set $L$ with natural bijections
 
 $$
-\operatorname{Hom}(L,Z)\cong\operatorname{Hom}(Y,A\sqcup Z)
+\mathrm{Hom}(L,Z)\cong\mathrm{Hom}(Y,A\sqcup Z)
 $$
 
 for every set $Z$. Take $Z=1$, a singleton. There is exactly one map $L\to1$,
@@ -51,7 +51,7 @@ Then
 
 $$
 \boxed{\max_{\theta\in H}C(\theta)
-      =\max_{v\in\operatorname{ext}(H)}C(v).}
+      =\max_{v\in\mathrm{ext}(H)}C(v).}
 $$
 
 In particular, **at least one** global maximizer is a vertex.
@@ -61,7 +61,7 @@ coordinate interval, the displayed inequality bounds the value at the current
 coordinate by the larger endpoint value. Replace that coordinate by such an
 endpoint. Repeating for all coordinates never lowers the value and finishes
 at a vertex. Degenerate intervals already have their only endpoint. The reverse
-inequality follows from $\operatorname{ext}(H)\subset H$. ∎
+inequality follows from $\mathrm{ext}(H)\subset H$. ∎
 
 **Scope.** The hypothesis concerns the full objective $C$, not merely an
 interaction term in a decomposition $C=g+h+r$. A constant objective shows why
@@ -199,7 +199,7 @@ Let $P$ be a nonempty compact feasible set, $C:P\to\mathbb R$ continuous,
 and $T\subset P$ a finite nonempty candidate set. Let
 
 $$
-p\in\operatorname{argmax}_{t\in T}C(t).
+p\in\mathrm{argmax}_{t\in T}C(t).
 $$
 
 If $U$ is a proved upper bound on $\max_P C$, then
@@ -212,7 +212,7 @@ $$
 $\max_P C\le U$ gives the right one. ∎
 
 Under Theorem 1, a valid choice is
-$U=\max_{v\in\operatorname{ext}(H)}C(v)$, obtained by full vertex enumeration.
+$U=\max_{v\in\mathrm{ext}(H)}C(v)$, obtained by full vertex enumeration.
 For the quadratic model, Theorem 2 supplies
 $U=Q(p)+\|c-Fp\|_2^2/(2\mu)$. The certificate and the candidate score must
 refer to the same objective and feasible set.

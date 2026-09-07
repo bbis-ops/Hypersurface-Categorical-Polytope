@@ -386,12 +386,25 @@ The original coexponential obstruction motivated the search for an
 operational substitute; the face-selection law is that substitute in
 geometric form.
 
-The earlier vertex, Fisher-factorization, and constructive-search results are
-preserved in [`FORMAL_THEOREMS.md`](docs/FORMAL_THEOREMS.md),
-[`PAPER_DRAFT.md`](docs/PAPER_DRAFT.md), and the legacy manifest returned by
-`python -m categorical_polytope firsts`. In particular,
-`formal_bounds.py` encodes the explicit separability bound
-`C(theta*) - C(theta_sep) <= Phi(epsilon)`.
+The corrected vertex, quadratic-factorization, and constructive-search
+results are stated in [`FORMAL_THEOREMS.md`](docs/FORMAL_THEOREMS.md) and
+[`PAPER_DRAFT.md`](docs/PAPER_DRAFT.md). The original deliverables remain
+listed in the legacy manifest returned by `python -m categorical_polytope firsts`.
+
+In particular, [`formal_bounds.py`](categorical_polytope/formal_bounds.py)
+retains the original $\Phi(\varepsilon)$ comparison for reproducibility.
+It is not a universal separability bound; the
+[revision record](docs/ORIGINAL_NOTE_REVIEW.md#2-the-displayed-fisher-bound-is-not-a-universal-upper-bound)
+gives the counterexample and explains the correction.
+
+For the quadratic objective $Q(\theta)=c^\top\theta-\frac12\theta^\top F\theta$
+with $F=F^\top\succ0$, let $r_z=c-Fz$ for a candidate $z\in\mathbb R^n$.
+With an independently established $0\lt\mu\le\lambda_{\min}(F)$,
+the [corrected residual certificate](docs/FORMAL_THEOREMS.md#theorem-2--quadratic-residual-and-separation-bounds) is
+
+$$
+Q(F^{-1}c)-Q(z)\le\frac{\|r_z\|_2^2}{2\mu}.
+$$
 
 ## Requirements
 
@@ -446,6 +459,25 @@ cd categorical_polytope
 python -m categorical_polytope
 ```
 
+## Publication control
+
+A proof that renders as literal text has not been published. GitHub's Markdown
+pass rewrites some characters before its math renderer sees them, and its KaTeX
+instance refuses a set of macros outright — silently, and only on github.com.
+
+```bash
+python experiments/ghmath.py README.md docs categorical_polytope experiments
+```
+
+[`ghmath.py`](experiments/ghmath.py) checks every Markdown file against rules
+extracted from defects this repository actually shipped: bare `<` and `>`,
+`\operatorname`, escaped braces, literal asterisks, the LaTeX delimiters
+`\[ \] \( \)`, and indented `$$` blocks. It exits non-zero on a rendering error,
+so it can gate a merge; `--fix` repairs the mechanical ones and `--list-rules`
+prints the catalogue. It runs in the reproduction suite as the `docs-rendering`
+case. See the [runbook](docs/RUNBOOK.md#document-rendering) for its limits — it
+checks that math *can* render, not that the mathematics is right.
+
 ## Layout
 
 | Module | Role |
@@ -470,7 +502,7 @@ python -m categorical_polytope
 | `extremal_substitute.py` | Operational substitute when coexponential is absent; limits |
 | `vertex_probe.py` | Constructive near-optimal probe: search only ext(H) with certificate |
 | `decomposition_stability.py` | Coproduct robustness to independence violations; design rules |
-| `formal_bounds.py` | $\epsilon_0$, $\Phi(\varepsilon)$ theorem constants |
+| `formal_bounds.py` | Legacy $\epsilon_0$ and $\Phi(\varepsilon)$ comparison quantities; corrected bounds are in [Theorem 2](docs/FORMAL_THEOREMS.md#theorem-2--quadratic-residual-and-separation-bounds) |
 | `fisher_pruned_search.py` | Theorem 3: top-$k$ Fisher-pruned vertex search |
 | `firsts.py` | Deliverables manifest + run experiments |
 | `nonlinear_objective.py` | Non-quadratic $C$, empirical Fisher, vertex vs separable |

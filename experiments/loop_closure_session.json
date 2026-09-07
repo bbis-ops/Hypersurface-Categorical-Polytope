@@ -2,14 +2,43 @@
   "summary": {
     "backend": "scripted",
     "api_fallbacks": [],
+    "confusion_source": "measured",
+    "self_report_divergence": {
+      "n_pairs": 8,
+      "mean_abs_error": 0.09921592380346678,
+      "max_abs_error": 0.15929375,
+      "worst_turn": 2,
+      "reported": [
+        0.05,
+        0.12,
+        0.22,
+        0.35,
+        0.48,
+        0.55,
+        0.62,
+        0.7
+      ],
+      "measured": [
+        0.0425,
+        0.0361,
+        0.0607,
+        0.2241,
+        0.378,
+        0.5088,
+        0.4925,
+        0.5536
+      ],
+      "overclaims": 8,
+      "underclaims": 0
+    },
     "n_turns": 8,
-    "closure_turn": 3,
-    "closure_quote": "Cross-naturality mixes my lambda-sigma face \u2014 corners feel wrong.",
+    "closure_turn": 4,
+    "closure_quote": "Maybe the true picture is interior on the face, not a corner.",
     "modes": [
       "CORNER_HUNTING",
       "CORNER_HUNTING",
       "CORNER_HUNTING",
-      "INTERIOR_SEARCH",
+      "CORNER_HUNTING",
       "INTERIOR_SEARCH",
       "INTERIOR_SEARCH",
       "INTERIOR_SEARCH",
@@ -28,12 +57,12 @@
     "gaps": [
       0.0,
       0.0,
-      0.007475585937499751,
-      0.030358886718749645,
-      0.053242187500000426,
-      0.06556396484374982,
-      0.0778857421875001,
-      0.09648437500000018
+      0.0,
+      0.008197345046996318,
+      0.03528500403213464,
+      0.05830951416950203,
+      0.05543711048157629,
+      0.06619747164371503
     ],
     "narrative": "Coexp absent in Set (cardinality) -> learner raises confusion on the (lam,sigma) face -> live probe sees grid beating vertices -> INTERIOR_SEARCH closes the operational substitute loop."
   },
@@ -56,11 +85,13 @@
         "certified_separable": true,
         "search_mode": "CORNER_HUNTING",
         "reason": "low leakage and vertex localization \u2014 separable corner probe OK",
-        "value_vertex": 7.028125,
-        "value_grid": 7.028125
+        "value_vertex": 7.02390625,
+        "value_grid": 7.02390625
       },
       "tutor_note": "Probe: corner/separable OK. Learner: \"Curry lives at the product corner \u2014 I'm comfortable there.\"",
-      "loop_event": ""
+      "loop_event": "",
+      "confusion_reported": 0.05,
+      "confusion_measured": 0.0425
     },
     {
       "turn": 1,
@@ -80,11 +111,13 @@
         "certified_separable": true,
         "search_mode": "CORNER_HUNTING",
         "reason": "low leakage and vertex localization \u2014 separable corner probe OK",
-        "value_vertex": 7.0675,
-        "value_grid": 7.0675
+        "value_vertex": 7.0203203125,
+        "value_grid": 7.0203203125
       },
       "tutor_note": "Probe: corner/separable OK. Learner: \"Coproduct is disjoint union; I probe each block at a vertex.\"",
-      "loop_event": ""
+      "loop_event": "",
+      "confusion_reported": 0.12,
+      "confusion_measured": 0.036125000000000004
     },
     {
       "turn": 2,
@@ -100,15 +133,17 @@
       },
       "probe": {
         "epsilon": 0.0,
-        "gap_vertex_grid": 0.007475585937499751,
+        "gap_vertex_grid": 0.0,
         "certified_separable": true,
         "search_mode": "CORNER_HUNTING",
         "reason": "low leakage and vertex localization \u2014 separable corner probe OK",
-        "value_vertex": 7.12375,
-        "value_grid": 7.1312255859375
+        "value_vertex": 7.034147265625,
+        "value_grid": 7.034147265625
       },
       "tutor_note": "Probe: corner/separable OK. Learner: \"Coexponential in Set? I can't find a representing object.\"",
-      "loop_event": ""
+      "loop_event": "",
+      "confusion_reported": 0.22,
+      "confusion_measured": 0.06070625
     },
     {
       "turn": 3,
@@ -124,15 +159,17 @@
       },
       "probe": {
         "epsilon": 0.0,
-        "gap_vertex_grid": 0.030358886718749645,
+        "gap_vertex_grid": 0.008197345046996318,
         "certified_separable": true,
-        "search_mode": "INTERIOR_SEARCH",
-        "reason": "grid beats vertex by 0.0304 \u2014 abandon corner-hunting",
-        "value_vertex": 7.196875,
-        "value_grid": 7.22723388671875
+        "search_mode": "CORNER_HUNTING",
+        "reason": "low leakage and vertex localization \u2014 separable corner probe OK",
+        "value_vertex": 7.12605642578125,
+        "value_grid": 7.134253770828247
       },
-      "tutor_note": "Probe: INTERIOR_SEARCH. Your report: \"Cross-naturality mixes my lambda-sigma face \u2014 corners feel wrong.\" \u2014 corner-hunting is unsound; search the face interior.",
-      "loop_event": "LOOP_CLOSURE: coexp confusion + face coupling -> interior search"
+      "tutor_note": "Probe: corner/separable OK. Learner: \"Cross-naturality mixes my lambda-sigma face \u2014 corners feel wrong.\"",
+      "loop_event": "",
+      "confusion_reported": 0.35,
+      "confusion_measured": 0.22410031249999998
     },
     {
       "turn": 4,
@@ -148,15 +185,17 @@
       },
       "probe": {
         "epsilon": 0.0,
-        "gap_vertex_grid": 0.053242187500000426,
+        "gap_vertex_grid": 0.03528500403213464,
         "certified_separable": true,
         "search_mode": "INTERIOR_SEARCH",
-        "reason": "grid beats vertex by 0.0532 \u2014 abandon corner-hunting",
-        "value_vertex": 7.27,
-        "value_grid": 7.3232421875
+        "reason": "grid beats vertex by 0.0353 \u2014 abandon corner-hunting",
+        "value_vertex": 7.2126167119140625,
+        "value_grid": 7.247901715946197
       },
       "tutor_note": "Probe: INTERIOR_SEARCH. Your report: \"Maybe the true picture is interior on the face, not a corner.\" \u2014 corner-hunting is unsound; search the face interior.",
-      "loop_event": ""
+      "loop_event": "LOOP_CLOSURE: coexp confusion + face coupling -> interior search",
+      "confusion_reported": 0.48,
+      "confusion_measured": 0.377985265625
     },
     {
       "turn": 5,
@@ -172,15 +211,17 @@
       },
       "probe": {
         "epsilon": 0.0,
-        "gap_vertex_grid": 0.06556396484374982,
+        "gap_vertex_grid": 0.05830951416950203,
         "certified_separable": true,
         "search_mode": "INTERIOR_SEARCH",
-        "reason": "grid beats vertex by 0.0656 \u2014 abandon corner-hunting",
-        "value_vertex": 7.309375,
-        "value_grid": 7.37493896484375
+        "reason": "grid beats vertex by 0.0583 \u2014 abandon corner-hunting",
+        "value_vertex": 7.286192955126953,
+        "value_grid": 7.344502469296455
       },
       "tutor_note": "Probe: INTERIOR_SEARCH. Your report: \"I should search the interior; corner-hunting failed me.\" \u2014 corner-hunting is unsound; search the face interior.",
-      "loop_event": ""
+      "loop_event": "",
+      "confusion_reported": 0.55,
+      "confusion_measured": 0.50878747578125
     },
     {
       "turn": 6,
@@ -196,15 +237,17 @@
       },
       "probe": {
         "epsilon": 0.0,
-        "gap_vertex_grid": 0.0778857421875001,
+        "gap_vertex_grid": 0.05543711048157629,
         "certified_separable": true,
         "search_mode": "INTERIOR_SEARCH",
-        "reason": "grid beats vertex by 0.0779 \u2014 abandon corner-hunting",
-        "value_vertex": 7.34875,
-        "value_grid": 7.4266357421875
+        "reason": "grid beats vertex by 0.0554 \u2014 abandon corner-hunting",
+        "value_vertex": 7.2770140118579105,
+        "value_grid": 7.332451122339487
       },
       "tutor_note": "Probe: INTERIOR_SEARCH. Your report: \"Adjoints reverse arrows \u2014 factorization is only approximate.\" \u2014 corner-hunting is unsound; search the face interior.",
-      "loop_event": ""
+      "loop_event": "",
+      "confusion_reported": 0.62,
+      "confusion_measured": 0.49246935441406253
     },
     {
       "turn": 7,
@@ -220,15 +263,17 @@
       },
       "probe": {
         "epsilon": 0.0,
-        "gap_vertex_grid": 0.09648437500000018,
+        "gap_vertex_grid": 0.06619747164371503,
         "certified_separable": true,
         "search_mode": "INTERIOR_SEARCH",
-        "reason": "grid beats vertex by 0.0965 \u2014 abandon corner-hunting",
-        "value_vertex": 7.39375,
-        "value_grid": 7.490234375
+        "reason": "grid beats vertex by 0.0662 \u2014 abandon corner-hunting",
+        "value_vertex": 7.311399410079224,
+        "value_grid": 7.377596881722939
       },
       "tutor_note": "Probe: INTERIOR_SEARCH. Your report: \"Coexp shadow + Fisher epsilon + interior search \u2014 the loop closes.\" \u2014 corner-hunting is unsound; search the face interior.",
-      "loop_event": ""
+      "loop_event": "",
+      "confusion_reported": 0.7,
+      "confusion_measured": 0.5535989512519531
     }
   ]
 }

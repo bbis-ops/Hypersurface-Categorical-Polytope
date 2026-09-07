@@ -1,0 +1,182 @@
+{
+  "schema_version": "curved-reduction.backend.v1",
+  "operation": "polyhedral_curved_reduction",
+  "request_id": "exact-curved-cubic-response",
+  "status": "licensed",
+  "answered": true,
+  "licensed": true,
+  "scope": {
+    "licensed": true,
+    "blockers": [],
+    "proof_basis": "exact full-polynomial transport and quadratic elimination",
+    "checks": {
+      "exact_feasible_simple_vertex": true,
+      "exact_bounded_recession_cone": true,
+      "exact_global_base_loss": true,
+      "unique_global_base_maximizer": true,
+      "polynomial_remainders": true,
+      "positive_witness_eventually_feasible": true,
+      "omitted_base_is_subleading": true
+    },
+    "limitation": "witness coordinate rates need not be exact optimizer coordinate rates"
+  },
+  "localization": {
+    "vertex": [
+      0.0,
+      0.0
+    ],
+    "vertex_exact": [
+      "0",
+      "0"
+    ],
+    "active_constraints": [
+      0,
+      1
+    ],
+    "generators_exact": {
+      "c0": [
+        "1",
+        "0"
+      ],
+      "c1": [
+        "0",
+        "1"
+      ]
+    },
+    "constraint_slacks_exact": [
+      "0",
+      "0",
+      "1",
+      "1"
+    ],
+    "base_vertex_value_exact": "0",
+    "perturbation_vertex_value_exact": "0"
+  },
+  "reduction": {
+    "method": "quadratic_square_completion",
+    "eliminated_axis": "c0",
+    "retained_axis": "c1",
+    "base": {
+      "c0": {
+        "order": 6,
+        "coefficient": {
+          "exact": "1",
+          "value": 1.0
+        }
+      },
+      "c1": {
+        "order": 6,
+        "coefficient": {
+          "exact": "1",
+          "value": 1.0
+        }
+      }
+    },
+    "penalty_coefficient": {
+      "exact": "1",
+      "value": 1.0
+    },
+    "driver_polynomial": [
+      {
+        "power": 2,
+        "coefficient": {
+          "exact": "1",
+          "value": 1.0
+        }
+      }
+    ],
+    "remainder_polynomial": [],
+    "reduced_polynomial": [
+      {
+        "power": 4,
+        "coefficient": {
+          "exact": "1/4",
+          "value": 0.25
+        }
+      }
+    ],
+    "identity": "R = S(y) - a*(x - H(y)/(2*a))**2",
+    "identity_variables": {
+      "x": "c0",
+      "y": "c1"
+    },
+    "checks": {
+      "exact_diagonal_base": true,
+      "driver_positive_near_origin": true,
+      "reduced_positive_near_origin": true,
+      "reduced_order_below_base": true,
+      "omitted_base_is_subleading": true,
+      "order_margin": 6
+    },
+    "effective_weight": {
+      "exact": "2/3",
+      "value": 0.6666666666666666
+    },
+    "response_exponent": {
+      "exact": "3",
+      "value": 3.0
+    },
+    "leading_coefficient": {
+      "exact": "1/432",
+      "value": 0.0023148148148148147,
+      "prefactor": {
+        "exact": "1/12",
+        "value": 0.08333333333333333
+      },
+      "power_base": {
+        "exact": "1/6",
+        "value": 0.16666666666666666
+      },
+      "power": {
+        "exact": "2",
+        "value": 2.0
+      }
+    },
+    "witness": {
+      "retained_coordinate": "y_s = (scale_base*s)**(1/(q-alpha))",
+      "eliminated_coordinate": "x_s = H(y_s)/(2*a)",
+      "scale_base": {
+        "exact": "1/6",
+        "value": 0.16666666666666666
+      },
+      "coordinate_exponents": {
+        "c0": {
+          "exact": "1",
+          "value": 1.0
+        },
+        "c1": {
+          "exact": "1/2",
+          "value": 0.5
+        }
+      },
+      "omitted_base_exponent": {
+        "exact": "6",
+        "value": 6.0
+      },
+      "interpretation": "asymptotically sharp witness, not an exact optimizer formula"
+    }
+  },
+  "scaling": {
+    "kind": "asymptotic_equivalent",
+    "response_exponent": 3.0,
+    "response_exponent_exact": "3",
+    "effective_weight_exact": "2/3",
+    "leading_coefficient": {
+      "exact": "1/432",
+      "value": 0.0023148148148148147,
+      "prefactor": {
+        "exact": "1/12",
+        "value": 0.08333333333333333
+      },
+      "power_base": {
+        "exact": "1/6",
+        "value": 0.16666666666666666
+      },
+      "power": {
+        "exact": "2",
+        "value": 2.0
+      }
+    },
+    "law": "M(s)-F(v)-s*G(v) ~ C*s**gamma"
+  }
+}

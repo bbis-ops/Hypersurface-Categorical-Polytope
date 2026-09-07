@@ -1,33 +1,33 @@
 # Adversarial verification certificate: V.7--V.14
 
-Backend: `stealth/ox-alpha@openrouter.ai`. Generated candidates are untrusted data; every retained expression passes the AST whitelist and is adjudicated locally.
+Backend: `nvidia/nemotron-3-super-120b-a12b:free@openrouter.ai`. Generated candidates are untrusted data; every retained expression passes the AST whitelist and is adjudicated locally.
 
-Local adjudicator version: **15**.
+Local adjudicator version: **17**.
 
 This certificate distinguishes parse-valid proposals from candidates satisfying a theorem's hypotheses. `outside_scope` is never counted as a verification. A `counterexample` is a numerical survivor requiring independent analytic review; it is not silently deleted.
 
 | Law | parse-valid corpus | in-scope verified | counterexamples | outside scope | rejected/inconclusive |
 |---|---:|---:|---:|---:|---:|
-| V.7 | 208 | 125 | 0 | 11 | 72 |
-| V.8 | 203 | 121 | 0 | 53 | 29 |
-| V.9 | 214 | 123 | 0 | 45 | 46 |
-| V.10 | 271 | 141 | 0 | 87 | 43 |
-| V.11 | 226 | 121 | 0 | 9 | 96 |
-| V.12 | 153 | 141 | 0 | 10 | 2 |
-| V.13 | 156 | 123 | 0 | 33 | 0 |
-| V.14 | 221 | 119 | 0 | 98 | 4 |
+| V.7 | 244 | 142 | 0 | 11 | 91 |
+| V.8 | 246 | 152 | 0 | 61 | 33 |
+| V.9 | 251 | 155 | 0 | 50 | 46 |
+| V.10 | 271 | 141 | 0 | 25 | 105 |
+| V.11 | 248 | 132 | 0 | 10 | 106 |
+| V.12 | 175 | 150 | 0 | 14 | 11 |
+| V.13 | 227 | 182 | 0 | 45 | 0 |
+| V.14 | 245 | 130 | 0 | 111 | 4 |
 
 ## Campaign accounting
 
-- API items requested across small rate-safe batches: **1867**
-- Parse-valid items returned before deduplication: **1686**
-- Unique retained corpus: **1652**
-- Provider-reported prompt tokens: **34,759**
-- Provider-reported completion tokens: **302,162**
-- Provider-reported total tokens: **336,921**
-- In-scope verified: **1014**
+- API items requested across small rate-safe batches: **2239**
+- Parse-valid items returned before deduplication: **1958**
+- Unique retained corpus: **1907**
+- Provider-reported prompt tokens: **43,554**
+- Provider-reported completion tokens: **447,131**
+- Provider-reported total tokens: **490,685**
+- In-scope verified: **1184**
 - Numerical counterexamples requiring review: **0**
-- Outside theorem hypotheses: **346**
+- Outside theorem hypotheses: **327**
 
 ## Counterexample ledger
 
@@ -35,7 +35,7 @@ No numerical survivor is currently logged.
 
 ## Finite-guard failures
 
-The adversarial search found **51** bases with an independently confirmed off-vertex maximum that at least one finite guard missed. These confirm V.13 while refuting exhaustive interpretations of the detection algorithm; they remain in `verification_guard_failures.json`.
+The adversarial search found **71** bases with an independently confirmed off-vertex maximum that at least one finite guard missed. These confirm V.13 while refuting exhaustive interpretations of the detection algorithm; they remain in `verification_guard_failures.json`.
 
 ## Resolved apparent counterexamples
 
@@ -100,8 +100,8 @@ The adversarial search found **51** bases with an independently confirmed off-ve
 - **V.10 / exp_decay_s135**: counterexample -> verified; fractional exponent matched
 - **V.10 / twin_sines_s135**: counterexample -> verified; fractional exponent matched
 - **V.10 / half_amplitude_s135**: counterexample -> verified; fractional exponent matched
-- **V.10 / baseline_s15**: verified -> outside_scope; no resolved inward fractional gap
-- **V.10 / product_bounded_s15**: verified -> outside_scope; no resolved inward fractional gap
+- **V.10 / baseline_s15**: outside_scope -> inconclusive; no resolved inward fractional gap
+- **V.10 / product_bounded_s15**: outside_scope -> inconclusive; no resolved inward fractional gap
 - **V.10 / baseline_s11**: counterexample -> verified; fractional exponent matched
 - **V.10 / atan_s11**: counterexample -> verified; fractional exponent matched
 - **V.10 / damped_osc_s11**: counterexample -> verified; fractional exponent matched
@@ -142,9 +142,12 @@ The adversarial search found **51** bases with an independently confirmed off-ve
 - **V.14 / vanishing_xpenalty_a**: counterexample -> verified; weighted unified exponent matched
 - **V.10 / coeff_half_sum_tanh**: counterexample -> verified; fractional exponent matched
 - **V.10 / coeff_asym_weights**: counterexample -> verified; fractional exponent matched
+- **V.14 / pair10**: counterexample -> verified; weighted unified exponent matched
 
 ## Reproduce or resume
 
-`python experiments/run_verification_campaign.py --api --per-law 64 --in-scope-per-law 64 --batch-size 32 --model stealth/ox-alpha`
+`python experiments/run_verification_campaign.py --api --per-law 64 --in-scope-per-law 64 --batch-size 32`
+
+Add `--model` / `--base-url`, or `--preset`, to choose an endpoint; the backend used for this run is recorded above.
 
 Rerunning resumes from the JSON checkpoint and does not erase prior candidates or counterexamples.

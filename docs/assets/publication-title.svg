@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="380" viewBox="0 0 1200 380" role="img" aria-labelledby="title desc">
+  <title id="title">Extremal Selection as an Operational Substitute for Coexponentials: Fisher-Controlled Factorization</title>
+  <desc id="desc">The unchanged publication title, presented as a closing title card for the corrected research note.</desc>
+  <rect width="1200" height="380" rx="8" fill="#0d202a"/>
+  <path d="M52 48H1148M52 330H1148" stroke="#52615c"/>
+  <text x="600" y="92" text-anchor="middle" fill="#d9b77b" font-family="Arial, sans-serif" font-size="16" letter-spacing="4">THE RESEARCH NOTE</text>
+  <g text-anchor="middle" fill="#f4efe5" font-family="Georgia, 'Times New Roman', serif" font-size="45">
+    <text x="600" y="160">Extremal Selection as an Operational</text>
+    <text x="600" y="215">Substitute for Coexponentials</text>
+  </g>
+  <path d="M557 249H643" stroke="#d9b77b" stroke-width="2"/>
+  <text x="600" y="293" text-anchor="middle" fill="#cbb68f" font-family="Georgia, 'Times New Roman', serif" font-size="27" font-style="italic">Fisher-Controlled Factorization</text>
+</svg>

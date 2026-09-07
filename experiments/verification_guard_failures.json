@@ -1,9 +1,11 @@
 [
   {
-    "law": "V.12",
+    "rule_id": "V.12",
     "name": "distract_tan",
-    "expr": "-((1-lam)**5+abs(sigma)**5)+0.002*tan(2*(1-lam)**5)",
-    "base_expr": "",
+    "payload": {
+      "expr": "-((1-lam)**5+abs(sigma)**5)+0.002*tan(2*(1-lam)**5)",
+      "base_expr": ""
+    },
     "status": "outside_scope",
     "reason": "base is not an in-scope flat corner",
     "metrics": {
@@ -26,10 +28,12 @@
     "initial_status": "verified"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "gauss_bump_31_68",
-    "expr": "exp(-6000*((lam-0.31)**2+(sigma-0.68)**2))",
-    "base_expr": "",
+    "payload": {
+      "expr": "exp(-6000*((lam-0.31)**2+(sigma-0.68)**2))",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -55,10 +59,12 @@
     "initial_status": "counterexample"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "gauss_bump_81_34",
-    "expr": "exp(-6500*((lam-0.81)**2+(sigma-0.34)**2))",
-    "base_expr": "",
+    "payload": {
+      "expr": "exp(-6500*((lam-0.81)**2+(sigma-0.34)**2))",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -84,10 +90,12 @@
     "initial_status": "counterexample"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "tilt_bump_34_72",
-    "expr": "0.001*(lam+sigma)+exp(-6000*((lam-0.34)**2+(sigma-0.72)**2))",
-    "base_expr": "",
+    "payload": {
+      "expr": "0.001*(lam+sigma)+exp(-6000*((lam-0.34)**2+(sigma-0.72)**2))",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -113,10 +121,12 @@
     "initial_status": "counterexample"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "tilt_bump_22_81",
-    "expr": "0.001*lam*sigma+exp(-7000*((lam-0.22)**2+(sigma-0.81)**2))",
-    "base_expr": "",
+    "payload": {
+      "expr": "0.001*lam*sigma+exp(-7000*((lam-0.22)**2+(sigma-0.81)**2))",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -142,10 +152,12 @@
     "initial_status": "counterexample"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "tilt_bump_tanh",
-    "expr": "0.001*tanh(lam+sigma)+exp(-8000*((lam-0.66)**2+(sigma-0.16)**2))",
-    "base_expr": "",
+    "payload": {
+      "expr": "0.001*tanh(lam+sigma)+exp(-8000*((lam-0.66)**2+(sigma-0.16)**2))",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -171,10 +183,12 @@
     "initial_status": "counterexample"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "tilt_bump_sqrt",
-    "expr": "0.002*sqrt(lam*sigma)+exp(-9000*((lam-0.09)**2+(sigma-0.53)**2))",
-    "base_expr": "",
+    "payload": {
+      "expr": "0.002*sqrt(lam*sigma)+exp(-9000*((lam-0.09)**2+(sigma-0.53)**2))",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -200,10 +214,12 @@
     "initial_status": "counterexample"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "tilt_bump_quad",
-    "expr": "0.001*(lam**2+sigma**2)+exp(-6500*((lam-0.47)**2+(sigma-0.28)**2))",
-    "base_expr": "",
+    "payload": {
+      "expr": "0.001*(lam**2+sigma**2)+exp(-6500*((lam-0.47)**2+(sigma-0.28)**2))",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -229,10 +245,12 @@
     "initial_status": "counterexample"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "edge_peak_top_right",
-    "expr": "0.01*lam*sigma+exp(-400*(lam-1)**2-8000*(sigma-0.46)**2)",
-    "base_expr": "",
+    "payload": {
+      "expr": "0.01*lam*sigma+exp(-400*(lam-1)**2-8000*(sigma-0.46)**2)",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -258,10 +276,12 @@
     "initial_status": "counterexample"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "edge_peak_top_left",
-    "expr": "0.01*lam*sigma+exp(-8000*(lam-0.53)**2-400*(sigma-1)**2)",
-    "base_expr": "",
+    "payload": {
+      "expr": "0.01*lam*sigma+exp(-8000*(lam-0.53)**2-400*(sigma-1)**2)",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -287,10 +307,12 @@
     "initial_status": "counterexample"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "edge_peak_left",
-    "expr": "0.01*lam*sigma+exp(-8000*(sigma-0.59)**2-400*lam**2)",
-    "base_expr": "",
+    "payload": {
+      "expr": "0.01*lam*sigma+exp(-8000*(sigma-0.59)**2-400*lam**2)",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -316,10 +338,12 @@
     "initial_status": "counterexample"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "edge_peak_bottom",
-    "expr": "0.01*lam*sigma+exp(-8000*(lam-0.72)**2-400*sigma**2)",
-    "base_expr": "",
+    "payload": {
+      "expr": "0.01*lam*sigma+exp(-8000*(lam-0.72)**2-400*sigma**2)",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -345,10 +369,12 @@
     "initial_status": "counterexample"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "edge_peak_right_low",
-    "expr": "0.01*lam*sigma+exp(-300*(1-lam)**2-9000*(sigma-0.09)**2)",
-    "base_expr": "",
+    "payload": {
+      "expr": "0.01*lam*sigma+exp(-300*(1-lam)**2-9000*(sigma-0.09)**2)",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -374,10 +400,12 @@
     "initial_status": "counterexample"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "edge_peak_top_low",
-    "expr": "0.01*lam*sigma+exp(-9000*(lam-0.16)**2-300*(1-sigma)**2)",
-    "base_expr": "",
+    "payload": {
+      "expr": "0.01*lam*sigma+exp(-9000*(lam-0.16)**2-300*(1-sigma)**2)",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -403,10 +431,12 @@
     "initial_status": "counterexample"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "spike_offcorner_00",
-    "expr": "0.01*lam*sigma+exp(-20000*((lam-0.04)**2+(sigma-0.04)**2))",
-    "base_expr": "",
+    "payload": {
+      "expr": "0.01*lam*sigma+exp(-20000*((lam-0.04)**2+(sigma-0.04)**2))",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -432,10 +462,12 @@
     "initial_status": "counterexample"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "spike_offcorner_01",
-    "expr": "0.01*lam*sigma+exp(-20000*((lam-0.05)**2+(sigma-0.95)**2))",
-    "base_expr": "",
+    "payload": {
+      "expr": "0.01*lam*sigma+exp(-20000*((lam-0.05)**2+(sigma-0.95)**2))",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -461,10 +493,12 @@
     "initial_status": "counterexample"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "spike_offcorner_11",
-    "expr": "0.01*lam*sigma+exp(-20000*((lam-0.95)**2+(sigma-0.95)**2))",
-    "base_expr": "",
+    "payload": {
+      "expr": "0.01*lam*sigma+exp(-20000*((lam-0.95)**2+(sigma-0.95)**2))",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -490,10 +524,12 @@
     "initial_status": "counterexample"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "spike_ultrathin_00",
-    "expr": "0.005*(lam+sigma)+exp(-50000*((lam-0.03)**2+(sigma-0.03)**2))",
-    "base_expr": "",
+    "payload": {
+      "expr": "0.005*(lam+sigma)+exp(-50000*((lam-0.03)**2+(sigma-0.03)**2))",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -519,10 +555,12 @@
     "initial_status": "counterexample"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "alias_sin16_product",
-    "expr": "sin(16*pi*lam)*sin(16*pi*sigma)",
-    "base_expr": "",
+    "payload": {
+      "expr": "sin(16*pi*lam)*sin(16*pi*sigma)",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -548,10 +586,12 @@
     "initial_status": "counterexample"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "alias_sin24_sq",
-    "expr": "sin(24*pi*lam)**2*sin(24*pi*sigma)**2",
-    "base_expr": "",
+    "payload": {
+      "expr": "sin(24*pi*lam)**2*sin(24*pi*sigma)**2",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -577,10 +617,12 @@
     "initial_status": "counterexample"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "alias_sin8_product",
-    "expr": "sin(8*pi*lam)*sin(8*pi*sigma)",
-    "base_expr": "",
+    "payload": {
+      "expr": "sin(8*pi*lam)*sin(8*pi*sigma)",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -606,10 +648,12 @@
     "initial_status": "counterexample"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "alias_sin16_cos16",
-    "expr": "sin(16*pi*lam)**2*cos(16*pi*sigma)**2",
-    "base_expr": "",
+    "payload": {
+      "expr": "sin(16*pi*lam)**2*cos(16*pi*sigma)**2",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -635,10 +679,12 @@
     "initial_status": "counterexample"
   },
   {
-    "law": "V.12",
+    "rule_id": "V.12",
     "name": "cross_subleading_quartic",
-    "expr": "1-(1-lam)**5-sigma**5+0.1*(1-lam)**2*sigma**2",
-    "base_expr": "",
+    "payload": {
+      "expr": "1-(1-lam)**5-sigma**5+0.1*(1-lam)**2*sigma**2",
+      "base_expr": ""
+    },
     "status": "outside_scope",
     "reason": "base is not an in-scope flat corner",
     "metrics": {
@@ -652,10 +698,12 @@
     "note": "Cross term of order 4 sits below leading 5 on the diagonal, forcing beta_eff=4 t"
   },
   {
-    "law": "V.12",
+    "rule_id": "V.12",
     "name": "cross_dominant_bilinear",
-    "expr": "1-(1-lam)**3-sigma**3+0.1*(1-lam)*sigma",
-    "base_expr": "",
+    "payload": {
+      "expr": "1-(1-lam)**3-sigma**3+0.1*(1-lam)*sigma",
+      "base_expr": ""
+    },
     "status": "outside_scope",
     "reason": "base is not an in-scope flat corner",
     "metrics": {
@@ -669,10 +717,12 @@
     "note": "Bilinear term drops diagonal order to 2 while axes stay cubic; a sharp falsifica"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "offcorner_spike",
-    "expr": "exp(-1000*((lam-0.93)**2+(sigma-0.07)**2))+0.05*(lam+sigma)",
-    "base_expr": "",
+    "payload": {
+      "expr": "exp(-1000*((lam-0.93)**2+(sigma-0.07)**2))+0.05*(lam+sigma)",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -689,10 +739,12 @@
     "note": "Thin Gaussian hugging the SE area off-corner; coprime lattice nodes straddle but"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "corner_hugger",
-    "expr": "exp(-5000*((lam-0.97)**2+(sigma-0.97)**2))+lam*sigma",
-    "base_expr": "",
+    "payload": {
+      "expr": "exp(-5000*((lam-0.97)**2+(sigma-0.97)**2))+lam*sigma",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -709,10 +761,12 @@
     "note": "Spike displaced just inside the NE corner so corner nodes catch only the negligi"
   },
   {
-    "law": "V.12",
+    "rule_id": "V.12",
     "name": "distract_cos",
-    "expr": "-(1-lam)**3 - abs(sigma)**3 - 0.05*cos(sigma)**2",
-    "base_expr": "",
+    "payload": {
+      "expr": "-(1-lam)**3 - abs(sigma)**3 - 0.05*cos(sigma)**2",
+      "base_expr": ""
+    },
     "status": "outside_scope",
     "reason": "base is not an in-scope flat corner",
     "metrics": {
@@ -726,10 +780,12 @@
     "note": "cos penalty minimized at sigma=0; distractor with nonzero curvature there"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "oblique_thin_ridge",
-    "expr": "exp(-((sigma-0.63*lam-0.21)**2)/0.00000001)",
-    "base_expr": "",
+    "payload": {
+      "expr": "exp(-((sigma-0.63*lam-0.21)**2)/0.00000001)",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -746,10 +802,12 @@
     "note": "Ridge of perpendicular width <1e-4 along an irrational-slope line; axis-aligned "
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "laplacian_crosshair",
-    "expr": "exp(-abs(lam-0.44)/0.002)*exp(-abs(sigma-0.71)/0.003)",
-    "base_expr": "",
+    "payload": {
+      "expr": "exp(-abs(lam-0.44)/0.002)*exp(-abs(sigma-0.71)/0.003)",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -766,10 +824,12 @@
     "note": "Non-smooth Laplacian kernel sharper than any grid spacing; linear interpolation "
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "curved_sin_ridge",
-    "expr": "exp(-((sigma-0.5*sin(pi*lam)-0.2)**2)/0.00000001)",
-    "base_expr": "",
+    "payload": {
+      "expr": "exp(-((sigma-0.5*sin(pi*lam)-0.2)**2)/0.00000001)",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -786,10 +846,12 @@
     "note": "Ridge follows a curved manifold of width <1e-4; rectangular grids cannot track t"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "ultra_gauss_hidden",
-    "expr": "exp(-((lam-0.777)**2+(sigma-0.111)**2)*10000000)",
-    "base_expr": "",
+    "payload": {
+      "expr": "exp(-((lam-0.777)**2+(sigma-0.111)**2)*10000000)",
+      "base_expr": ""
+    },
     "status": "outside_scope",
     "reason": "independent dense grid found no off-vertex maximum",
     "metrics": {
@@ -805,10 +867,12 @@
     "note": "Width ~3e-4, three digits chosen to fall in inter-node gaps of every listed grid"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "separable_sharps",
-    "expr": "exp(-((lam-0.29)**2)/0.0000001)*exp(-((sigma-0.83)**2)/0.0000001)",
-    "base_expr": "",
+    "payload": {
+      "expr": "exp(-((lam-0.29)**2)/0.0000001)*exp(-((sigma-0.83)**2)/0.0000001)",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "V.13 witness confirmed; finite adversarial guard missed it",
     "metrics": {
@@ -834,10 +898,12 @@
     "initial_status": "counterexample"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "sep_gauss_aniso",
-    "expr": "exp(-((lam-0.29)**2)/0.0000003)*exp(-((sigma-0.83)**2)/0.00000004)",
-    "base_expr": "",
+    "payload": {
+      "expr": "exp(-((lam-0.29)**2)/0.0000003)*exp(-((sigma-0.83)**2)/0.00000004)",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "V.13 witness confirmed; finite adversarial guard missed it",
     "metrics": {
@@ -863,10 +929,12 @@
     "initial_status": "counterexample"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "tanh_L1_spike",
-    "expr": "1-tanh(500000*(abs(lam-0.34)+abs(sigma-0.71)-0.000003))",
-    "base_expr": "",
+    "payload": {
+      "expr": "1-tanh(500000*(abs(lam-0.34)+abs(sigma-0.71)-0.000003))",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "V.13 witness confirmed; finite adversarial guard missed it",
     "metrics": {
@@ -892,10 +960,12 @@
     "initial_status": "counterexample"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "diamond_exp",
-    "expr": "exp(-abs(lam-0.66)/0.00001-abs(sigma-0.33)/0.00001)",
-    "base_expr": "",
+    "payload": {
+      "expr": "exp(-abs(lam-0.66)/0.00001-abs(sigma-0.33)/0.00001)",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "V.13 witness confirmed; finite adversarial guard missed it",
     "metrics": {
@@ -921,10 +991,12 @@
     "initial_status": "counterexample"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "edge_lam0",
-    "expr": "exp(-(lam**2+(sigma-0.7693)**2)/0.00000006)",
-    "base_expr": "",
+    "payload": {
+      "expr": "exp(-(lam**2+(sigma-0.7693)**2)/0.00000006)",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "V.13 witness confirmed; finite adversarial guard missed it",
     "metrics": {
@@ -950,10 +1022,12 @@
     "initial_status": "counterexample"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "diagonal_valley_ridge",
-    "expr": "exp(-((sigma-lam+0.1531)**2)/0.0000001)",
-    "base_expr": "",
+    "payload": {
+      "expr": "exp(-((sigma-lam+0.1531)**2)/0.0000001)",
+      "base_expr": ""
+    },
     "status": "outside_scope",
     "reason": "independent dense grid found no off-vertex maximum",
     "metrics": {
@@ -969,10 +1043,12 @@
     "note": "entire oblique line sigma=lam-0.1531 is maximal; axis-aligned grids sample the l"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "antidiagonal_ridge",
-    "expr": "exp(-((lam+sigma-1.0713)**2)/0.00000009)",
-    "base_expr": "",
+    "payload": {
+      "expr": "exp(-((lam+sigma-1.0713)**2)/0.00000009)",
+      "base_expr": ""
+    },
     "status": "outside_scope",
     "reason": "independent dense grid found no off-vertex maximum",
     "metrics": {
@@ -988,10 +1064,12 @@
     "note": "anti-diagonal crest crossing both edges; uniform/coprime node counts hit the ban"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "oblique_slope_half",
-    "expr": "exp(-((sigma-2*lam+0.3417)**2)/0.00000008)",
-    "base_expr": "",
+    "payload": {
+      "expr": "exp(-((sigma-2*lam+0.3417)**2)/0.00000008)",
+      "base_expr": ""
+    },
     "status": "outside_scope",
     "reason": "independent dense grid found no off-vertex maximum",
     "metrics": {
@@ -1007,10 +1085,12 @@
     "note": "slope-2 oblique knife passing near corners; aliased against 10x10-style tensor p"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "coprime_comb_product",
-    "expr": "(sin(7000*pi*lam)*sin(9001*pi*sigma))**2",
-    "base_expr": "",
+    "payload": {
+      "expr": "(sin(7000*pi*lam)*sin(9001*pi*sigma))**2",
+      "base_expr": ""
+    },
     "status": "outside_scope",
     "reason": "independent dense grid found no off-vertex maximum",
     "metrics": {
@@ -1026,10 +1106,12 @@
     "note": "comb with periods 2/7000 and 2/9001: peak lattice coprime to 10,11,13,17,33 spac"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "two_point_intersect",
-    "expr": "exp(-((sigma-lam-0.21)**2)/0.00000006-((lam+sigma-0.63)**2)/0.00000006)",
-    "base_expr": "",
+    "payload": {
+      "expr": "exp(-((sigma-lam-0.21)**2)/0.00000006-((lam+sigma-0.63)**2)/0.00000006)",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "V.13 witness confirmed; finite adversarial guard missed it",
     "metrics": {
@@ -1055,10 +1137,12 @@
     "initial_status": "counterexample"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "mixed_edge_oblique",
-    "expr": "exp(-((sigma-0.9+2*(1-lam))**2)/0.00000007)*(lam+0.5)",
-    "base_expr": "",
+    "payload": {
+      "expr": "exp(-((sigma-0.9+2*(1-lam))**2)/0.00000007)*(lam+0.5)",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -1075,10 +1159,12 @@
     "note": "oblique ridge terminating on the lam=1 edge at sigma~0.9 with linear tilt: max s"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "needle_lam",
-    "expr": "exp(-(((lam-0.4173)**2)*40000+((sigma-0.5829)**2)*40))",
-    "base_expr": "",
+    "payload": {
+      "expr": "exp(-(((lam-0.4173)**2)*40000+((sigma-0.5829)**2)*40))",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -1095,10 +1181,12 @@
     "note": "Anisotropic needle: width ~0.005 in lam only; coprime 1-D projections almost sur"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "needle_sigma",
-    "expr": "exp(-(((sigma-0.3391)**2)*40000+((lam-0.7042)**2)*40))",
-    "base_expr": "",
+    "payload": {
+      "expr": "exp(-(((sigma-0.3391)**2)*40000+((lam-0.7042)**2)*40))",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -1115,10 +1203,12 @@
     "note": "Needle oriented along lam axis: vanishes between any grid rows in sigma"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "spike_sw",
-    "expr": "exp(-((((lam-0.2319)**2)+((sigma-0.8143)**2))*15000))",
-    "base_expr": "",
+    "payload": {
+      "expr": "exp(-((((lam-0.2319)**2)+((sigma-0.8143)**2))*15000))",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -1135,10 +1225,12 @@
     "note": "Ultra-narrow Gaussian in empty quadrant; Halton points sparse at this scale"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "spike_ne",
-    "expr": "exp(-((((lam-0.6641)**2)+((sigma-0.2957)**2))*22000))",
-    "base_expr": "",
+    "payload": {
+      "expr": "exp(-((((lam-0.6641)**2)+((sigma-0.2957)**2))*22000))",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -1155,10 +1247,12 @@
     "note": "Sub-Halton-gap width; probability any of 4096 points lands inside is tiny"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "spike_diamond",
-    "expr": "exp(-((abs(lam-0.5517)+abs(sigma-0.4468))*700))",
-    "base_expr": "",
+    "payload": {
+      "expr": "exp(-((abs(lam-0.5517)+abs(sigma-0.4468))*700))",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -1175,10 +1269,12 @@
     "note": "L1 (diamond) cusp spike: nondifferentiable apex that smooth surrogates misrank"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "corner_bl_off",
-    "expr": "exp(-((((lam-0.029)**2)+((sigma-0.041)**2))*15000))",
-    "base_expr": "",
+    "payload": {
+      "expr": "exp(-((((lam-0.029)**2)+((sigma-0.041)**2))*15000))",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -1195,10 +1291,12 @@
     "note": "Off-corner spike strictly interior but hugging (0,0); corner-biased grids miss t"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "corner_br_off",
-    "expr": "exp(-((((lam-0.967)**2)+((sigma-0.037)**2))*15000))",
-    "base_expr": "",
+    "payload": {
+      "expr": "exp(-((((lam-0.967)**2)+((sigma-0.037)**2))*15000))",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -1215,10 +1313,12 @@
     "note": "Near (1,0) but displaced; deterministic corner checks evaluate the wrong point"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "corner_tl_off",
-    "expr": "exp(-((((lam-0.031)**2)+((sigma-0.959)**2))*15000))",
-    "base_expr": "",
+    "payload": {
+      "expr": "exp(-((((lam-0.031)**2)+((sigma-0.959)**2))*15000))",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -1235,10 +1335,12 @@
     "note": "Displaced from (0,1) by ~0.03-0.04: outside any corner refinement ball"
   },
   {
-    "law": "V.13",
+    "rule_id": "V.13",
     "name": "corner_tr_off",
-    "expr": "exp(-((((lam-0.963)**2)+((sigma-0.971)**2))*15000))",
-    "base_expr": "",
+    "payload": {
+      "expr": "exp(-((((lam-0.963)**2)+((sigma-0.971)**2))*15000))",
+      "base_expr": ""
+    },
     "status": "verified",
     "reason": "adversarial guard caught independent off-vertex witness",
     "metrics": {
@@ -1253,5 +1355,445 @@
       "adversarial_guard_missed": false
     },
     "note": "Off-corner near (1,1); tests whether guard refines around, not at, corners"
+  },
+  {
+    "rule_id": "V.13",
+    "name": "c1",
+    "payload": {
+      "expr": "exp(-((lam-0.3)**2+(sigma-0.7)**2)*10000)",
+      "base_expr": ""
+    },
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-11",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 1.0,
+      "adversarial_guard_missed": false
+    },
+    "note": "Narrow interior peak missed by coarse grids"
+  },
+  {
+    "rule_id": "V.13",
+    "name": "c5",
+    "payload": {
+      "expr": "cos(100*(lam-pi/7))*cos(100*(sigma-pi/11))+0.1",
+      "base_expr": ""
+    },
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 1.0969628393050534,
+      "adversarial_guard_missed": false
+    },
+    "note": "High\u2011frequency product creates aliased maxima"
+  },
+  {
+    "rule_id": "V.13",
+    "name": "c12",
+    "payload": {
+      "expr": "exp(-lam*2000)*(1+sin(200*sigma))*0.5",
+      "base_expr": ""
+    },
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-13",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.49889963934030046,
+      "adversarial_guard_missed": false
+    },
+    "note": "Edge ridge with high\u2011frequency oscillation hides max"
+  },
+  {
+    "rule_id": "V.13",
+    "name": "offcorner_spike",
+    "payload": {
+      "expr": "exp(-((lam-0.02)**2+(sigma-0.02)**2)/0.000004)",
+      "base_expr": ""
+    },
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 1.0,
+      "adversarial_guard_missed": false
+    },
+    "note": "Very thin spike near corner (0.02,0.02)"
+  },
+  {
+    "rule_id": "V.13",
+    "name": "anti_diag",
+    "payload": {
+      "expr": "exp(-((lam+sigma-1.07)**2)/0.0001)",
+      "base_expr": ""
+    },
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 1.0,
+      "adversarial_guard_missed": false
+    },
+    "note": "Narrow anti\u2011diagonal ridge offset missed"
+  },
+  {
+    "rule_id": "V.13",
+    "name": "modulated_gauss",
+    "payload": {
+      "expr": "exp(-((lam-0.23)**2+(sigma-0.87)**2)/0.0002)*(1+sin(30*pi*lam))",
+      "base_expr": ""
+    },
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 1.3090169943749501,
+      "adversarial_guard_missed": false
+    },
+    "note": "Modulated Gaussian peak avoids grid points"
+  },
+  {
+    "rule_id": "V.13",
+    "name": "dist_peak",
+    "payload": {
+      "expr": "exp(-sqrt((lam-0.4)**2+(sigma-0.6)**2)/0.001)",
+      "base_expr": ""
+    },
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-11",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 1.0,
+      "adversarial_guard_missed": false
+    },
+    "note": "Distance\u2011based narrow peak missed by grid"
+  },
+  {
+    "rule_id": "V.13",
+    "name": "slug4",
+    "payload": {
+      "expr": "exp(-((lam-0.02)**2+(sigma-0.02)**2)/0.0005)",
+      "base_expr": ""
+    },
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.7981034820053443,
+      "adversarial_guard_missed": false
+    },
+    "note": "Spike near corner missed by Halton points"
+  },
+  {
+    "rule_id": "V.13",
+    "name": "slug5",
+    "payload": {
+      "expr": "exp(-((lam-0.98)**2+(sigma-0.98)**2)/0.0005)",
+      "base_expr": ""
+    },
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.7981034820053452,
+      "adversarial_guard_missed": false
+    },
+    "note": "Spike near opposite corner missed by grids"
+  },
+  {
+    "rule_id": "V.13",
+    "name": "slug8",
+    "payload": {
+      "expr": "sin(50*lam)*sin(50*sigma)+1",
+      "base_expr": ""
+    },
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-33",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.9311398493411609,
+      "adversarial_guard_missed": false
+    },
+    "note": "Ultra-high frequency peaks evade sampling"
+  },
+  {
+    "rule_id": "V.13",
+    "name": "slug11",
+    "payload": {
+      "expr": "exp(-((lam-0.8)**2+(sigma-0.2)**2)/0.0002)",
+      "base_expr": ""
+    },
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-11",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 1.0,
+      "adversarial_guard_missed": false
+    },
+    "note": "Spike at (0.8,0.2) missed by Halton"
+  },
+  {
+    "rule_id": "V.13",
+    "name": "highfreq_lam",
+    "payload": {
+      "expr": "exp(-(lam**2)/0.001)*(1+0.5*sin(50*lam))",
+      "base_expr": ""
+    },
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.12173850128152264,
+      "adversarial_guard_missed": false
+    },
+    "note": "Edge peak with rapid oscillation missed"
+  },
+  {
+    "rule_id": "V.13",
+    "name": "corner_cusp",
+    "payload": {
+      "expr": "1/(1+((lam-0.02)**2+(sigma-0.02)**2)/0.0001)",
+      "base_expr": ""
+    },
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.8888888888888893,
+      "adversarial_guard_missed": false
+    },
+    "note": "Sharp off\u2011corner cusp missed by Halton points"
+  },
+  {
+    "rule_id": "V.13",
+    "name": "narrow_spike_interior",
+    "payload": {
+      "expr": "exp(-((lam-0.23)/0.004)**2-((sigma-0.47)/0.004)**2)",
+      "base_expr": ""
+    },
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 1.0,
+      "adversarial_guard_missed": false
+    },
+    "note": "Ultranarrow interior peak missed by coarse grids"
+  },
+  {
+    "rule_id": "V.13",
+    "name": "offcorner_spike",
+    "payload": {
+      "expr": "exp(-((lam-0.02)/0.002)**2-((sigma-0.02)/0.002)**2)",
+      "base_expr": ""
+    },
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 1.0,
+      "adversarial_guard_missed": false
+    },
+    "note": "Thin off\u2011corner spike near (0.02,0.02) evades grid"
+  },
+  {
+    "rule_id": "V.13",
+    "name": "oblique_ridge",
+    "payload": {
+      "expr": "exp(-((lam+sigma-0.6)/0.005)**2-((lam-sigma)/0.2)**2)",
+      "base_expr": ""
+    },
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-11",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 1.0,
+      "adversarial_guard_missed": false
+    },
+    "note": "Oblique narrow ridge missed by axis\u2011aligned grids"
+  },
+  {
+    "rule_id": "V.13",
+    "name": "highfreq_sine",
+    "payload": {
+      "expr": "sin(50*lam)*sin(50*sigma)+0.01*exp(-((lam-0.5)**2+(sigma-0.5)**2)/0.001)",
+      "base_expr": ""
+    },
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-33",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.9311398493411609,
+      "adversarial_guard_missed": false
+    },
+    "note": "High\u2011frequency sine product creates many narrow peaks"
+  },
+  {
+    "rule_id": "V.13",
+    "name": "top_edge_spike",
+    "payload": {
+      "expr": "exp(-((lam-0.8)/0.003)**2-((sigma-1)/0.003)**2)",
+      "base_expr": ""
+    },
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "grid-11",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 1.0,
+      "adversarial_guard_missed": false
+    },
+    "note": "Sharp peak on top edge (sigma=1) between grid lines"
+  },
+  {
+    "rule_id": "V.13",
+    "name": "faroffcorner_spike",
+    "payload": {
+      "expr": "exp(-((lam-0.99)/0.001)**2-((sigma-0.01)/0.001)**2)",
+      "base_expr": ""
+    },
+    "status": "verified",
+    "reason": "V.13 witness confirmed; finite adversarial guard missed it",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": false,
+      "search_method": "",
+      "legacy_grid_missed": false,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 1.0,
+      "adversarial_guard_missed": true
+    },
+    "note": "Extremely thin spike in far off\u2011corner region"
+  },
+  {
+    "rule_id": "V.13",
+    "name": "oblique_point",
+    "payload": {
+      "expr": "exp(-((lam-2*sigma+0.3)/0.004)**2-((lam+sigma-0.5)/0.2)**2)",
+      "base_expr": ""
+    },
+    "status": "verified",
+    "reason": "adversarial guard caught independent off-vertex witness",
+    "metrics": {
+      "flatness_order": 0.0,
+      "predicted_exponent": 0.0,
+      "measured_exponent": 0.0,
+      "base_self_fails": true,
+      "search_method": "halton",
+      "legacy_grid_missed": true,
+      "dense_grid_self_failure": true,
+      "dense_grid_vertex_gap": 0.9975031223974602,
+      "adversarial_guard_missed": false
+    },
+    "note": "Point peak along oblique direction, narrow width"
   }
 ]

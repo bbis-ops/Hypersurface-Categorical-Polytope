@@ -2,7 +2,9 @@
 
 Coexp absent in Set (cardinality) -> learner raises confusion on the (lam,sigma) face -> live probe sees grid beating vertices -> INTERIOR_SEARCH closes the operational substitute loop.
 
-**Backend:** scripted learner | **Closure at turn:** 3
+**Backend:** scripted learner | **Closure at turn:** 4 | **Coupling coordinate:** measured
+
+> Coupling was scored from the learner's own prose, not taken from its `confusion` field. Self-report sat 0.099 away on average (worst: turn 2, 0.159); it overclaimed on 8 turn(s) and underclaimed on 0.
 
 ```mermaid
 flowchart LR
@@ -16,18 +18,18 @@ flowchart LR
 
 ## Timeline
 
-| Turn | mode | epsilon | gap | topic |
-|------|------|---------|-----|-------|
-| 0 | CORNER_HUNTING | 0.0000 | 0.0000 | product_exp |
-| 1 | CORNER_HUNTING | 0.0000 | 0.0000 | coproduct |
-| 2 | CORNER_HUNTING | 0.0000 | 0.0075 | coexp_empty |
-| 3 | INTERIOR_SEARCH | 0.0000 | 0.0304 | cross_natural |
-| 4 | INTERIOR_SEARCH | 0.0000 | 0.0532 | face_interior |
-| 5 | INTERIOR_SEARCH | 0.0000 | 0.0656 | interior_search |
-| 6 | INTERIOR_SEARCH | 0.0000 | 0.0779 | adjoint |
-| 7 | INTERIOR_SEARCH | 0.0000 | 0.0965 | closure |
+| Turn | mode | epsilon | gap | reported | measured | topic |
+|------|------|---------|-----|----------|----------|-------|
+| 0 | CORNER_HUNTING | 0.0000 | 0.0000 | 0.050 | 0.043 | product_exp |
+| 1 | CORNER_HUNTING | 0.0000 | 0.0000 | 0.120 | 0.036 | coproduct |
+| 2 | CORNER_HUNTING | 0.0000 | 0.0000 | 0.220 | 0.061 | coexp_empty |
+| 3 | CORNER_HUNTING | 0.0000 | 0.0082 | 0.350 | 0.224 | cross_natural |
+| 4 | INTERIOR_SEARCH | 0.0000 | 0.0353 | 0.480 | 0.378 | face_interior |
+| 5 | INTERIOR_SEARCH | 0.0000 | 0.0583 | 0.550 | 0.509 | interior_search |
+| 6 | INTERIOR_SEARCH | 0.0000 | 0.0554 | 0.620 | 0.492 | adjoint |
+| 7 | INTERIOR_SEARCH | 0.0000 | 0.0662 | 0.700 | 0.554 | closure |
 
-**At closure:** "Cross-naturality mixes my lambda-sigma face — corners feel wrong."
+**At closure:** "Maybe the true picture is interior on the face, not a corner."
 
 ## Turn detail
 
@@ -47,12 +49,12 @@ flowchart LR
 - Tutor: Probe: corner/separable OK. Learner: "Coexponential in Set? I can't find a representing object."
 
 ### Turn 3
-**LOOP_CLOSURE: coexp confusion + face coupling -> interior search**
 - Facilitator: Turn 3: Does cross-naturality couple your face coordinates?
 - Learner quote: Cross-naturality mixes my lambda-sigma face — corners feel wrong.
-- Tutor: Probe: INTERIOR_SEARCH. Your report: "Cross-naturality mixes my lambda-sigma face — corners feel wrong." — corner-hunting is unsound; search the face interior.
+- Tutor: Probe: corner/separable OK. Learner: "Cross-naturality mixes my lambda-sigma face — corners feel wrong."
 
 ### Turn 4
+**LOOP_CLOSURE: coexp confusion + face coupling -> interior search**
 - Facilitator: Turn 4: Is your maximum still on a corner of (lam,sigma)?
 - Learner quote: Maybe the true picture is interior on the face, not a corner.
 - Tutor: Probe: INTERIOR_SEARCH. Your report: "Maybe the true picture is interior on the face, not a corner." — corner-hunting is unsound; search the face interior.
@@ -72,4 +74,4 @@ flowchart LR
 - Learner quote: Coexp shadow + Fisher epsilon + interior search — the loop closes.
 - Tutor: Probe: INTERIOR_SEARCH. Your report: "Coexp shadow + Fisher epsilon + interior search — the loop closes." — corner-hunting is unsound; search the face interior.
 
-*Disclaimer: theta comes from learner structured report (protocol), not from transformer activations. The probe is the mathematical witness.*
+*Disclaimer: lam/sigma/b/k come from the learner's structured report (protocol); the coupling coordinate is scored from its prose against a fixed proposition ledger. Neither is read from transformer activations. The probe is the mathematical witness.*

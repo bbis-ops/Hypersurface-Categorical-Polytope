@@ -1,7 +1,9 @@
 """
-Explicit theorem constants: epsilon_0 and Phi(epsilon).
+Legacy categorical-demo diagnostics: epsilon_0 and Phi(epsilon).
 
-Matches docs/FORMAL_THEOREMS.md — stability modulus for separable near-optimality.
+These formulas are retained for compatibility with the original reports.
+Phi is not a universal upper bound; see docs/ORIGINAL_NOTE_REVIEW.md.
+The corrected residual and separation theorems are in docs/FORMAL_THEOREMS.md.
 """
 
 from __future__ import annotations
@@ -16,11 +18,10 @@ from .fisher_factorization import LeakageReport, leakage_gap_bound
 @dataclass(frozen=True)
 class TheoremConstants:
     """
-    Threshold epsilon_0 and gap modulus Phi(epsilon).
+    Legacy threshold epsilon_0 and comparison quantity Phi(epsilon).
 
-    epsilon_0: below this normalized leakage, separable decomposition is certified
-               (design rule default 0.10; theory uses diag curvature).
-    Phi:       upper bound on C(theta*) - C(theta_sep).
+    Neither quantity establishes a universal objective-error guarantee.
+    certify_suboptimality compares an already supplied gap with these values.
     """
 
     epsilon_0: float
@@ -29,7 +30,7 @@ class TheoremConstants:
     frobenius_diag: float
 
     def Phi(self, epsilon: float) -> float:
-        """Phi(epsilon) -> 0 as epsilon -> 0. Lipschitz-style modulus."""
+        """Original comparison formula; not the corrected theorem's gap bound."""
         if epsilon <= 0:
             return 0.0
         return 0.5 * (epsilon * epsilon / self.lambda_min_diag) * (
@@ -51,7 +52,7 @@ def epsilon_0_explicit(
     quasiconvex_curvature: float = 1.0,
 ) -> float:
     """
-    Explicit epsilon_0 (Theorem 2 / design rule).
+    Legacy demonstration threshold epsilon_0, not an accuracy guarantee.
 
     epsilon_0 = lambda_min(F_diag) / (slope_sum + quasiconvex_curvature)
 
@@ -98,7 +99,10 @@ def certify_suboptimality(
     relative_gap_tol: float | None = None,
 ) -> tuple[bool, float, str]:
     """
-    Certificate (Theorem 2): gap_observed <= Phi(epsilon) and epsilon <= epsilon_0.
+    Legacy comparison: gap_observed <= Phi(epsilon) and epsilon <= epsilon_0.
+
+    The caller supplies the gap. Passing this predicate does not prove that
+    Phi bounds an unknown gap or that an auxiliary model is the target objective.
 
     Returns (certified, Phi(epsilon), reason).
     """

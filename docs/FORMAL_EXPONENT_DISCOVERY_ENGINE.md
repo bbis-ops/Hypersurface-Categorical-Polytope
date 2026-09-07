@@ -8,21 +8,20 @@ Formal result **V.21** · backend asset `portable-principle.v8` · operation:
 Fix a bounded polyhedron, a simple maximizing vertex, and an admissible base
 principal part. For a finite perturbation family
 
-\[
-\mathcal R=\{R_1,\ldots,R_N\},
-\]
+$$
+\mathcal R=\lbrace R_1,\ldots,R_N\rbrace,
+$$
 
 compile every member through V.20:
 
-\[
+$$
+\begin{aligned}
 R_j(x)
-\longmapsto
-R_j(\Phi(c))-R_j(v)
-\longmapsto
-\{q_{j,F}:F\text{ qualified}\}
-\longmapsto
-(q_j^*,\gamma_j).
-\]
+&\longmapsto R_j(\Phi(c))-R_j(v)\\
+&\longmapsto \lbrace q_{j,F}:F\text{ qualified}\rbrace\\
+&\longmapsto (q_j^\ast,\gamma_j).
+\end{aligned}
+$$
 
 The family is then partitioned into three finite, auditable structures:
 
@@ -40,11 +39,11 @@ possible perturbations.
 
 For each relevant class with $0\lt q_\ast\lt 1$, the engine emits the candidate law
 
-\[
+$$
 \Delta(s)=\Theta\!\left(s^{\gamma}\right),
 \qquad
-\gamma=\frac1{1-q_*}.
-\]
+\gamma=\frac1{1-q_\ast}.
+$$
 
 A class absent from `known_class_ids` is labeled `unregistered`. This means
 only that it is absent from the caller-supplied registry. The backend reports
@@ -83,9 +82,9 @@ complete.
 
 For
 
-\[
+$$
 D_0(x_0,x_1)=x_0^2+x_1^4,
-\]
+$$
 
 the family $x_1,x_0,x_1^2,x_0x_1,x_0^2$ produces:
 

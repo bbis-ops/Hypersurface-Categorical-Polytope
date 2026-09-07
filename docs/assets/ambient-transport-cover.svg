@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="460" viewBox="0 0 1200 460" role="img" aria-labelledby="title desc">
+  <title id="title">The feasible-chart transport principle</title>
+  <desc id="desc">An editorial cover for formal result V.20. A sheared lattice and highlighted corner illustrate the passage from ambient geometry to feasible coordinates. The geometry is illustrative; the exact chart and hypotheses are given in the document.</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#091924"/><stop offset="1" stop-color="#162f38"/></linearGradient>
+    <radialGradient id="light"><stop stop-color="#c49c59" stop-opacity=".17"/><stop offset="1" stop-color="#c49c59" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="1200" height="460" rx="8" fill="url(#bg)"/>
+  <ellipse cx="985" cy="215" rx="250" ry="215" fill="url(#light)"/>
+  <path d="M52 53H96" stroke="#d9b77b" stroke-width="3"/>
+  <text x="114" y="60" fill="#d9b77b" font-family="Arial, sans-serif" font-size="17" letter-spacing="3">V.20 / THE PORTABLE PRINCIPLE</text>
+  <text x="52" y="171" fill="#f4efe5" font-family="Georgia, 'Times New Roman', serif" font-size="65">The feasible-chart</text>
+  <text x="52" y="247" fill="#f4efe5" font-family="Georgia, 'Times New Roman', serif" font-size="65">transport principle.</text>
+  <text x="55" y="303" fill="#b9cbd0" font-family="Arial, sans-serif" font-size="23">Ambient polynomials. Feasible Newton data.</text>
+  <g fill="none" stroke-linejoin="round">
+    <path d="M841 105V329M890 105V329M939 105V329M988 105V329M1037 105V329M1086 105V329M1135 105V329M823 123H1149M823 172H1149M823 221H1149M823 270H1149M823 319H1149" stroke="#a8c1c8" stroke-opacity=".10"/>
+    <path d="M843 131L989 97L1131 277L985 311ZM890 191L1036 157M938 251L1084 217M892 120L1034 300M940 108L1082 288" stroke="#86a5ae" stroke-width="1.4"/>
+    <path d="M843 131L989 97L1131 277L985 311Z" fill="#d9b77b" fill-opacity=".04" stroke="#a8bcc1" stroke-width="1.6"/>
+    <path d="M989 97L843 131L985 311" stroke="#d9b77b" stroke-width="3"/>
+    <circle cx="843" cy="131" r="14" stroke="#d9b77b" stroke-opacity=".35"/>
+  </g>
+  <g fill="#b8c8c8"><circle cx="989" cy="97" r="4"/><circle cx="1131" cy="277" r="4"/><circle cx="985" cy="311" r="4"/></g>
+  <circle cx="843" cy="131" r="6" fill="#f5d298"/>
+  <path d="M52 377H1148" stroke="#77929a" stroke-opacity=".35"/>
+  <g font-family="Arial, sans-serif" font-size="16" letter-spacing="2">
+    <text x="52" y="420" fill="#d9b77b">01 / PRINCIPLE</text>
+    <text x="324" y="420" fill="#b9cbd0">02 / OBSTRUCTION</text>
+    <text x="656" y="420" fill="#b9cbd0">03 / EVIDENCE</text>
+    <text x="950" y="420" fill="#b9cbd0">04 / RECORD</text>
+  </g>
+</svg>

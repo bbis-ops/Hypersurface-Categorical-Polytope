@@ -44,7 +44,7 @@ coordinate, with all others fixed, the resulting one-dimensional function
 $f$ satisfies
 
 $$
-f((1-t)u+tv)\le\max\{f(u),f(v)\},\qquad 0\le t\le1.
+f((1-t)u+tv)\le\max\lbrace f(u),f(v)\rbrace,\qquad 0\le t\le1.
 $$
 
 Then

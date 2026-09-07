@@ -113,7 +113,7 @@ vertex. The decomposition $C=g+h+r$ needs assumptions that imply the
 coordinate-slice property for $C$ itself.
 
 Additional constraints change the geometry. For example,
-$[0,1]^2\cap\{x+y\le1/2\}$ has vertices $(1/2,0)$ and $(0,1/2)$, although
+$[0,1]^2\cap\lbrace x+y\le1/2\rbrace$ has vertices $(1/2,0)$ and $(0,1/2)$, although
 neither is an original box corner. Merely filtering box corners misses them.
 
 [Full theorem and proof →](../docs/FORMAL_THEOREMS.md#theorem-1--vertex-localization)

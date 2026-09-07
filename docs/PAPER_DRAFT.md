@@ -62,7 +62,7 @@ The full statement and proof are [Theorem 1](FORMAL_THEOREMS.md#theorem-1--verte
 ### 2.2. Curvature-aware quadratic bounds
 
 Let $Q(\theta)=c^\top\theta-\tfrac12\theta^\top F\theta$, where $F\succ0$,
-and let $r_z=c-Fz$. With a proved $0<\mu\le\lambda_{\min}(F)$,
+and let $r_z=c-Fz$. With a proved $0\lt \mu\le\lambda_{\min}(F)$,
 
 $$
 \begin{aligned}
@@ -81,7 +81,7 @@ $$
 Q(F^{-1}c)-Q(z_0)
 \le\frac{\rho^2}{2(1-\rho)}c^\top D^{-1}c,
 \qquad
-\rho=\|D^{-1/2}ED^{-1/2}\|_2<1.
+\rho=\|D^{-1/2}ED^{-1/2}\|_2\lt 1.
 $$
 
 This bound accounts for curvature and objective scale. A sequential coordinate

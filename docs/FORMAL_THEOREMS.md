@@ -97,7 +97,7 @@ Q(\theta^\star)-Q(z)
 \end{aligned}}
 $$
 
-If $0<\mu\le\lambda_{\min}(F)$ is established independently, this gives
+If $0\lt \mu\le\lambda_{\min}(F)$ is established independently, this gives
 
 $$
 \boxed{Q(\theta^\star)-Q(z)\le\frac{\|r_z\|_2^2}{2\mu}.}
@@ -119,7 +119,7 @@ Let $D$ be the block-diagonal part of $F$, let $E=F-D$, and put
 
 $$
 K=D^{-1/2}ED^{-1/2},\qquad
-\rho=\|K\|_2<1,\qquad z_0=D^{-1}c.
+\rho=\|K\|_2\lt 1,\qquad z_0=D^{-1}c.
 $$
 
 Then
@@ -150,7 +150,7 @@ $$
 \eta=\varepsilon\|D\|_F=\|E\|_F,\qquad d=\lambda_{\min}(D).
 $$
 
-If $\eta<d$, then $F\succeq(d-\eta)I$ and
+If $\eta\lt d$, then $F\succeq(d-\eta)I$ and
 
 $$
 \boxed{
@@ -165,7 +165,7 @@ $\mu=d-\eta$. For two symmetric blocks,
 $\|E\|_F=\sqrt2\|F_{AB}\|_F$; the two leakage conventions must not be mixed.
 
 These bounds have the correct scaling: replacing $(F,c)$ by $(aF,ac)$,
-$a>0$, multiplies both the true gap and the bounds by $a$. A numerical
+$a\gt 0$, multiplies both the true gap and the bounds by $a$. A numerical
 cutoff such as $\varepsilon\le0.10$ alone does not establish a chosen
 objective-error tolerance.
 
@@ -199,7 +199,7 @@ Let $P$ be a nonempty compact feasible set, $C:P\to\mathbb R$ continuous,
 and $T\subset P$ a finite nonempty candidate set. Let
 
 $$
-p\in\operatorname*{arg\,max}_{t\in T}C(t).
+p\in\operatorname{argmax}_{t\in T}C(t).
 $$
 
 If $U$ is a proved upper bound on $\max_P C$, then

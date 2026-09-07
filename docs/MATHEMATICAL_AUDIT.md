@@ -88,11 +88,11 @@ check on higher layers.
 
 Retain the original localization and principal-part assumptions. Suppose
 the independently qualified faces have a minimum $q_\ast \in(0,1)$, and verify
-the additional condition
+the additional condition (U)
 
 $$
 R(c)_+:=\max(R(c),0)\le K D_0(c)^{q_\ast}
-\quad\text{throughout a neighborhood of the vertex.}\tag{U}
+\quad\text{throughout a neighborhood of the vertex.}
 $$
 
 Then

@@ -17,9 +17,9 @@ Three extensions suggested for the discovery system, with implementations and fo
 | `ABELIAN_GROUP_TOY` | Additive Hom proxy | Same |
 | `POINTED_SUSPENSION` | Suspension cardinality shift | Same |
 
-**Formal sketch (Proposition H.1).** If \(C(\theta) = g+h+r+s\cdot I(\theta)\) and \(I\) violates axis quasiconvexity on a face of \(H\), then \(\arg\max_H C \not\subseteq \mathrm{ext}(H)\) regardless of whether a coexponential exists in the ambient category. Coexponential representability changes **factorization probes**, not the **signature** of \(I\).
+**Formal sketch (Proposition H.1).** If $C(\theta) = g+h+r+s\cdot I(\theta)$ and $I$ violates axis quasiconvexity on a face of $H$, then $\arg\max_H C \not\subseteq \mathrm{ext}(H)$ regardless of whether a coexponential exists in the ambient category. Coexponential representability changes **factorization probes**, not the **signature** of $I$.
 
-**Proof idea.** Theorem C.1 is purely analytic on \(H\); no functor \(Z \mapsto \mathrm{Hom}(Y,A\sqcup Z)\) enters the maximum principle.
+**Proof idea.** Theorem C.1 is purely analytic on $H$; no functor $Z \mapsto \mathrm{Hom}(Y,A\sqcup Z)$ enters the maximum principle.
 
 **Run:** `python experiments/run_research_probes.py` → discovery `localization_signature_geometric`.
 
@@ -27,21 +27,21 @@ Three extensions suggested for the discovery system, with implementations and fo
 
 ## 2. Enriched V-categories: limits, colimits, weighted Fisher
 
-**Question.** When the Fisher matrix is enriched by weights \(w_{ij} \in V\), how do colimit (max-plus) and limit (min-plus) duals interact with leakage \(\varepsilon\)?
+**Question.** When the Fisher matrix is enriched by weights $w_{ij} \in V$, how do colimit (max-plus) and limit (min-plus) duals interact with leakage $\varepsilon$?
 
 **Implementation** (`enriched_fisher.py`):
 
-\[
+$$
 \varepsilon_w = \frac{\|W \circ F_{\mathrm{off}}\|_F}{\|W \circ F_{\mathrm{diag}}\|_F},
 \qquad
 \text{colimit}_w(x_0,x_1) = \max(w_0 x_0, w_1 x_1),
 \qquad
 \text{limit}_w = \min(w_0 x_0, w_1 x_1).
-\]
+$$
 
-**Formal sketch (Lemma H.2).** Asymmetric weights widen \(\text{colimit}_w - \text{limit}_w\). Weighted \(\varepsilon_w\) can cross \(\varepsilon_0\) while unweighted \(\varepsilon\) does not — certification is **enrichment-dependent**.
+**Formal sketch (Lemma H.2).** Asymmetric weights widen $\text{colimit}_w - \text{limit}_w$. Weighted $\varepsilon_w$ can cross $\varepsilon_0$ while unweighted $\varepsilon$ does not — certification is **enrichment-dependent**.
 
-**Proof idea.** \(\varepsilon_w\) is a monotone rescaling of off-diagonal mass; choosing \(w\) to stress cross-block entries increases \(\varepsilon_w\) without changing the underlying statistical model.
+**Proof idea.** $\varepsilon_w$ is a monotone rescaling of off-diagonal mass; choosing $w$ to stress cross-block entries increases $\varepsilon_w$ without changing the underlying statistical model.
 
 **Discovery:** `enriched_epsilon_cert_flip`, `colimit_limit_weight_gap`.
 
@@ -49,12 +49,12 @@ Three extensions suggested for the discovery system, with implementations and fo
 
 ## 3. Live empirical Fisher for learners
 
-**Question.** If a learner’s internal diagram polytope is the box \(H\), can we measure \(\varepsilon\) live and detect when to abandon corner-hunting?
+**Question.** If a learner’s internal diagram polytope is the box $H$, can we measure $\varepsilon$ live and detect when to abandon corner-hunting?
 
 **Implementation** (`learner_diagram.py`):
 
-1. State \(\theta \in H\) (diagram coordinates).
-2. `empirical_fisher_at` objective at \(\theta\).
+1. State $\theta \in H$ (diagram coordinates).
+2. `empirical_fisher_at` objective at $\theta$.
 3. Compare `vertex_maximize` vs `grid_maximize` → `gap_vertex_grid`.
 4. `recommend_search_mode`: `CORNER_HUNTING` | `BLOCK_COORDINATE` | `INTERIOR_SEARCH`.
 
@@ -63,14 +63,14 @@ Three extensions suggested for the discovery system, with implementations and fo
 | Signal | Action |
 |--------|--------|
 | `gap_vertex_grid > tol` | **Interior search** (Theorem C.1 regime) |
-| \(\varepsilon > \varepsilon_0\) | Block coordinate ascent |
+| $\varepsilon \gt  \varepsilon_0$ | Block coordinate ascent |
 | else, certified | Corner / separable probe |
 
-**Formal sketch (Proposition H.3).** If \(\hat\varepsilon\) (empirical Fisher) exceeds \(\varepsilon_0\) or \(C(\theta_{\mathrm{grid}}) - C(\theta_{\mathrm{vertex}}) > \tau\), then any algorithm restricted to \(\mathrm{ext}(H)\) is **unsound** for maximizing \(C\).
+**Formal sketch (Proposition H.3).** If $\hat\varepsilon$ (empirical Fisher) exceeds $\varepsilon_0$ or $C(\theta_{\mathrm{grid}}) - C(\theta_{\mathrm{vertex}}) \gt  \tau$, then any algorithm restricted to $\mathrm{ext}(H)$ is **unsound** for maximizing $C$.
 
 **Discovery:** `learner_interior_switch`, `learner_low_leakage_corners`.
 
-**Phase 2 — trajectory logging:** `LearnerTrajectoryLog` appends \(\theta_t\), writes JSON, replays with `load_json`. Discovery: `learner_trajectory_interior`.
+**Phase 2 — trajectory logging:** `LearnerTrajectoryLog` appends $\theta_t$, writes JSON, replays with `load_json`. Discovery: `learner_trajectory_interior`.
 
 ```bash
 python experiments/log_learner_trajectory.py --out experiments/sample_learner_log.json
@@ -80,7 +80,7 @@ python experiments/log_learner_trajectory.py --out experiments/sample_learner_lo
 
 ## 4. Finite presheaf site (not only cardinality)
 
-**Module:** `presheaf_site.py` — objects `U`, `V`, `UV`, cover families, pointwise \((F^G)(c) = F(c)^{G(c)}\).
+**Module:** `presheaf_site.py` — objects `U`, `V`, `UV`, cover families, pointwise $(F^G)(c) = F(c)^{G(c)}$.
 
 **Lemma H.4.** Exponentials exist **per object** on the site; global Set coexponential remains obstructed.
 
@@ -90,9 +90,9 @@ python experiments/log_learner_trajectory.py --out experiments/sample_learner_lo
 
 ## 5. Lawvere metric enrichment
 
-**Module:** `lawvere_metric.py` — block distances \(d_{ij}\), weights \(w_{ij} = e^{-d_{ij}}\), metric colimit/limit.
+**Module:** `lawvere_metric.py` — block distances $d_{ij}$, weights $w_{ij} = e^{-d_{ij}}$, metric colimit/limit.
 
-**Lemma H.5.** Large block distance **dampens** \(\varepsilon_{\mathrm{Lawvere}}\) vs plain Fisher.
+**Lemma H.5.** Large block distance **dampens** $\varepsilon_{\mathrm{Lawvere}}$ vs plain Fisher.
 
 **Discovery:** `lawvere_metric_epsilon`.
 
@@ -118,7 +118,7 @@ python -m categorical_polytope tutor
 
 ## Loop closure (live polytope while learning coexp)
 
-**Free default:** scripted learner JSON on \(H\) — this is the reproducible run of record.
+**Free default:** scripted learner JSON on $H$ — this is the reproducible run of record.
 
 **Optional real learner:** `--api` against any OpenAI-compatible endpoint. Keys are
 checked in order `LOOP_API_KEY`, `OPENROUTER_API_KEY`, `OPENAI_API_KEY`; the key
@@ -199,7 +199,7 @@ python -m categorical_polytope loop
 
 Artifacts: `experiments/loop_closure_session.json`, `docs/LOOP_CLOSURE.md`, `experiments/figures/loop_closure_timeline.png`.
 
-The loop: Set obstruction → learner reports \((\lambda,\sigma,\text{confusion})\) → live \(\hat\varepsilon\) + grid–vertex gap → `INTERIOR_SEARCH` when face_bowl coupling wins.
+The loop: Set obstruction → learner reports $(\lambda,\sigma,\text{confusion})$ → live $\hat\varepsilon$ + grid–vertex gap → `INTERIOR_SEARCH` when face_bowl coupling wins.
 
 ---
 

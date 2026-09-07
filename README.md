@@ -463,39 +463,39 @@ python -m categorical_polytope
 | `cartesian_closed.py` | Product–exponential (curry) adjunction witness |
 | `conceptual_polytope.py` | Bounded diagram scores, extremal maximizers, coproduct blocks |
 | `neighboring_vertices.py` | Closed monoidal, Chu/Dialectica, continuations, coalgebra/comonad |
-| `hypersurface_box.py` | Box \(H\): \(C(b,k)\), quasiconvex \(r(\lambda,\sigma)\), \(\theta_{\max}\in\mathrm{ext}(H)\) |
+| `hypersurface_box.py` | Box $H$: $C(b,k)$, quasiconvex $r(\lambda,\sigma)$, $\theta_{\max}\in\mathrm{ext}(H)$ |
 | `adversarial_probe.py` | Vertex localization + componentwise probe under cross-information bound |
 | `fisher_factorization.py` | Fisher off-diagonal leakage; when separable optimization is nearly optimal |
 | `bridge_fisher_adversarial.py` | Map cross-information proxy to Fisher coupling |
 | `extremal_substitute.py` | Operational substitute when coexponential is absent; limits |
 | `vertex_probe.py` | Constructive near-optimal probe: search only ext(H) with certificate |
 | `decomposition_stability.py` | Coproduct robustness to independence violations; design rules |
-| `formal_bounds.py` | \(\epsilon_0\), \(\Phi(\varepsilon)\) theorem constants |
-| `fisher_pruned_search.py` | Theorem 3: top-\(k\) Fisher-pruned vertex search |
+| `formal_bounds.py` | $\epsilon_0$, $\Phi(\varepsilon)$ theorem constants |
+| `fisher_pruned_search.py` | Theorem 3: top-$k$ Fisher-pruned vertex search |
 | `firsts.py` | Deliverables manifest + run experiments |
-| `nonlinear_objective.py` | Non-quadratic \(C\), empirical Fisher, vertex vs separable |
+| `nonlinear_objective.py` | Non-quadratic $C$, empirical Fisher, vertex vs separable |
 | `__main__.py` | Demo CLI |
 
 ## Earlier categorical and optimization theory (encoded)
 
-1. **CCC corner** — \( \mathrm{Hom}(A \times X, Y) \cong \mathrm{Hom}(X, Y^A) \) as an explicit bijection on finite sets.
-2. **Vanishing corner** — No object \(C\) with \(|\mathrm{Hom}(C,Z)| = |\mathrm{Hom}(Y, A \sqcup Z)|\) for all \(Z\) unless the functor is degenerate (cardinality obstruction).
-3. **Polytope metaphor** — Separate monotone objectives in composition vs naturality; quasiconvex adjunction directions; global max at vertices \(\mathrm{ext}(\mathcal{P})\); coproduct blocks with bounded cross-naturality.
+1. **CCC corner** — $ \mathrm{Hom}(A \times X, Y) \cong \mathrm{Hom}(X, Y^A) $ as an explicit bijection on finite sets.
+2. **Vanishing corner** — No object $C$ with $|\mathrm{Hom}(C,Z)| = |\mathrm{Hom}(Y, A \sqcup Z)|$ for all $Z$ unless the functor is degenerate (cardinality obstruction).
+3. **Polytope metaphor** — Separate monotone objectives in composition vs naturality; quasiconvex adjunction directions; global max at vertices $\mathrm{ext}(\mathcal{P})$; coproduct blocks with bounded cross-naturality.
 4. **Neighboring vertices** — When coexponential ⊣ coproduct is empty in `Set`, walk to closed monoidal, Chu/Dialectica, continuations, or coalgebra/comonad corners (dual-flavored structure without set-theoretic co-curry).
 
 ## Neighboring vertices (from the lecture)
 
 | Vertex | What you get instead of coexponential |
 |--------|----------------------------------------|
-| Closed monoidal (\(\otimes \dashv [-,=]\)) | Internal hom for tensor, not cartesian product |
+| Closed monoidal ($\otimes \dashv [-,=]$) | Internal hom for tensor, not cartesian product |
 | Dialectica / Chu | Linear or relational duals, not set-theoretic co-curry |
 | Continuations | Right adjoints to sum-like types encoded differently |
-| Coalgebra / comonad | Final coalgebras, not left adjoint to \(\sqcup\) |
+| Coalgebra / comonad | Final coalgebras, not left adjoint to $\sqcup$ |
 
 Reversing arrows is a **strategy**, not a guarantee of representability on the dual side.
 
-5. **Box \(H\)** — \(C\) separately increasing in \(b,k\); \(r\) quasiconvex-decreasing in \(\sigma\), increasing in \(\lambda\); \(\theta_{\max}\in\mathrm{ext}(H)\); for a box, \(\theta_{\max}=(\lambda_{\max},\sigma_{\min},k_{\max},B_{\max})\).
-6. **Adversarial probe** — Bounded cross-information between blocks \(\Rightarrow\) worst-case \(\theta\) at block vertices; explicit componentwise probe.
+5. **Box $H$** — $C$ separately increasing in $b,k$; $r$ quasiconvex-decreasing in $\sigma$, increasing in $\lambda$; $\theta_{\max}\in\mathrm{ext}(H)$; for a box, $\theta_{\max}=(\lambda_{\max},\sigma_{\min},k_{\max},B_{\max})$.
+6. **Adversarial probe** — Bounded cross-information between blocks $\Rightarrow$ worst-case $\theta$ at block vertices; explicit componentwise probe.
 
 ```python
 from categorical_polytope import default_hypersurface_problem
@@ -506,7 +506,7 @@ worst = problem.localize_worst_case()
 print(probe.to_theta(), worst.to_theta())
 ```
 
-7. **Fisher factorization** — Off-diagonal Fisher blocks quantify leakage; small \(\varepsilon = \|F_{\mathrm{off}}\|_F/\|F_{\mathrm{diag}}\|_F\) implies separable per-block optimization is nearly optimal.
+7. **Fisher factorization** — Off-diagonal Fisher blocks quantify leakage; small $\varepsilon = \|F_{\mathrm{off}}\|_F/\|F_{\mathrm{diag}}\|_F$ implies separable per-block optimization is nearly optimal.
 
 ```python
 from categorical_polytope import build_block_fisher, BlockLayout, QuadraticJointObjective
@@ -536,7 +536,7 @@ report = assess_decomposition(fisher, linear=(1.0, 0.5, 2.0, 3.0))
 print(report.strategy, report.coproduct_robust, report.bounds)
 ```
 
-10. **Non-quadratic \(C\)** — interaction terms beyond the quadratic proxy; local empirical Fisher.
+10. **Non-quadratic $C$** — interaction terms beyond the quadratic proxy; local empirical Fisher.
 
 ```python
 from categorical_polytope import NonlinearStudy

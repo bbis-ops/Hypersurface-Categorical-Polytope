@@ -304,10 +304,11 @@ def leakage_gap_bound(
     theta_joint: Sequence[float] | None = None,
 ) -> float:
     """
-    Upper bound on objective gap from separable vs joint (quadratic proxy).
+    Legacy comparison quantity, retained for the original demo reports.
 
-    gap <= 0.5 * (epsilon^2 / lambda_min_diag) * ||theta_joint||^2
-    with epsilon = normalized off-diagonal Frobenius leakage.
+    Despite the historical function name, this is not a universal upper bound.
+    See docs/ORIGINAL_NOTE_REVIEW.md for a counterexample and
+    docs/FORMAL_THEOREMS.md for the corrected residual-based certificate.
     """
     n = len(fisher)
     diag_min = min(fisher[i][i] for i in range(n))

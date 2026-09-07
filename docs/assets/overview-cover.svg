@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="500" viewBox="0 0 1200 500" role="img" aria-labelledby="title desc">
+  <title id="title">The geometry of selection — a research companion</title>
+  <desc id="desc">An editorial cover for the Overview, with an abstract wireframe polytope and a highlighted vertex. Chapters: origin, construction, evidence, and source documents. The geometry is illustrative.</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#091924"/><stop offset="1" stop-color="#162f38"/></linearGradient>
+    <radialGradient id="light"><stop stop-color="#c49c59" stop-opacity=".18"/><stop offset="1" stop-color="#c49c59" stop-opacity="0"/></radialGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#a8c1c8" stroke-opacity=".07"/></pattern>
+  </defs>
+  <rect width="1200" height="500" rx="8" fill="url(#bg)"/>
+  <rect x="720" width="480" height="500" fill="url(#grid)"/>
+  <ellipse cx="950" cy="245" rx="275" ry="240" fill="url(#light)"/>
+  <path d="M52 53H96" stroke="#d9b77b" stroke-width="3"/>
+  <text x="114" y="60" fill="#d9b77b" font-family="Arial, sans-serif" font-size="17" letter-spacing="3">CATEGORICAL POLYTOPE</text>
+  <text x="52" y="178" fill="#f4efe5" font-family="Georgia, 'Times New Roman', serif" font-size="74">The geometry</text>
+  <text x="52" y="261" fill="#f4efe5" font-family="Georgia, 'Times New Roman', serif" font-size="74">of selection.</text>
+  <text x="55" y="312" fill="#b9cbd0" font-family="Arial, sans-serif" font-size="23">An illustrated companion to the research note.</text>
+  <g fill="none" stroke-linejoin="round">
+    <path d="M797 198L955 106L1126 200L1081 358L885 384L797 198Z" stroke="#75959f" stroke-width="1.5"/>
+    <path d="M797 198L971 257L1126 200M955 106L971 257L885 384M971 257L1081 358" stroke="#b8c8c8" stroke-width="1.5"/>
+    <path d="M797 198L935 328L1126 200M955 106L935 328L1081 358M935 328L885 384" stroke="#56757e" stroke-dasharray="5 7"/>
+    <path d="M797 198L971 257L885 384Z" fill="#d9b77b" fill-opacity=".09" stroke="#d9b77b" stroke-width="2"/>
+    <circle cx="971" cy="257" r="15" stroke="#d9b77b" stroke-opacity=".35"/>
+  </g>
+  <g fill="#b8c8c8"><circle cx="797" cy="198" r="4"/><circle cx="955" cy="106" r="4"/><circle cx="1126" cy="200" r="4"/><circle cx="1081" cy="358" r="4"/><circle cx="885" cy="384" r="4"/></g>
+  <circle cx="971" cy="257" r="6" fill="#f5d298"/>
+  <path d="M52 413H1148" stroke="#77929a" stroke-opacity=".35"/>
+  <g font-family="Arial, sans-serif" font-size="16" letter-spacing="2">
+    <text x="52" y="453" fill="#d9b77b">01 / ORIGIN</text>
+    <text x="289" y="453" fill="#b9cbd0">02 / CONSTRUCTION</text>
+    <text x="637" y="453" fill="#b9cbd0">03 / EVIDENCE</text>
+    <text x="921" y="453" fill="#b9cbd0">04 / DOCUMENTS</text>
+  </g>
+</svg>

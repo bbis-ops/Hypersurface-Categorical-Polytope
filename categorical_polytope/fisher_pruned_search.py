@@ -1,5 +1,10 @@
 """
-Theorem 3 algorithm: Fisher-pruned vertex search with Phi(epsilon) certificate.
+Legacy marginally pruned vertex search and auxiliary quadratic diagnostics.
+
+The certified flag compares factorization_gap with the original Phi formula;
+probe_gap is a separate comparison against the full vertex reference. Neither
+field automatically supplies a global certificate for a constrained objective.
+See docs/FORMAL_THEOREMS.md for the corrected candidate-search theorem.
 
 Pseudocode:
   V_A, V_B = vertices of block projections
@@ -26,9 +31,11 @@ def _default_bounds() -> BoxBounds:
 @dataclass
 class FisherPrunedVertexSearch:
     """
-    Constructive near-optimal probe with top-k pruning per block.
+    Candidate construction with top-k pruning per block.
 
-    Complexity: O(k^2 * #blocks) evaluations vs O(4^n) full vertex product.
+    The two-block candidate stage checks at most k^2 pairs after ranking.
+    run() also computes a full vertex reference and auxiliary quadratic analysis;
+    those additional costs are part of the reported diagnostic calculation.
     """
 
     bounds: BoxBounds = field(default_factory=_default_bounds)

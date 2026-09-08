@@ -92,7 +92,7 @@ For any candidate $z\in\mathbb R^n$, write $r_z=c-Fz$. Then
 $$
 \boxed{\begin{aligned}
 Q(\theta^\star)-Q(z)
-&=\frac12(z-\theta^\star)^\top F(z-\theta^\star)\\
+&=\frac12(z-\theta^\star)^\top F(z-\theta^\star)\cr
 &=\frac12r_z^\top F^{-1}r_z.
 \end{aligned}}
 $$

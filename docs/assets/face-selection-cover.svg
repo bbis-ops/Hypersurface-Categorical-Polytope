@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="410" viewBox="0 0 1200 410" role="img" aria-labelledby="title desc">
+  <title id="title">The feasible-face selection law</title>
+  <desc id="desc">Editorial cover for the portable principle series. The geometric motif is illustrative; mathematical statements, hypotheses, and exact examples are in the document below.</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#091924"/><stop offset="1" stop-color="#162f38"/></linearGradient>
+    <radialGradient id="light"><stop stop-color="#c49c59" stop-opacity=".15"/><stop offset="1" stop-color="#c49c59" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="1200" height="410" rx="8" fill="url(#bg)"/>
+  <ellipse cx="998" cy="213" rx="220" ry="187" fill="url(#light)"/>
+  <path d="M52 51H92" stroke="#d9b77b" stroke-width="3"/>
+  <text x="109" y="58" fill="#d9b77b" font-family="Arial, sans-serif" font-size="15" letter-spacing="2.6">GEOMETRY / THE PORTABLE PRINCIPLE</text>
+  <text x="52" y="157" fill="#f4efe5" font-family="Georgia, 'Times New Roman', serif" font-size="58">The feasible-face</text>
+  <text x="52" y="228" fill="#f4efe5" font-family="Georgia, 'Times New Roman', serif" font-size="58">selection law.</text>
+  <text x="55" y="282" fill="#b9cbd0" font-family="Arial, sans-serif" font-size="22">Local geometry. Qualified asymptotic channels.</text>
+  <g stroke-linejoin="round"><path d="M858 286L977 93L1135 271Z" fill="#87b8bd" fill-opacity=".06" stroke="#88a7af" stroke-width="1.5"/><path d="M858 286L977 93M858 286L1135 271" stroke="#d9b77b" stroke-width="3"/><path d="M858 286L1032 170M896 224L1086 276M931 167L1045 277" stroke="#88a7af" stroke-opacity=".5"/><circle cx="858" cy="286" r="15" fill="none" stroke="#d9b77b" stroke-opacity=".4"/><circle cx="858" cy="286" r="6" fill="#f5d298"/><circle cx="977" cy="93" r="4" fill="#b2c8ce"/><circle cx="1135" cy="271" r="4" fill="#b2c8ce"/></g>
+  <path d="M52 351H1148" stroke="#77929a" stroke-opacity=".35"/>
+  <g font-family="Arial, sans-serif" font-size="14" letter-spacing="2">
+    <text x="52" y="384" fill="#d9b77b">01 / STATEMENT</text>
+    <text x="350" y="384" fill="#b9cbd0">02 / MECHANISM</text>
+    <text x="661" y="384" fill="#b9cbd0">03 / EVIDENCE</text>
+    <text x="963" y="384" fill="#b9cbd0">04 / SCOPE</text>
+  </g>
+</svg>

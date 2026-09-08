@@ -1,305 +1,418 @@
+![The feasible-face selection law — local geometry, independent qualification, conditional scaling.](assets/face-selection-cover.svg)
+
 # Face-selection law at a simple polyhedral vertex
 
-Theorem V.16 (`FORMAL_NEWTON_TROPICAL.md`) selects `q* = min_j q_j` over the
-monomials of the perturbation, on the positive orthant. Section 15 of
-`FORMAL_VERTEX_THRESHOLD.md` gives the weighted degree of a single monomial.
-This note transports both to a simple vertex of a general polyhedron, which is
-what domain three adjudicates.
+**The polyhedral theorem** · exact face algebra with explicit analytic hypotheses
 
-The transport is a change of coordinates, not a new theorem. What is new is
-that the hypotheses it needs are stated explicitly — including several the
-first draft left implicit — and that one of them is measured per corpus row
-rather than assumed.
+[**Read the conclusion →**](#8-selection-qualified) · [Hypotheses](#4-hypotheses-with-uniform-remainders) · [Signed obstruction](#6-upper-control-on-unqualified-faces) · [Worked geometry](#9-worked-case-the-tilted-simplex)
+
+| 01 · Orthant | 02 · Polyhedron | 03 · Parameters | 04 · Execution |
+| :--- | :--- | :--- | :--- |
+| [Newton–tropical law](FORMAL_NEWTON_TROPICAL.md) | **This theorem** | [Qualified stratification](FORMAL_QUALIFIED_SELECTION_STRATIFICATION.md) | [Backend contract](FACE_SELECTION_BACKEND.md) |
+
+At a simple vertex, inward edge coordinates turn the tangent cone into an
+orthant. The selection rule then restricts the **combined perturbation** to
+each feasible face, qualifies its first nonzero weighted layer, and takes the
+least qualified degree. A separate upper bound controls signed channels that
+qualification alone can miss.
+
+```mermaid
+flowchart TD
+  accTitle: The conditional polyhedral selection law
+  accDescr: Global isolation localizes the problem at a simple vertex. The feasible chart determines the base weights and face initial forms. A positive witness gives a lower bound; a uniform positive-gain envelope supplies the global upper bound. Together they determine the exponent.
+  local("01 · Global isolation and a simple vertex")
+  chart("02 · Feasible chart and base principal part")
+  faces("03 · Combine, restrict, and qualify")
+  lower("Positive witness<br/>lower bound")
+  upper("Uniform gain envelope<br/>upper bound")
+  law("04 · Matching response exponent")
+  local --> chart --> faces --> lower --> law
+  chart --> upper --> law
+  classDef input fill:#102734,stroke:#8199a4,color:#edf2f4
+  classDef work fill:#173b46,stroke:#87b8bd,color:#edf2f4
+  classDef result fill:#283b3b,stroke:#d9b77b,stroke-width:2px,color:#fff1d6
+  class local input
+  class chart,faces,lower,upper work
+  class law result
+  linkStyle default stroke:#9b875f,stroke-width:2px
+```
+
+> [!IMPORTANT]
+> A qualified minimum supplies a candidate exponent and a lower bound.
+> The theorem also needs **Hypothesis 5**, the uniform positive-gain envelope.
+> An unresolved signed face is not evidence that its contribution vanishes.
+> [The mathematical audit](MATHEMATICAL_AUDIT.md) records the counterexample.
+
+---
 
 ## 0. Standing assumptions
 
-`P` is a bounded full-dimensional polyhedron; `F` and `G` are continuous on `P`
-and real analytic near the vertex under study. Boundedness is not cosmetic: it
-is what makes Lemma 1 available, and the domain's proposal prompt already
-rejects unbounded systems.
+Let $P\subset\mathbb R^n$ be a bounded full-dimensional polyhedron. Let $F,G$
+be continuous on $P$ and real analytic near the vertex under study. The
+centered perturbation in edge coordinates is polynomial, as specified below.
+Compactness gives existence of the maximum and makes global localization
+available.
 
 ## 1. Setup
 
-Let `v` be a **simple** vertex with inward edge generators `u_1..u_n`, and
+Let $v$ be a **simple** vertex with linearly independent inward edge generators
+$u_1,\ldots,u_n$. Define
 
-    Phi(c) = v + sum_i c_i u_i,    c >= 0.
+$$
+\Phi(c)=v+\sum_{i=1}^n c_i u_i,\qquad c_i\ge0.
+$$
 
-Simplicity makes the `u_i` linearly independent, so `Phi` is a linear
-isomorphism from the nonnegative orthant onto the tangent cone `T_v P`; near
-`v` it is a bijection onto a neighbourhood of `v` in `P`. Set
+The linear map $c\mapsto\sum_i c_i u_i$ identifies the orthant with the
+tangent cone $T_vP$. The translated map $\Phi$ is an **affine** isomorphism
+onto $v+T_vP$; locally at zero it parametrizes $P$ near $v$.
 
-    D(c) = F(v) - F(Phi(c)),    R(c) = G(Phi(c)) - G(v),
+Set
 
-and study `M(s) = sup_{x in P} (F(x) + s G(x))` as `s -> 0+`.
+$$
+\begin{aligned}
+D(c)&=F(v)-F(\Phi(c)),\cr
+R(c)&=G(\Phi(c))-G(v),\cr
+M(s)&=\max_{x\in P}\bigl(F(x)+sG(x)\bigr),\cr
+\Delta(s)&=M(s)-F(v)-sG(v),\qquad s\downarrow0.
+\end{aligned}
+$$
 
 ## 2. Global isolation
 
-The first draft asserted that `v` is "the relevant unperturbed maximizer" and
-then worked locally. That is an assumption and needs to be one, because a
-perturbation can move the global optimum to a different vertex entirely.
+**Hypothesis 0.** The vertex $v$ is the unique maximizer of $F$ on $P$.
 
-**Hypothesis 0 (isolation).** `v` is the unique maximizer of `F` on `P`.
+**Lemma 1.** For every open neighborhood $U$ of $v$, all maximizers of
+$F+sG$ lie in $U$ for sufficiently small positive $s$.
 
-**Lemma 1.** Under Hypothesis 0, for every neighbourhood `U` of `v` there is
-`s_U > 0` such that for all `0 < s < s_U` the supremum defining `M(s)` is
-attained in `U`.
+<details>
+<summary><strong>Read the proof</strong> · a compactness gap</summary>
 
-*Proof.* `P \ U` is compact and `F` is continuous with a unique maximum at `v`,
-so `eta := F(v) - max_{P \ U} F > 0`. Let `K = 2 sup_P |G|`, finite by
-compactness. For `x` in `P \ U`,
+If $P\setminus U$ is empty there is nothing to prove. Otherwise define
 
-    F(x) + s G(x) <= F(v) - eta + sK/2 < F(v) + s G(v)
+$$
+\eta=F(v)-\max_{P\setminus U}F\gt0,\qquad
+K=\max_PG-\min_PG\ge0.
+$$
 
-as soon as `s K < eta`. The value at `v` already beats everything outside `U`,
-so the supremum is attained in `U`. Take `s_U = eta / K`. ∎
+For $x\in P\setminus U$,
 
-Everything below is therefore about the local problem in edge coordinates, and
-Lemma 1 is what licenses that reduction. Without Hypothesis 0 — at a tie
-between two vertices, say — the conclusion can fail outright, which is part of
-what the domain's `linear_max_at_vertex` rule exists to exercise.
+$$
+F(x)+sG(x)-F(v)-sG(v)\le-\eta+sK.
+$$
+
+If $K\gt0$, take $0\lt s\lt\eta/K$. If $K=0$, the right side is
+$-\eta$ for every $s$. In either case the value at $v$ excludes all
+maximizers outside $U$. $\square$
+
+</details>
+
+A tie among unperturbed maximizers requires a separate comparison. Numerical
+failure to find a rival does not prove Hypothesis 0.
 
 ## 3. Weights and initial forms
 
-Fix the weight vector `w = (1/beta_1, ..., 1/beta_n)`, the `beta_i` pinned by
-Hypothesis 2 below. For a monomial `c**alpha`,
+Let $w_i=1/\beta_i$, with the base orders supplied by Hypothesis 2. Define
 
-    w-deg(c**alpha) = <w, alpha> = sum_i alpha_i / beta_i.
+$$
+\deg_w(c^\alpha)=\langle w,\alpha\rangle
+=\sum_i\frac{\alpha_i}{\beta_i},\qquad
+\delta_\tau(c)=(\tau^{1/\beta_i}c_i)_i.
+$$
 
-For a series `H = sum_j gamma_j c**alpha_j` not identically zero, the **initial
-form** `in_w(H)` is the sum of the terms of least `w`-degree, and `w-deg(H)` is
-that least degree. The anisotropic dilation
+Combine like monomials first. For a nonzero series $H$, its initial form
+$\mathrm{in}_w(H)$ contains the terms of least weighted degree. Thus
 
-    delta_tau(c) = (tau**(1/beta_1) c_1, ..., tau**(1/beta_n) c_n)
+$$
+\tau^{-\deg_w(H)}H(\delta_\tau c)
+\longrightarrow\mathrm{in}_w(H)(c)
+\qquad(\tau\downarrow0).
+$$
 
-sends `c**alpha` to `tau**(w-deg) c**alpha`, so `in_w(H)` is exactly what
-survives in `tau**(-w-deg(H)) H(delta_tau c)` as `tau -> 0+`.
-
-`D_0` and `W_S` below are initial forms in this sense, not descriptions of one.
+A cancelled layer is absent from the combined polynomial. A nonzero negative
+layer is still its first layer and cannot be skipped to reach a positive one.
 
 ## 4. Hypotheses, with uniform remainders
 
-**Hypothesis 1 (positivity).** `D(c) >= 0` near `c = 0`, with equality only at
-`c = 0`.
+**Hypothesis 1 · strict local base maximality.**
+$D(c)\ge0$ near zero, with equality only at zero.
 
-**Hypothesis 2 (weighted principal part, uniform).** There are `A_i > 0` and
-`beta_i > 1` such that, with `D_0(c) = sum_i A_i c_i**beta_i = in_w(D)`,
+**Hypothesis 2 · diagonal weighted principal part.**
+There are $A_i\gt0$ and $\beta_i\gt1$ such that
 
-    D(delta_tau z) = tau ( D_0(z) + e_D(tau, z) ),
-    sup_{z in K} |e_D(tau, z)| -> 0  as tau -> 0+,  for every compact K.
+$$
+D_0(c)=\sum_i A_i c_i^{\beta_i}=\mathrm{in}_w(D),
+$$
 
-**Hypothesis 3 (polynomial perturbation, uniform facewise).** `R` is a finite
-sum `sum_j gamma_j c**alpha_j`, and for every face `S` on which `R` does not
-vanish identically,
+and, for every compact set $K$ of inward coordinates,
 
-    R|C_S(delta_tau z) = tau**q_S ( W_S(z) + e_R(tau, z) ),
-    sup_{z in K} |e_R(tau, z)| -> 0,  for every compact K in C_S,
+$$
+\begin{aligned}
+D(\delta_\tau z)&=\tau\bigl(D_0(z)+e_D(\tau,z)\bigr),\cr
+\sup_{z\in K}|e_D(\tau,z)|&\longrightarrow0.
+\end{aligned}
+$$
 
-with `q_S` and `W_S` as defined in section 5.
+**Hypothesis 3 · polynomial perturbation and uniform face remainders.**
+$R$ is a finite polynomial with $R(0)=0$. On each face $C_S$ where its
+restriction is nonzero,
 
-Uniformity is the point. The first draft wrote `o(tau)` pointwise in `z` and
-then took a supremum over `z`, which does not follow: pointwise remainders
-permit the error to blow up along a sequence of `z` as `tau -> 0`. With `R` a
-finite polynomial and `D` analytic the uniform version holds automatically on
-compacta, so nothing is lost — but it has to be said, because the balance in
-section 7 exchanges a limit with a supremum.
+$$
+\begin{aligned}
+R|_{C_S}(\delta_\tau z)
+&=\tau^{q_S}\bigl(W_S(z)+e_{R,S}(\tau,z)\bigr),\cr
+\sup_{z\in K}|e_{R,S}(\tau,z)|
+&\longrightarrow0
+\quad\text{for every compact }K\subset C_S.
+\end{aligned}
+$$
 
-Hypothesis 2 is the one the transport smuggles in, and the only one not implied
-by the setting: an arbitrary `F` in edge coordinates may carry cross terms of
-lower weight. `base_homogeneity` in the corpus measures the exponent of
-`D(delta_tau z)`; the value 1 means Hypothesis 2 holds for that row.
+Here $q_S$ and $W_S$ are the first degree and initial form defined below.
+Finite polynomials give the uniform face remainder directly. Analyticity
+gives compact uniform control once the stated principal part has been
+identified; it does **not** force that principal part to be diagonal.
+Cross terms of equal or lower weight must be checked.
+
+The measured metric `base_homogeneity` is a diagnostic for this hypothesis.
+A measured value near one does not establish the full identity
+$\mathrm{in}_w(D)=D_0$ or a uniform remainder bound.
 
 ## 5. Faces, and admissibility defined from the data alone
 
-For nonempty `S` in `{1..n}` let
+For nonempty $S\subseteq\lbrace1,\ldots,n\rbrace$, let
 
-    C_S = {c >= 0 : c_i = 0 for i not in S},
+$$
+C_S=\lbrace c\ge0:c_i=0\text{ for }i\notin S\rbrace.
+$$
 
-which `Phi` carries to `v + cone{u_i : i in S}`, the corresponding face of the
-tangent cone. Monomial `j` has support `S_j = {i : alpha_ij > 0}`, and
-`c**alpha_j` is nonzero on `relint(C_S)` exactly when `S_j` is contained in
-`S`. Monomial support and tangent-cone face are the same data in edge
-coordinates.
+A combined monomial $c^\alpha$ survives on this face precisely when
+$\mathrm{supp}(\alpha)\subseteq S$. Every **nonzero** point of the
+orthant lies in the relative interior of exactly one such face. The origin
+is a separate zero-dimensional stratum and has centered gain zero.
 
-Every `c >= 0` lies in `relint(C_S)` for exactly one `S`, namely `supp(c)`, so
-the faces partition the cone and
+| Qualification | Definition from the combined local data |
+| :--- | :--- |
+| Active | $R|_{C_S}$ is not identically zero |
+| Initial degree and form | $q_S=\deg_w(R|_{C_S})$, $W_S=\mathrm{in}_w(R|_{C_S})$ |
+| Positive | $W_S(z)\gt0$ for some $z\in\mathrm{relint}(C_S)$ |
+| Subcritical | $0\lt q_S\lt1$ |
+| **Admissible / qualified** | Active, positive, and subcritical |
 
-    sup over the cone = max over S of ( sup over relint(C_S) ).      (*)
+These definitions use the polynomial, its coefficients, the base weights,
+and the cone. They do not use an observed exponent or the unknown optimum.
 
-Define, for each face `S`, three properties **of the data `(F, G, T_vP)`
-alone**:
-
-- `S` is **active** if `R|C_S` is not identically zero, i.e. some `S_j` is
-  contained in `S`. For active `S` put `q_S = w-deg(R|C_S)` and
-  `W_S = in_w(R|C_S)`; equivalently
-  `q_S = min{ q_j : S_j subset S, gamma_j != 0 }` where `q_j = <w, alpha_j>`.
-- `S` is **positive** if `W_S(z) > 0` for some `z` in `relint(C_S)`.
-- `S` is **subcritical** if `q_S < 1`.
-
-`S` is **admissible** when it is active, positive and subcritical.
-
-None of the three refers to `M(s)`, to `gamma`, or to any conclusion of this
-note; all are computable from the exponents, the coefficients and the cone.
-That is what makes section 8 non-circular. The first draft folded "the relevant
-branch has positive effective perturbation and `q* < 1`" into a hypothesis and
-then used admissibility in the conclusion, which is close to assuming what is
-to be proved.
-
-**Hypothesis 4 (no leading cancellation).** For each admissible `S`, `W_S` does
-not vanish identically on `relint(C_S)`. With `W_S` a nonzero polynomial this
-is automatic; it is stated because the initial form of a *sum* over a face can
-cancel even when no individual monomial does.
+**Hypothesis 4 · no leading cancellation.** In the historical numbering,
+$W_S$ must not vanish identically on an admissible face. After combining
+coefficients and selecting the first **nonzero** layer, this is automatic.
+The condition does not forbid cancellation in the input sum; cancellation
+must be resolved before $q_S$ and $W_S$ are defined.
 
 ## 6. Upper control on unqualified faces
 
-**Correction.** The former Lemma 2 asserted that every unqualified face
-contributes nothing. This is false for signed perturbations. With
-`D_0=x^6+y^6` and `R=-x^2+xy^2`, every face is unqualified, but completing
-the square proves `Delta(s) ~ s^3/432`. Uniform convergence to a non-positive
-initial form does not preserve its sign near its zero set. See the exact
-proof and implementation certificate in
-[`MATHEMATICAL_AUDIT.md`](MATHEMATICAL_AUDIT.md).
+For $D_0=x^6+y^6$ and $R=-x^2+xy^2$, no coordinate face qualifies, yet
 
-**Lemma 2 (safe exclusions).** An inactive face gives no improvement. A face
-on which `R_+(c) <= K D_0(c)` locally also gives no improvement for small
-`s`. In particular this holds if every surviving monomial has degree at
-least one, or if `R <= 0` locally.
+$$
+-x^2+xy^2=\frac{y^4}{4}-\left(x-\frac{y^2}{2}\right)^2
+$$
 
-*Proof.* The compact closed section `D_0(z)=1` and Hypothesis 2 give
-`D(c) >= a D_0(c)` for some `a>0`. Thus
-`-D+sR <= (-a+sK)D_0 <= 0` when `sK<a`. If every degree is at least one,
-normalizing on that same section bounds `R_+` by `K D_0` locally. ∎
+opens a curved channel and gives $\Delta(s)\sim s^3/432$. A non-positive
+initial form and a uniformly small remainder do not exclude gain near the
+initial form's zeros. This was the error in the former exclusion lemma.
 
-For the selection theorem define `q*` from independently qualified faces,
-then require the additional data-only upper bound:
+**Lemma 2 · safe exclusions.** An inactive face gives no improvement. A face
+on which $R_+(c)\le KD_0(c)$ locally gives no improvement for small $s$,
+where $R_+=\max(R,0)$. This includes faces on which $R\le0$, and faces whose
+surviving monomials all have degree at least one.
 
-**Hypothesis 5 (uniform positive-gain envelope).** The qualified set is
-nonempty, and near the vertex there is a finite `K` such that
+<details>
+<summary><strong>Read the proof</strong> · domination by the base</summary>
 
-    R_+(c) := max(R(c), 0) <= K D_0(c)**q*.
+The compact closed section $D_0(z)=1$ and Hypothesis 2 imply
+$D(c)\ge aD_0(c)$ near zero for some $a\gt0$. Consequently
 
-This holds automatically for nonnegative combined polynomial coefficients.
-It also holds when the full cone's lowest layer has a positive witness.
-For other signed polynomials it needs a separate certificate; qualification
-alone is insufficient. The backend checks monomial domination of negative
-layers and retains uncontrolled cases as `higher_order_unresolved`.
+$$
+-D(c)+sR(c)\le(-a+sK)D_0(c)\le0
+$$
+
+when $sK\lt a$. A finite sum of monomials of degrees at least one satisfies
+the required bound by normalizing on the same section and taking
+$D_0(c)\le1$. $\square$
+
+</details>
+
+Suppose qualified faces exist and define $q_\ast=\min_{S\text{ qualified}}q_S$.
+
+**Hypothesis 5 · uniform positive-gain envelope.**
+There is a finite $K$ such that, throughout an inward neighborhood of zero,
+
+$$
+\boxed{R_+(c)\le K D_0(c)^{q_\ast}.}
+$$
+
+This follows automatically for nonnegative combined coefficients when
+$q_\ast$ exists. It also follows if the full cone's lowest layer has a
+positive witness: then every monomial has degree at least $q_\ast$.
+For other signed polynomials a separate certificate is needed.
+
+The implementation uses sufficient monomial-domination checks and retains
+uncontrolled cases as `higher_order_unresolved`. That status withholds
+licensing; it does not assert that a hidden channel necessarily exists.
 
 ## 7. The facewise balance
 
-Fix an admissible `S` and the closed cross-section
-`Z = {z in C_S : D_0(z) = 1}`, compact by positivity of the base coefficients.
-This section includes the boundary; its relative-interior portion need not
-be compact. Write
-`c = delta_tau z`. By Hypotheses 2 and 3, uniformly for `z` in `Z`,
+Fix an admissible face $S$. The section
 
-    J_s(tau, z) = -D(delta_tau z) + s R(delta_tau z)
-                = -tau (D_0(z) + e_D) + s tau**q_S (W_S(z) + e_R).
+$$
+Z_S=\lbrace z\in C_S:D_0(z)=1\rbrace
+$$
 
-With `A = D_0(z) > 0`, `B = W_S(z) > 0`, `k = q_S` in `(0,1)`, the leading
-expression `-tau A + s tau**k B` is stationary at
+is compact and includes its boundary. Its relative-interior portion need
+not be compact. For $c=\delta_\tau z$,
 
-    tau_* = ( s k B / A )**(1/(1-k)),
+$$
+J_s(\tau,z)
+=-\tau\bigl(1+e_D(\tau,z)\bigr)
++s\tau^{q_S}\bigl(W_S(z)+e_{R,S}(\tau,z)\bigr).
+$$
 
-and substituting back gives
+A fixed positive witness $z\in\mathrm{relint}(C_S)\cap Z_S$ has
+$B=W_S(z)\gt0$. For the leading scalar model,
 
-    J = A tau_* (1-k)/k  >  0.
+$$
+\tau_s=(s q_SB)^{1/(1-q_S)},\qquad
+-\tau_s+sB\tau_s^{q_S}=\frac{1-q_S}{q_S}\tau_s\gt0.
+$$
 
-Since `tau_*` scales as `s**(1/(1-k))`, so does `J`. Uniformity of `e_D` and
-`e_R` on `Z` is what lets the supremum over `z` pass inside the limit, giving
-matching upper and lower constants and hence
+The uniform remainders are negligible along this fixed rescaling, giving
+a lower bound of order $s^{1/(1-q_S)}$. For the upper bound, all surviving
+terms on this face have degree at least $q_S$. Compact normalization gives
+$R_+\le K_SD_0^{q_S}$, and the same scalar maximization bounds the whole
+face above. Hence
 
-    sup_{c in relint(C_S), c near 0} J_s = Theta( s**(1/(1-q_S)) ),
+$$
+\sup_{\substack{c\in\mathrm{relint}(C_S)\cr c\text{ near }0}}
+\bigl(-D(c)+sR(c)\bigr)
+=\Theta\left(s^{1/(1-q_S)}\right).
+$$
 
-so the face predicts `gamma_S = 1/(1 - q_S)`.
-
-**Checked against measurement.** For the tilted simplex face `c_2 = 0`
-(`D_0 = z**4`, `R = z`, `k = 1/4`) the coefficient is
-`3/4 * (1/4)**(1/3) = 0.472470`, and the adjudicator measures
-`0.472470 * s**(4/3)` to six decimals at `s = 1e-2, 2.5e-3, 6.25e-4`.
+This facewise bound holds for qualified faces. Hypothesis 5 is what extends
+upper control to **all** local directions, including unqualified ones.
 
 ## 8. Selection, qualified
 
-Define
+Under Hypotheses 0–5,
 
-    q* = min { q_S : S admissible }.
+$$
+\boxed{
+\Delta(s)=\Theta\left(s^{1/(1-q_\ast)}\right),
+\qquad q_\ast=\min_{S\text{ qualified}}q_S.}
+$$
 
-Under Hypothesis 5, put `t=D_0(c)`. Hypothesis 2 gives the uniform upper
-bound `-D+sR <= -a t+sK t**q*` for some `a>0`. Maximizing this scalar
-expression gives `O(s**(1/(1-q*)))`. A fixed positive witness on a minimizing
-qualified face gives the matching lower bound by section 7. With Lemma 1
-localising the global problem,
+<details>
+<summary><strong>Read the proof</strong> · matching global bounds</summary>
 
-    M(s) - F(v) - s G(v) = Theta( s**(1/(1-q*)) ),    gamma = 1/(1-q*).
+Set $t=D_0(c)$. Hypotheses 2 and 5 give
 
-**Relation to V.16's monomial minimum.** Because `q_S` is itself a minimum over
-the monomials supported in `S`, the minimum of `q_S` over *all* nonempty faces
-is attained at the full face and equals `min_j q_j`. Restricting to admissible
-faces can only raise it:
+$$
+-D(c)+sR(c)\le-at+sKt^{q_\ast}
+$$
 
-    q* >= min_j q_j,
+for some $a\gt0$. Its maximum for $t\ge0$ is a finite constant times
+$s^{1/(1-q_\ast)}$. A positive witness on a minimizing qualified face
+gives the matching lower bound by section 7. Lemma 1 localizes the global
+maximum to this neighborhood. $\square$
 
-with **equality precisely when some face attaining `min_j q_j` is admissible**.
-V.16's statement is therefore recovered under a sufficient condition — for
-example all `gamma_j > 0`, whence every active face is positive and no initial
-form cancels, together with `min_j q_j < 1` — and *not* in general.
+</details>
 
-The qualification is not pedantic. `3d_shear_orders_2_4_6` in the corpus has an
-inadmissible face carrying `q = 1.3804` alongside admissible ones at `q = 0.5`.
-There the inadmissible face is the larger value, so nothing is lost; but that
-ordering is not guaranteed, and an implementation taking `min_j q_j` blindly
-would in general select a branch that contributes nothing. The adjudicator
-computes the face minimum, which is the quantity the theorem is about.
+### Relation to the orthant monomial minimum
+
+After combining coefficients, the least degree over all nonzero face
+restrictions equals the full-cone least degree $\min_j q_j$. Restricting
+to qualified faces can only raise that minimum:
+
+$$
+q_\ast\ge\min_j q_j.
+$$
+
+Equality holds exactly when some face attaining the monomial minimum is
+qualified. Positive coefficients and a subcritical minimum recover
+[V.16](FORMAL_NEWTON_TROPICAL.md#theorem-v16). Signed coefficients require
+qualification and the upper envelope; a raw monomial minimum is insufficient.
 
 ## 9. Worked case: the tilted simplex
 
-`P = {x0 >= 0, x1 >= 0, x0 + x1 <= 1}`, `v = (0,1)`. The active constraints at
-`v` are `x0 >= 0` and `x0 + x1 <= 1`, so
+Take
 
-    T_v P = { d : d_0 >= 0, d_0 + d_1 <= 0 },
+$$
+P=\lbrace x_0,x_1\ge0:x_0+x_1\le1\rbrace,\qquad v=(0,1).
+$$
 
-with extreme rays `u_1 = (1,-1)` and `u_2 = (0,-1)`, and `x = (c_1, 1-c_1-c_2)`.
-For `F = -((x0+x1-1)**2 + x0**4)` we get `x0+x1-1 = -c_2` and `x0 = c_1`, hence
+The inward generators are $u_1=(1,-1)$ and $u_2=(0,-1)$, so
 
-    D(c) = c_2**2 + c_1**4,    beta = (4, 2),    w = (1/4, 1/2).
+$$
+\Phi(c_1,c_2)=(c_1,1-c_1-c_2).
+$$
 
-With `G = x0`, `R(c) = c_1`, support `{1}`. Face `{1}` is active, positive and
-subcritical with `q = 1/4`. Face `{2}` is **inactive**: `R` vanishes on it
-identically, so by Lemma 2 its `beta = 2` never enters — the quadratic term is
-the leading behaviour of `F` along that edge and is nonetheless irrelevant,
-which is the point the first draft got wrong by claiming the quadratic term was
-constant on the feasible cone. `q* = 1/4` and `gamma = 4/3`.
+For $F=-((x_0+x_1-1)^2+x_0^4)$ and $G=x_0$,
 
-The ambient axis `e_0 = (1,0)` has `e_00 + e_01 = 1 > 0`, so it is not in
-`T_v P` at all; its quadratic decay is not a branch of the constrained problem.
-That is the `ambient_exponent_law` counterexample, stated exactly.
+$$
+D(c)=c_1^4+c_2^2,\qquad R(c)=c_1,\qquad
+w=(1/4,1/2).
+$$
+
+| Face | Restricted perturbation | Qualification |
+| :--- | :--- | :--- |
+| $\lbrace1\rbrace$ | $c_1$ | Positive, $q=1/4$ |
+| $\lbrace2\rbrace$ | $0$ | Inactive |
+| $\lbrace1,2\rbrace$ | $c_1$ | Positive, $q=1/4$ |
+
+Thus $q_\ast=1/4$ and $\gamma=4/3$. The exact optimizer is
+
+$$
+c_1=(s/4)^{1/3},\qquad c_2=0,\qquad
+\Delta(s)=\frac{3}{4^{4/3}}s^{4/3}
+$$
+
+for $0\lt s\le4$, when $c_1\le1$. The quadratic term is **not constant**
+on the feasible cone; its edge is inactive for this perturbation.
+
+The ambient direction $(1,0)$ violates $d_0+d_1\le0$ and is outside $T_vP$.
+Its quadratic decay cannot determine the constrained exponent.
+[V.20](FORMAL_AMBIENT_FACE_TRANSPORT.md) makes this transport auditable.
 
 ## 10. Scope
 
-Conditional statement: for a **simple** vertex, under Hypotheses 0–5, the
-asymptotic exponent is `gamma = 1/(1 - q*)` with `q*` the minimum weighted
-degree over **admissible** faces.
+| Mathematical requirement | What the implementation provides |
+| :--- | :--- |
+| A simple vertex and feasible inward chart | Geometric localization; exact active-constraint reconstruction when available |
+| The diagonal principal part and uniform remainders | Exact polynomial data plus numerical diagnostics or caller-supplied analytic evidence, depending on the interface |
+| Unique global base maximizer | The general predictor uses a finite rival probe; this cannot certify uniqueness |
+| Control of signed higher layers | Sufficient domination checks; unresolved cases block licensing |
+| Exact optimizer support | Winning faces describe leading channels; subleading coordinates require further analysis |
 
-Not established here:
+The backend's `base_homogeneity` and isolation measurements participate in
+its licensing decision. They are finite diagnostics, not proofs of the full
+analytic hypotheses. The exact core separately records whether analytic
+hypotheses are verified, assumed, unverified, or violated; an assumed
+hypothesis licenses only a conditional calculation.
 
-- **Hypothesis 2 for arbitrary `F`.** In edge coordinates a base may carry
-  cross terms; one of lower weight makes the drop `Theta(tau**c)` with `c < 1`,
-  and the per-edge `beta_i` stop describing the cone's interior. Constructed
-  violations at `c = 0.75` and `c = 0.5` still predict correctly — a positive
-  cross term only steepens the interior and drives the optimum onto a face —
-  but agreeing is not being licensed. This is why `base_homogeneity` is
-  recorded per row and never gated on.
-- **Non-simplicial vertices.** With more than `n` active constraints `Phi` is
-  not an isomorphism onto the orthant and the argument fails at section 1. The
-  vertex probe returns the vertex value there rather than answering.
-- **Hypothesis 0 in the corpus.** Uniqueness of the unperturbed maximizer is
-  measured rather than assumed, but only by a finite probe. `rival_margin`
-  records per row how far the vertex outranks the best competing maximum found
-  outside a ball of radius `0.25`; it can exhibit a rival, it cannot certify
-  that none exists, so it is recorded and never gated on, exactly as
-  `base_homogeneity` is. The count is not zero — [`POLYHEDRA.md`](POLYHEDRA.md)
-  lists the rows that come back at or below zero, and some of them are rows the
-  edge law is otherwise counted as confirming. There the maximizer is a whole
-  face, Lemma 1 does not hold, and the agreement between predicted and measured
-  exponent is not evidence for the law.
+This theorem does not cover arbitrary cross-term principal parts or
+non-simplicial tangent cones. An empty qualified set establishes neither
+zero response nor a competing law. The separately scoped
+[V.22 reduction](FORMAL_CURVED_REDUCTION.md) resolves a supported family
+of curved channels. Finite-scale accuracy requires its own bounds.
 
-None of the three is a gap in the coordinate transport; all three are limits on
-where it applies.
+## Reproduce
+
+Run from the repository root:
+
+```bash
+python experiments/reproduce_principle.py --only transport selector-limit curved
+python -m pytest -q -p no:cacheprovider tests/test_face_selection.py tests/test_face_selection_backend.py
+```
+
+The reproduction suite checks the transported simplex law and the signed
+counterexample's distinct selector/reduction outcomes.
+
+---
+
+[Continue to qualified stratification →](FORMAL_QUALIFIED_SELECTION_STRATIFICATION.md) · [Backend evidence](FACE_SELECTION_BACKEND.md) · [Revision record](PRINCIPLE_DOCUMENTATION_REVIEW.md)

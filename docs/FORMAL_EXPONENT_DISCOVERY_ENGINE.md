@@ -17,8 +17,8 @@ compile every member through V.20:
 $$
 \begin{aligned}
 R_j(x)
-&\longmapsto R_j(\Phi(c))-R_j(v)\\
-&\longmapsto \lbrace q_{j,F}:F\text{ qualified}\rbrace\\
+&\longmapsto R_j(\Phi(c))-R_j(v)\cr
+&\longmapsto \lbrace q_{j,F}:F\text{ qualified}\rbrace\cr
 &\longmapsto (q_j^\ast,\gamma_j).
 \end{aligned}
 $$

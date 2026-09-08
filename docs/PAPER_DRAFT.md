@@ -66,7 +66,7 @@ and let $r_z=c-Fz$. With a proved $0\lt \mu\le\lambda_{\min}(F)$,
 
 $$
 \begin{aligned}
-Q(F^{-1}c)-Q(z)&=\frac12r_z^\top F^{-1}r_z\\
+Q(F^{-1}c)-Q(z)&=\frac12r_z^\top F^{-1}r_z\cr
 &\le\frac{\|r_z\|_2^2}{2\mu}.
 \end{aligned}
 $$

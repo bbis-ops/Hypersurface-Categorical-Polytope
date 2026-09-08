@@ -1,4 +1,15 @@
+![The portable principle as a backend — reproducible requests and inspectable evidence.](assets/backend-contract-cover.svg)
+
 # Face-selection backend asset
+
+**Current asset: `portable-principle.v8`** · face-selection schema:
+`face-selection.backend.v1`
+
+[**Version map →**](#portable-principle-version-map) · [Request contract](#request-contract) · [Status semantics](#face-selection-status-semantics) · [Reproduce the results](RUNBOOK.md)
+
+| 01 · Orthant | 02 · Polyhedron | 03 · Parameters | 04 · Execution |
+| :--- | :--- | :--- | :--- |
+| [Newton–tropical law](FORMAL_NEWTON_TROPICAL.md) | [Feasible-face selection](FORMAL_FACE_SELECTION.md) | [Qualified stratification](FORMAL_QUALIFIED_SELECTION_STRATIFICATION.md) | **This contract** |
 
 The face-selection law is available as a stable backend capability, not only as
 a mathematical helper. Its public boundary is
@@ -12,11 +23,69 @@ and presents it in three visible stages:
    polyhedron by its tangent cone and active constraints.
 2. **Selection** - restrict the perturbation to tangent-cone faces, classify
    each face, and select the smallest admissible weighted degree `q_star`.
-3. **Scaling** - return `gamma = 1 / (1 - q_star)` and the measured leading
+3. **Scaling** - return $\gamma=1/(1-q_\ast)$ and the measured leading
    coefficient when it has stabilized.
 
-Every response carries the analytic warrant for the answer. A computed
-exponent is never silently promoted to a licensed theorem conclusion.
+Responses expose the evidence and scope used by each operation. The meaning
+of `licensed` depends on that operation: exact algebra, numerical diagnostics,
+and caller attestations must be read at their actual evidence level.
+
+```mermaid
+flowchart TD
+  accTitle: One backend, distinct evidence contracts
+  accDescr: A JSON request chooses face selection, affine phase analysis, or curved reduction. Each uses different evidence and returns a scope decision. Portfolio and discovery organize face-selection cases.
+  request("01 · JSON request")
+  selector("Face selection<br/>with portfolio and discovery")
+  phase("Affine phase analysis")
+  curved("Curved reduction")
+  measured("Exact polynomial refinement<br/>and numerical hypothesis probes")
+  declared("Exact affine algebra<br/>and caller attestations")
+  certified("Exact checks for<br/>the supported V.22 family")
+  evidence("02 · Read output, scope, and evidence")
+  request --> selector --> measured --> evidence
+  request --> phase --> declared --> evidence
+  request --> curved --> certified --> evidence
+  classDef input fill:#102734,stroke:#8199a4,color:#edf2f4
+  classDef work fill:#173b46,stroke:#87b8bd,color:#edf2f4
+  classDef result fill:#283b3b,stroke:#d9b77b,stroke-width:2px,color:#fff1d6
+  class request input
+  class selector,phase,curved,measured,declared,certified work
+  class evidence result
+  linkStyle default stroke:#9b875f,stroke-width:2px
+```
+
+> [!IMPORTANT]
+> `licensed` is an operation-specific scope decision. A general face-selection
+> response still relies on numerical hypothesis probes; a phase response relies
+> on supplied analytic attestations. Neither proves arbitrary analytic
+> hypotheses from a JSON request. Curved reduction has its own exact supported
+> contract, and finite-scale accuracy is a separate decision.
+
+---
+
+## Portable-principle version map
+
+The version sections describe cumulative capability layers retained in the
+current **v8** asset. Asset versions, JSON schema versions, and formal result
+numbers identify different things: **V.20** is the transport theorem, not an
+asset version. Its formal note names the current implementation, v8.
+
+| Asset layer | Capability | Mathematical reference |
+| :--- | :--- | :--- |
+| [v2](#portable-principle-v2-extension) | Mechanism traces, term classification, universality classes, and portfolios | [Face-selection law](FORMAL_FACE_SELECTION.md) |
+| [v3](#portable-principle-v3-exact-universality-phase-diagrams) | Exact affine degree walls and transition margins | [V.17 · phase fan](FORMAL_FACE_SELECTION_PHASE_FAN.md) |
+| [v4](#portable-principle-v4-stratified-qualified-selection) | Coefficient cancellation and qualification strata | [V.18 · qualified selection](FORMAL_QUALIFIED_SELECTION_STRATIFICATION.md) |
+| [v5](#portable-principle-v5-constructive-mixed-sign-positivity) | Constructive mixed-sign binomial witnesses | [V.19 · positivity](FORMAL_BINOMIAL_POSITIVITY_WITNESS.md) |
+| [v6](#portable-principle-v6-exact-ambient-to-face-transport) | Exact feasible-chart pullbacks and term provenance | [V.20 · ambient transport](FORMAL_AMBIENT_FACE_TRANSPORT.md) |
+| [v7](#portable-principle-v7-finite-family-exponent-discovery) | Finite perturbation screens and exponent-law candidates | [V.21 · discovery](FORMAL_EXPONENT_DISCOVERY_ENGINE.md) |
+| [v8 · current](#portable-principle-v8-signed-layer-control-and-curved-channels) | Withhold licensing for uncontrolled higher layers; dispatch supported curved channels to a separate reduction contract | [Mathematical audit](MATHEMATICAL_AUDIT.md) · [V.22 · quadratic elimination](FORMAL_CURVED_REDUCTION.md) |
+
+The face-selection, portfolio, phase, and discovery responses carry
+`asset_version: "portable-principle.v8"` with the
+`face-selection.backend.v1` schema. Curved reduction uses
+`curved-reduction.backend.v1` and does **not** emit an `asset_version` field.
+Its optional [finite-scale certificate](CURVED_FINITE_SCALE.md) is available
+through the same backend entry point.
 
 ## Python integration
 
@@ -68,26 +137,36 @@ One request or an array of requests can be sent over standard input:
 '@ | python -m categorical_polytope.adjudication.polyhedra.backend --pretty
 ```
 
-The process exits with zero when every item produced either a licensed or an
-explicitly unlicensed prediction. Refusals and invalid requests return nonzero.
+The process exits with zero when every top-level response has status
+`licensed`, `unlicensed`, or `complete`. The `complete` status marks a finished
+portfolio or discovery operation; inspect its cases and scope evidence for
+individual licensing decisions. Other statuses, including `refused`,
+`outside_scope`, and boundary errors, return nonzero. Process success alone
+does not certify a theorem or finite-scale accuracy.
 After installing the package, the same interface is available as
 `categorical-face-selection`.
 
 ## Request contract
 
-The wire schema remains `face-selection.backend.v1`; the additive portable-law
-extension is identified by `asset_version = portable-principle.v8`. Version 8
-adds fail-closed higher-layer control for signed perturbations; consumers that
-use licensing status should treat the correction as semantically significant. Existing
-v1 consumers can ignore the new fields without changing behavior.
+The face-selection wire schema remains `face-selection.backend.v1`; the
+current portable-law asset is `portable-principle.v8`. Existing consumers can
+continue parsing the v1 envelope, but mathematical decisions can change:
+v8 withholds licensing when higher-layer control is unresolved. Consumers must
+respect the returned `status`, `licensed`, and `scope.blockers` rather than
+assuming that an earlier licensed input remains licensed.
+
+The following fields describe an individual face-selection request. Portfolio,
+phase, discovery, and curved-reduction operations have the additional contracts
+described below.
 
 | Field | Required | Meaning |
 | --- | --- | --- |
-| `system` | yes | Literal `([[...]], [...])` representation of `Ax <= b` |
+| `operation` | no | Defaults to `polyhedral_face_selection`; other operations are described in their sections |
+| `system` | yes | Literal `([[...]], [...])` representation of $Ax\le b$ |
 | `base` | yes | Safely parsed arithmetic expression in `x0`, `x1`, ... |
 | `perturbation` | yes | Safely parsed perturbation expression; `pert` is accepted as an alias |
 | `request_id` | no | Caller correlation identifier, at most 128 characters |
-| `observed_exponent` | no | Activates the inverse law `q_star = 1 - 1/gamma` |
+| `observed_exponent` | no | Activates the inverse law $q_{\mathrm{obs}}=1-1/\gamma_{\mathrm{obs}}$ |
 | `observation_tolerance` | no | Face-matching tolerance; defaults to `0.05` |
 
 Expressions are capped at 20,000 characters and pass through the existing
@@ -96,13 +175,17 @@ other executable syntax are not evaluated.
 
 ## Response contract
 
-Every successful analysis contains these top-level fields:
+A face-selection analysis returns the following fields; individual values may
+be unavailable when localization or selection is refused. Other operations
+have their own response layouts.
 
 | Field | Backend use |
 | --- | --- |
+| `schema_version` | JSON contract identifier: `face-selection.backend.v1` |
+| `asset_version` | Current capability and licensing revision: `portable-principle.v8` |
 | `status` | `licensed`, `unlicensed`, or `refused` |
 | `answered` | Whether a response exponent was produced |
-| `licensed` | Whether every measured theorem hypothesis currently holds |
+| `licensed` | Whether the operation's admission checks pass; read the evidence and limitations in `scope` |
 | `capabilities` | Stable names for the asset's supported reasoning functions |
 | `principles` | Machine-readable localization, selection, and scaling definitions |
 | `localization` | Vertex, tangent-cone face count, binding and released constraints |
@@ -123,8 +206,10 @@ The four relevance classes are `relevant`, `critical`, `subleading`, and
 filters irrelevant directions without erasing the evidence that they were
 considered.
 
-Polynomial inputs are transported with exact rational arithmetic after the
-feasible chart has been reconstructed from the active constraints. Every
+For supported polynomial inputs, transport uses exact rational arithmetic
+relative to the localized chart. Inspect `ambient_hierarchy.chart_source`
+to distinguish exact active-constraint reconstruction from a chart derived
+from the numerical probe. Every
 top-level perturbation term retains its lineage; cancellations and per-face
 geometric suppressions are reported separately. Non-polynomial inputs use the
 safe numerical fallback. See [V.20](FORMAL_AMBIENT_FACE_TRANSPORT.md).
@@ -161,12 +246,30 @@ This operation accepts the same `system`, `base`, `perturbation`, and optional
 `request_id` fields. It has its own `curved-reduction.backend.v1` response
 contract: `localization`, `reduction`, `scaling`, and `scope`.
 
-For an exact two-dimensional loss `A*x^p+B*y^q` and perturbation
-`-a*x^2+x*H(y)+K(y)`, it combines the reduced polynomial
-`S(y)=H(y)^2/(4*a)+K(y)` exactly. A positive initial order `alpha<q`, a
-positive square-center curve of order `r`, and `p*r>q` license
-`gamma=q/(q-alpha)` and a sharp closed-form coefficient. The full base,
-simple vertex, feasibility, and boundedness are checked exactly.
+In exact two-dimensional inward coordinates, the full loss and centered
+perturbation must have the forms
+
+$$
+D=Ax^p+By^q,\qquad R=-ax^2+xH(y)+K(y),
+$$
+
+with $A,B,a\gt0$, integer $p,q\gt1$, and $H(0)=K(0)=0$. The operation combines
+
+$$
+S(y)=\frac{H(y)^2}{4a}+K(y)
+=Cy^\alpha+\text{higher powers}
+$$
+
+exactly. It requires $C\gt0$, $0\lt\alpha\lt q$, a positive leading
+coefficient of $H$ at order $r$, and $pr\gt q$. These checks license
+
+$$
+\gamma=\frac{q}{q-\alpha}
+$$
+
+and the [sharp coefficient](FORMAL_CURVED_REDUCTION.md). The full base,
+simple vertex, feasibility, and boundedness are checked exactly within this
+supported family.
 
 Supported cases return `status="licensed"`; unproved cases return
 `status="outside_scope"` with blockers and vertex attempts. A refused
@@ -197,6 +300,12 @@ also have settled numerically. For exactly transported polynomials, unresolved
 positivity or higher positive layers block licensing even if the numerical
 face probes appear settled. See the corrected upper-bound hypothesis and
 exact counterexample in [the mathematical audit](MATHEMATICAL_AUDIT.md).
+
+The isolation probe establishes that no rival was found at its resolution;
+it does not prove a unique global maximizer. Likewise, a measured homogeneity
+near one does not prove the complete diagonal principal-part identity or its
+uniform remainder. This status reports the backend's admission criteria,
+with exact polynomial safeguards where available.
 
 ### `unlicensed`
 
@@ -230,41 +339,47 @@ as JSON envelopes and never interrupt a batch.
 
 ## Forward and inverse power
 
-The forward path answers:
+The forward path computes
 
-```text
-geometry + base + perturbation
-    -> feasible asymptotic faces
-    -> minimum admissible weight q_star
-    -> response exponent gamma
-    -> active constraints and leading amplitude
-```
+$$
+\text{feasible face data}\longmapsto q_\ast
+\longmapsto\gamma=\frac1{1-q_\ast},
+$$
 
-The inverse path answers:
+together with candidate leading channels and a measured amplitude.
 
-```text
-observed gamma
-    -> effective q_star = 1 - 1/gamma
-    -> tangent-cone faces carrying that weight
-    -> unique, ambiguous, or geometrically inconsistent channel
-```
+Given an observed exponent $\gamma_{\mathrm{obs}}\gt1$, the inverse path uses
 
-This makes the law useful both for prediction and for diagnosis. It can predict
-how a perturbation will move an optimizer, or infer hidden active geometry from
-an observed fractional-power response.
+$$
+q_{\mathrm{obs}}=1-\frac1{\gamma_{\mathrm{obs}}},
+$$
+
+then compares that weight with the numerical predictor's admitted face
+degrees within the supplied absolute weight tolerance. The inverse block
+uses those measured face degrees, even when exact refinement corrects the
+forward invariants. The result may be unique, ambiguous, or unmatched.
+
+This diagnoses compatibility with candidate leading mechanisms. It does not
+uniquely reconstruct an arbitrary objective or determine the optimizer's
+complete support.
 
 ## Relationship to the exact core
 
-`categorical_polytope.face_selection` is the exact, rational, explicitly
-evidenced model for supplied edge charts and polynomial monomials. The backend
+`categorical_polytope.face_selection` represents supplied edge charts,
+polynomial monomials, rational weights, and explicit hypothesis evidence. The backend
 uses `adjudication.polyhedra.predict`, which derives and measures the same law
 from a general inequality system and safe expressions. The two layers serve
 different roles:
 
-- exact core: theorem objects, exact weights, cancellation and explicit
-  positivity witnesses;
-- backend predictor: automatic geometric localization, numerical edge-order
-  measurement, constraint inference and corpus-aligned admission.
+- core: theorem objects, rational weights and exponents, combined monomials,
+  and explicit positivity witnesses; chart coordinates and witness evaluations
+  may use floating-point values;
+- backend predictor: automatic localization, numerical hypothesis probes,
+  and exact polynomial transport/refinement when supported.
+
+The core distinguishes `VERIFIED` from `ASSUMED` analytic hypotheses and
+permits conditional use under either. The label is retained; the module does
+not turn an assumption into independent proof.
 
 Both preserve the same invariant: the Newton minimum is taken only after
 restriction to feasible tangent-cone faces.
@@ -275,13 +390,11 @@ restriction to feasible tangent-cone faces.
 
 `mechanism` makes the theory's internal hierarchy queryable:
 
-```text
-ambient monomials
-    -> feasible face restrictions
-    -> admissible weights
-    -> minimum q_star
-    -> response exponent gamma
-```
+$$
+\text{transported perturbation}
+\longmapsto\text{qualified face weights}
+\longmapsto(q_\ast,\gamma).
+$$
 
 It also returns every relevant degree, the next competing degree, the
 selection margin, tied minimal channels, filtered-face reasons, active
@@ -292,9 +405,9 @@ the model-specific leading coefficient.
 
 Top-level additive terms are classified independently as:
 
-- `relevant` - positive on an admissible face with `0 < q < 1`;
-- `critical` - `q = 1`, requiring a different balance;
-- `subleading` - `q > 1`;
+- `relevant` - positive on an admissible face with $0\lt q\lt1$;
+- `critical` - $q=1$, requiring a different balance;
+- `subleading` - $q\gt1$;
 - `inactive` - eliminated by sign, cancellation, constancy, or geometry;
 - `unresolved` - a mixed-sign initial form needs additional positivity evidence.
 
@@ -393,13 +506,13 @@ phase = FaceSelectionBackend().handle({
 ```
 
 The backend computes every pairwise degree crossing and every relevance wall
-`q=0` or `q=1` in exact rational arithmetic. It returns:
+$q=0$ or $q=1$ in exact rational arithmetic. It returns:
 
 - all exact breakpoints;
 - the winning face mechanisms in each open chamber;
 - tied winners at transition walls;
 - activation, deactivation, and universality-class transitions; and
-- the exact chamber law `gamma(theta) = 1 / (1 - q_star(theta))`.
+- the exact chamber law $\gamma(\theta)=1/(1-q_\ast(\theta))$.
 
 ### Automatic Newton-weight compilation
 
@@ -407,9 +520,9 @@ Mechanisms do not need to arrive with a precomputed degree. Given fixed base
 orders `beta_i` and affine monomial exponent laws `alpha_i(theta)`, the backend
 derives
 
-```text
-q(theta) = sum_i alpha_i(theta) / beta_i
-```
+$$
+q(\theta)=\sum_i\frac{\alpha_i(\theta)}{\beta_i}
+$$
 
 exactly:
 
@@ -456,9 +569,12 @@ includes:
 - the nearest actual transition; and
 - the exact parameter distance to a change in universality mechanism.
 
-This distance is an asymptotic robustness margin. A large value means the
-current mechanism is stable under parameter error; zero means the system is
-exactly on a universality transition.
+This distance measures stability of the **winning mechanism identities**
+under parameter changes that stay inside the domain. The exponent can still
+vary with the parameter inside a chamber. It is not a bound on exponent
+error or finite-scale approximation error. Zero marks an interior transition;
+`null` means no interior transition exists. Endpoint qualification is evaluated
+separately.
 
 This is not a grid search: between consecutive returned walls, no unreported
 degree-order transition can occur under the declared assumptions. The
@@ -475,7 +591,7 @@ cancellation must be introduced as additional stratum walls.
 
 v4 makes parameter-dependent qualification executable. A mechanism may carry
 an affine `coefficient` law in addition to its degree or exponent law. The
-backend adds every exact `coefficient(parameter)=0` root to the phase
+backend adds every exact coefficient-zero root to the phase
 stratification and qualifies the mechanism only where that coefficient is
 positive.
 
@@ -512,14 +628,20 @@ mechanism is classified as `qualified`, `cancelled`, `non_positive`,
 `zero_weight`, `critical`, `subleading`, or `geometry_filtered`. The minimum is
 taken only after this classification.
 
-The three uniform analytic flags are required before the backend promotes
+The three uniform analytic flags are required before the backend reports
 
-```text
-q_star(parameter) -> gamma(parameter) -> gap = Theta(s**gamma(parameter))
-```
+$$
+q_\ast(\theta)\longmapsto\gamma(\theta)
+\longmapsto\Delta(s;\theta)=\Theta(s^{\gamma(\theta)})
+$$
 
-to a licensed asymptotic consequence. This separates an exact algebraic phase
-calculation from a theorem-qualified scaling statement. See
+as a licensed conditional consequence. These flags are **caller attestations**,
+not independently verified properties of an objective. The phase operation
+does not reconstruct the full perturbation or run the default polynomial
+selector's signed-layer checks. It has no separate flag or automatic test for
+the corrected positive-gain upper envelope, which remains an external
+mathematical obligation. Any layer exposed by cancellation must be included
+in the supplied mechanisms or handled on another stratum. See
 [`FORMAL_QUALIFIED_SELECTION_STRATIFICATION.md`](FORMAL_QUALIFIED_SELECTION_STRATIFICATION.md).
 
 ## Portable-principle v5: constructive mixed-sign positivity
@@ -553,3 +675,141 @@ General mixed-sign initial forms with three or more distinct signatures remain
 `positivity_unresolved` unless another exact certificate or caller witness is
 available. See
 [`FORMAL_BINOMIAL_POSITIVITY_WITNESS.md`](FORMAL_BINOMIAL_POSITIVITY_WITNESS.md).
+
+## Portable-principle v6: exact ambient-to-face transport
+
+The [V.20 compiler](FORMAL_AMBIENT_FACE_TRANSPORT.md) reconstructs the inward
+edge chart from the active constraints and transports both the base and the
+perturbation into that chart. With active set $S$,
+
+$$
+A_Sv=b_S,\qquad A_Su_i=-e_i,\qquad
+\Phi(c)=v+\sum_i c_i u_i.
+$$
+
+The polynomial used for feasible-face selection is
+
+$$
+\widehat R(c)=R(\Phi(c))-R(v).
+$$
+
+Like monomials are combined before selection. Ambient coordinate-axis orders
+cannot replace the orders in the feasible chart. Exact transport also keeps
+algebraic cancellation distinct from terms suppressed by a face restriction.
+
+| Response evidence | What to inspect |
+| :--- | :--- |
+| `ambient_hierarchy.chart_source` | How the feasible chart was reconstructed |
+| `ambient_hierarchy.base_pullback` | Transported base polynomial |
+| `ambient_hierarchy.perturbation_pullback` | Combined polynomial, term lineage, cancellations, and face restrictions |
+| `ambient_hierarchy.weight_layer` | Exact pullback axial orders, weights, and comparison with measured orders |
+| `ambient_hierarchy.selection_layer` | Selected degree and supporting faces |
+| `transitions[].ambient_transport_change` | Chart and pullback changes in a portfolio |
+
+Run the saved two-geometry portfolio from the repository root:
+
+```bash
+python -m categorical_polytope.adjudication.polyhedra.backend --input experiments/face_selection_ambient_v20_request.json --pretty
+```
+
+Both cases return `face-weight:1/4|response:4/3` with pullback axial orders
+`{"c0": 4, "c1": 2}`. The portfolio records `same_universality_class` while
+`ambient_transport_change.changed` is `true`: the charts differ, and the
+selected exponent agrees. Exact transport supplies algebraic evidence;
+the [v8 scope checks](#portable-principle-v8-signed-layer-control-and-curved-channels)
+still govern licensing.
+
+[Saved request →](../experiments/face_selection_ambient_v20_request.json) · [Compiler tests →](../tests/test_ambient_face_compiler.py)
+
+## Portable-principle v7: finite-family exponent discovery
+
+The [discovery operation](#discovery-operation) applies the compiler to every
+member of a supplied finite perturbation family. It groups the resulting
+weights and exponents into universality classes while retaining distinct
+mechanism fingerprints and diagnostics.
+
+```bash
+python -m categorical_polytope.adjudication.polyhedra.backend --input experiments/face_selection_discovery_v21_request.json --pretty
+```
+
+The saved request screens six candidates against the base loss
+$x_0^2+x_1^4$. It returns five relevant candidates, one critical candidate,
+and three classes:
+
+| Selected weight $q_\ast$ | Response exponent $\gamma$ | Members |
+| :--- | :--- | :--- |
+| $1/4$ | $4/3$ | $x_1$ |
+| $1/2$ | $2$ | $x_0$, $x_1^2$, $x_1-x_1+x_0$ |
+| $3/4$ | $4$ | $x_0x_1$ |
+
+Inspect `screening.counts`, `universality_classes`, `exponent_law_spectrum`,
+`law_candidates`, and `diagnostic_candidates`. The $x_0^2$ candidate reaches
+the critical $q=1$ boundary; the cancelled-linear candidate retains its
+cancellation diagnostic after joining the $q_\ast=1/2$ class.
+
+The supplied registry already contains the $4/3$ class, so the other two
+classes are unregistered law candidates. Registry absence is not a claim of
+literature novelty. Likewise, a completed finite screen does not exhaust all
+perturbations or prove its members' analytic hypotheses. Set
+`include_cases: true` to inspect each full response and its licensing evidence.
+
+[V.21 statement →](FORMAL_EXPONENT_DISCOVERY_ENGINE.md) · [Saved request →](../experiments/face_selection_discovery_v21_request.json) · [Discovery tests →](../tests/test_face_selection_discovery.py)
+
+## Portable-principle v8: signed-layer control and curved channels
+
+v8 corrects a scope error: a non-positive first weighted layer can leave a
+higher positive layer uncontrolled near its zeros. The exact face selector
+must establish the required upper control before discarding that face. When
+it cannot, it records `higher_order_unresolved` and blocks theorem licensing.
+
+Inspect `exact_refinement.selection_complete`,
+`exact_refinement.unresolved_faces`, `exact_refinement.selection_blockers`,
+and `scope.blockers`. An incomplete selection yields `unlicensed` when the
+numerical predictor produced an exponent and `refused` otherwise. This is a
+mathematical correction despite the unchanged face-selection wire schema.
+
+For the canonical loss $x^6+y^6$ and perturbation $-x^2+xy^2$,
+
+$$
+-x^2+xy^2=\frac{y^4}{4}-\left(x-\frac{y^2}{2}\right)^2.
+$$
+
+The original selector leaves the full face unresolved. The separately scoped
+[curved-reduction operation](#curved-channels-by-exact-quadratic-elimination)
+resolves this example by V.22 and returns an exact exponent and coefficient.
+It must be requested explicitly; the original selector does not automatically
+switch operations.
+
+| Request | Expected result |
+| :--- | :--- |
+| Original selector, with `operation` omitted | `refused`, `licensed: false`, unresolved face `[[0,1]]` |
+| `operation: "curved_reduction"` | `licensed`, $\gamma=3$, leading coefficient $1/432$ |
+| Curved reduction after adding $-y^4/4+y^5$ | `licensed`, $\gamma=6$, leading coefficient $3125/46656$ |
+
+Reproduce the three cases and the separate finite-scale accuracy check:
+
+```bash
+python experiments/reproduce_principle.py --only selector-limit curved curved-cancellation finite-scale
+```
+
+The runner treats the original selector's nonzero exit as an expected refusal.
+In the finite-scale pair, both requests retain the exponent-3 asymptotic
+license, while the accuracy decisions differ. The scale, tolerance, exact
+intervals, and feasibility evidence are documented in the
+[runbook](RUNBOOK.md#finite-scale-accuracy-is-a-separate-question).
+
+[Corrected hypothesis and counterexample →](MATHEMATICAL_AUDIT.md) · [V.22 theorem →](FORMAL_CURVED_REDUCTION.md) · [Finite-scale contract →](CURVED_FINITE_SCALE.md)
+
+---
+
+## Reproduce and inspect
+
+```bash
+python experiments/reproduce_principle.py
+```
+
+The [runbook](RUNBOOK.md) maps each request to expected results, scope
+decisions, and evidence fields. The runner preserves requests, full outputs,
+explicit checks, and source hashes in a fresh directory.
+
+[Return to the theorem →](FORMAL_FACE_SELECTION.md) · [Documentation revision record](PRINCIPLE_DOCUMENTATION_REVIEW.md)

@@ -8,7 +8,7 @@ A guide to the categorical motivation, three proved optimization guarantees,
 their reproducible examples, and the implementation boundary. The short note
 gives the argument in compact form; this page shows how its parts fit together.
 
-[**Read the short note →**](../docs/SHORT_NOTE.md) · [Full proofs](../docs/FORMAL_THEOREMS.md) · [Revision record](../docs/ORIGINAL_NOTE_REVIEW.md) · [The project today](../README.md)
+[**Read the short note →**](../docs/SHORT_NOTE.md) · [Full proofs](../docs/FORMAL_THEOREMS.md) · [Revision record](../docs/ORIGINAL_NOTE_REVIEW.md) · [Portable principle](../README.md#the-three-layer-selection-principle)
 
 | 01 · The idea | 02 · The construction | 03 · The evidence | 04 · The documents |
 | :--- | :--- | :--- | :--- |

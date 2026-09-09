@@ -5,7 +5,7 @@
 Formal result **V.20** · backend asset `portable-principle.v8` · exact compiler:
 `categorical_polytope/ambient_face_compiler.py`.
 
-[**Read the statement →**](#statement) · [Mathematical audit](MATHEMATICAL_AUDIT.md) · [Exact compiler](../categorical_polytope/ambient_face_compiler.py) · [Regression suite](../tests/test_ambient_face_compiler.py)
+[**Read the statement →**](#statement) · [Mathematical audit](MATHEMATICAL_AUDIT.md) · [Exact compiler](../categorical_polytope/ambient_face_compiler.py) · [Regression suite](../tests/test_ambient_face_compiler.py) · [Shared architecture](../README.md#the-three-layer-selection-principle)
 
 | 01 · The principle | 02 · The obstruction | 03 · The evidence | 04 · The record |
 | :--- | :--- | :--- | :--- |

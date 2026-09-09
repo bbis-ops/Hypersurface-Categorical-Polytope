@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="410" viewBox="0 0 1200 410" role="img" aria-labelledby="title desc">
+  <title id="title">The portable principle — from feasible geometry to response laws</title>
+  <desc id="desc">Repository cover. An illustrative polyhedral diagram highlights a feasible edge beside a weighted support motif. The document below connects theorem statements, executable evidence, mathematical scope, and the categorical origins.</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#091924"/><stop offset="1" stop-color="#162f38"/></linearGradient>
+    <radialGradient id="light"><stop stop-color="#c49c59" stop-opacity=".15"/><stop offset="1" stop-color="#c49c59" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="1200" height="410" rx="8" fill="url(#bg)"/>
+  <ellipse cx="993" cy="211" rx="223" ry="189" fill="url(#light)"/>
+  <path d="M52 51H92" stroke="#d9b77b" stroke-width="3"/>
+  <text x="109" y="58" fill="#d9b77b" font-family="Arial, sans-serif" font-size="15" letter-spacing="2.6">NEWTON–TROPICAL / THE PORTABLE PRINCIPLE</text>
+  <text x="52" y="157" fill="#f4efe5" font-family="Georgia, 'Times New Roman', serif" font-size="58">From feasible geometry</text>
+  <text x="52" y="228" fill="#f4efe5" font-family="Georgia, 'Times New Roman', serif" font-size="58">to response laws.</text>
+  <text x="55" y="282" fill="#b9cbd0" font-family="Arial, sans-serif" font-size="22">Theorems. Reproduction. Scope.</text>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M885 111L1111 146L1042 297L828 253Z" fill="#87b8bd" fill-opacity=".04" stroke="#78959e" stroke-width="1.4"/>
+    <path d="M885 111L948 216L1111 146M948 216L1042 297M948 216L828 253" fill="none" stroke="#9bb5bc" stroke-width="1.4"/>
+    <path d="M885 111L948 216L828 253Z" fill="#d9b77b" fill-opacity=".08"/>
+    <path d="M828 253L948 216" stroke="#f5d298" stroke-width="4"/>
+    <path d="M828 253L967 90M828 253L1129 263" fill="none" stroke="#87b8bd" stroke-opacity=".38" stroke-width="1.1" stroke-dasharray="4 7"/>
+    <path d="M993 126L1020 112L1056 100" fill="none" stroke="#d9b77b" stroke-width="1.8"/>
+    <g fill="#b2c8ce"><circle cx="885" cy="111" r="4"/><circle cx="1111" cy="146" r="4"/><circle cx="1042" cy="297" r="4"/></g>
+    <g fill="#f5d298"><circle cx="828" cy="253" r="6"/><circle cx="948" cy="216" r="5"/><circle cx="993" cy="126" r="3"/><circle cx="1020" cy="112" r="3"/><circle cx="1056" cy="100" r="3"/></g>
+  </g>
+  <path d="M52 351H1148" stroke="#77929a" stroke-opacity=".35"/>
+  <g font-family="Arial, sans-serif" font-size="14" letter-spacing="2">
+    <text x="52" y="384" fill="#d9b77b">01 / THE PRINCIPLE</text>
+    <text x="350" y="384" fill="#b9cbd0">02 / THE EVIDENCE</text>
+    <text x="661" y="384" fill="#b9cbd0">03 / THE ORIGINS</text>
+    <text x="963" y="384" fill="#b9cbd0">04 / THE CODE</text>
+  </g>
+</svg>

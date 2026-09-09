@@ -5,7 +5,7 @@
 **Current asset: `portable-principle.v8`** · face-selection schema:
 `face-selection.backend.v1`
 
-[**Version map →**](#portable-principle-version-map) · [Request contract](#request-contract) · [Status semantics](#face-selection-status-semantics) · [Reproduce the results](RUNBOOK.md)
+[**Version map →**](#portable-principle-version-map) · [Request contract](#request-contract) · [Status semantics](#face-selection-status-semantics) · [Reproduce the results](RUNBOOK.md) · [Shared architecture](../README.md#the-three-layer-selection-principle)
 
 | 01 · Orthant | 02 · Polyhedron | 03 · Parameters | 04 · Execution |
 | :--- | :--- | :--- | :--- |

@@ -4,7 +4,7 @@
 
 **The polyhedral theorem** · exact face algebra with explicit analytic hypotheses
 
-[**Read the conclusion →**](#8-selection-qualified) · [Hypotheses](#4-hypotheses-with-uniform-remainders) · [Signed obstruction](#6-upper-control-on-unqualified-faces) · [Worked geometry](#9-worked-case-the-tilted-simplex)
+[**Read the conclusion →**](#8-selection-qualified) · [Hypotheses](#4-hypotheses-with-uniform-remainders) · [Signed obstruction](#6-upper-control-on-unqualified-faces) · [Worked geometry](#9-worked-case-the-tilted-simplex) · [Shared architecture](../README.md#the-three-layer-selection-principle)
 
 | 01 · Orthant | 02 · Polyhedron | 03 · Parameters | 04 · Execution |
 | :--- | :--- | :--- | :--- |

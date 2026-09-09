@@ -4,7 +4,7 @@
 
 **V.18** · current backend asset `portable-principle.v8` · exact affine phase algebra
 
-[**Read the theorem →**](#theorem-v18--stratified-qualified-selection) · [Cancellation example](#worked-cancellation-driven-transition) · [Certificate](#machine-readable-qualification-certificate) · [Reproduce](#reproduce)
+[**Read the theorem →**](#theorem-v18--stratified-qualified-selection) · [Cancellation example](#worked-cancellation-driven-transition) · [Certificate](#machine-readable-qualification-certificate) · [Reproduce](#reproduce) · [Shared architecture](../README.md#the-three-layer-selection-principle)
 
 | 01 · Orthant | 02 · Polyhedron | 03 · Parameters | 04 · Execution |
 | :--- | :--- | :--- | :--- |

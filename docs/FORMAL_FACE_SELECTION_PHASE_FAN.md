@@ -6,6 +6,8 @@ Formal result **V.17** · executable module:
 constructive binomial positivity, V.20 exact ambient transport, and V.21
 finite-family discovery).
 
+[Shared architecture](../README.md#the-three-layer-selection-principle)
+
 ## Abstract
 
 The face-selection law does more than solve one singular asymptotic problem.

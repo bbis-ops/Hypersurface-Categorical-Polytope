@@ -27,7 +27,7 @@ certified by an upper bound on the same objective over the same feasible set.
 
 These are conditional optimization results, not a construction of a
 coexponential. This note develops the categorical and Fisher-controlled
-origin of the project; its [Newton–tropical continuation](../README.md)
+origin of the project; its [Newton–tropical continuation](../README.md#the-three-layer-selection-principle)
 studies a different question: which feasible face and weighted balance
 govern a singular perturbation?
 

@@ -7,7 +7,7 @@ finite-family discovery, curved reduction, finite-scale accuracy, and the
 activation/contact expansion. The original categorical demos have their own
 [historical reproduction route](#historical-demos-and-paper-materials).
 
-[**Run the evidence suite →**](#one-command-reproduction) · [Choose a result](#choose-a-result-to-reproduce) · [Read a certificate](#how-to-read-the-evidence) · [Run the tests](#regression-tests)
+[**Run the evidence suite →**](#one-command-reproduction) · [Choose a result](#choose-a-result-to-reproduce) · [Read a certificate](#how-to-read-the-evidence) · [Run the tests](#regression-tests) · [Shared architecture](../README.md#the-three-layer-selection-principle)
 
 | 01 · Prepare | 02 · Reproduce | 03 · Inspect | 04 · Extend |
 | :--- | :--- | :--- | :--- |

@@ -3,6 +3,8 @@
 Formal result **V.21** · backend asset `portable-principle.v8` · operation:
 `polyhedral_face_selection_discovery`.
 
+[Shared architecture](../README.md#the-three-layer-selection-principle)
+
 ## Principle
 
 Fix a bounded polyhedron, a simple maximizing vertex, and an admissible base

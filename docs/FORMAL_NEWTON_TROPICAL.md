@@ -4,7 +4,7 @@
 
 **V.15 · sharp constant** / **V.16 · selection**
 
-[**Read the law →**](#theorem-v16) · [Sharp constant](#theorem-v15) · [Numerical scope](#implementation-and-evidence) · [Reproduce](#reproduce)
+[**Read the law →**](#theorem-v16) · [Sharp constant](#theorem-v15) · [Numerical scope](#implementation-and-evidence) · [Reproduce](#reproduce) · [Shared architecture](../README.md#the-three-layer-selection-principle)
 
 | 01 · Orthant | 02 · Polyhedron | 03 · Parameters | 04 · Execution |
 | :--- | :--- | :--- | :--- |

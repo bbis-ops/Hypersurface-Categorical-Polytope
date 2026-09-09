@@ -1,277 +1,359 @@
+![Newton–tropical face selection — from feasible geometry to response laws.](docs/assets/repository-cover.svg)
+
 # Newton–Tropical Face Selection at Simple Polyhedral Vertices
 
-This repository's central result is a portable **face-selection law for
-singular asymptotics at a simple polyhedral vertex**. It turns local geometry,
-weighted polynomial order, and active constraints into a finite prediction of
-the winning face and response exponent. The earlier categorical-polytope
-lecture is the historical origin of the project; the Newton–tropical
-selection principle is now its mathematical center of gravity.
+**The portable principle** · Localize. Qualify. Scale.
 
-The law is developed in the orthant theorem
-[`FORMAL_NEWTON_TROPICAL.md`](docs/FORMAL_NEWTON_TROPICAL.md), the polyhedral
-transport and selection theorem
-[`FORMAL_FACE_SELECTION.md`](docs/FORMAL_FACE_SELECTION.md), and the
-outcome-independent admissibility refinement
-[`FORMAL_QUALIFIED_SELECTION_STRATIFICATION.md`](docs/FORMAL_QUALIFIED_SELECTION_STRATIFICATION.md).
-The executable contract is documented in
-[`FACE_SELECTION_BACKEND.md`](docs/FACE_SELECTION_BACKEND.md).
+This repository's central result is a **portable face-selection law for
+singular asymptotics at a simple polyhedral vertex**. It turns feasible
+geometry, weighted polynomial order, and active constraints into a finite
+prediction of candidate leading faces and the response exponent, under
+explicit local and global hypotheses.
+
+Its geometric contribution is the passage **from an orthant balance law
+to a selection law on a polyhedron**. The active constraints determine the
+inward chart; that chart determines which perturbation terms survive on
+each face. Qualification uses the localized problem before any response
+exponent or perturbed optimizer is observed.
+
+**Feasibility comes before degree.** In the canonical tilted-vertex
+examples, an ambient-axis calculation predicts $2$. Transport through the
+tangent geometry reveals the feasible quartic direction and gives $4/3$.
+The principle explains that change and carries the same selection rule
+across different polyhedral geometries satisfying its hypotheses.
+
+The law is developed in the [orthant theorem](docs/FORMAL_NEWTON_TROPICAL.md),
+the [polyhedral transport and selection theorem](docs/FORMAL_FACE_SELECTION.md),
+and the [outcome-independent qualification refinement](docs/FORMAL_QUALIFIED_SELECTION_STRATIFICATION.md).
+The [backend contract](docs/FACE_SELECTION_BACKEND.md) connects these
+statements to executable calculations and their evidence.
+
+The categorical-polytope lecture is the project's historical origin.
+The Newton–tropical selection principle is its mathematical center.
+
+[**Read the theorem ↓**](#main-theorem) · [Why it is portable](#from-an-orthant-law-to-a-polyhedral-law) · [Reproduce a result](#quick-start) · [Repository guide](#navigate-the-repository) · [Earlier theory](#earlier-categorical-and-optimization-theory-encoded)
+
+---
 
 ## Main theorem
 
-Let `v` be a simple maximizing vertex of a full-dimensional polyhedron, and
-let its inward edge chart be
+Let $P$ be a bounded full-dimensional polyhedron. Let $F,G$ be continuous
+on $P$ and real analytic near a simple vertex $v$ that uniquely maximizes
+the base objective $F$. In inward edge coordinates,
 
-```text
-Phi(c) = v + sum_i c_i u_i,    c_i >= 0.
-```
+$$
+\Phi(c)=v+\sum_i c_i u_i,\qquad c_i\ge0,
+$$
 
-Suppose the localized base loss has weighted principal part
-`D_0(c) = sum_i A_i c_i^beta_i`, with `A_i > 0` and `beta_i > 1`, and the
-localized perturbation `R(c)` is polynomial. On every tangent-cone face
-`C_S`, restrict `R`, combine equal monomials, discard cancelled layers, and
-let `q_S` be the first surviving weighted degree. Qualify the face using only
-`(D_0, R, C_S)`: require `0 < q_S < 1`, a nonzero initial form, and a
-relative-interior point where both the base cost and leading perturbation gain
-are positive.
+define $D(c)=F(v)-F(\Phi(c))$ and $R(c)=G(\Phi(c))-G(v)$.
+Assume the base has the diagonal weighted principal part
 
-For signed perturbations, additionally verify the local uniform upper bound
-`max(R(c), 0) <= K D_0(c)^q*` for a finite `K`. Nonnegative combined
-coefficients satisfy this automatically; arbitrary signed initial forms
-require additional control near their zeros. Then, under this bound and the
-stated uniform-remainder and global-isolation hypotheses,
+$$
+D_0(c)=\sum_i A_i c_i^{\beta_i},\qquad A_i\gt0,\quad\beta_i\gt1,
+$$
 
-```text
-q*    = min { q_S : C_S is admissible }
-gamma = 1 / (1 - q*)
-M(s) - F(v) - s G(v) = Theta(s^gamma)    as s -> 0+.
-```
+with the [stated uniform remainders](docs/FORMAL_FACE_SELECTION.md#4-hypotheses-with-uniform-remainders),
+and that $R$ is polynomial.
 
-The minimizing faces identify candidate leading channels. Determining the
-optimizer's support requires the reduced optimization and sometimes
-subleading analysis. The exponent depends on the winning
-weighted degree, while the sharp leading coefficient is determined by the
-reduced optimization problem on that face. Because admissibility is fixed
-before faces are compared and never refers to an observed exponent, this is a
-selection theorem rather than a post-hoc fit.
+Weight $c_i$ by $w_i=1/\beta_i$. A monomial $c^\alpha$ then has degree
 
-The [mathematical audit](docs/MATHEMATICAL_AUDIT.md) proves why the extra
-upper bound is needed: `D_0=x^6+y^6`, `R=-x^2+xy^2` has no qualified
-coordinate face, yet `Delta(s) ~ s^3/432` along a curved approach. The
-backend marks uncontrolled higher layers as unresolved and withholds
-theorem licensing.
+$$
+\deg_w(c^\alpha)=\sum_i\frac{\alpha_i}{\beta_i}.
+$$
 
-For a supported class of these cases, the new
-[quadratic-elimination theorem](docs/FORMAL_CURVED_REDUCTION.md) supplies a
-constructive resolution. Backend operation `curved_reduction` completes the
-square in `R=-a*x^2+x*H(y)+K(y)`, checks that the omitted base cost is
-subleading, and returns an exact exponent and sharp coefficient. It resolves
-the example above to `gamma=3`, `C=1/432`, and detects cancellations that
-expose a different exponent on the curved channel.
+Combine like monomials, restrict to each feasible tangent-cone face, and
+take its first **nonzero** weighted layer. A face qualifies when its degree
+$q_S$ lies in $(0,1)$ and its initial form has a positive relative-interior
+witness. These tests use local data, not an observed response exponent.
 
-An optional [finite-scale certificate](docs/CURVED_FINITE_SCALE.md) bounds the
-actual response at a requested `s` using the full reduced polynomial and an
-exactly feasible witness. It separately reports whether the leading power law
-meets a requested relative tolerance, including near coefficient cancellation.
+If qualified faces exist, set $q_\ast=\min_{S\text{ qualified}}q_S$ and verify
+the local positive-gain envelope
+
+$$
+\max(R(c),0)\le K D_0(c)^{q_\ast}
+$$
+
+for some finite $K$. Then the polyhedral theorem gives
+
+$$
+\boxed{
+M(s)-F(v)-sG(v)=\Theta(s^\gamma),\qquad
+\gamma=\frac1{1-q_\ast},\qquad s\downarrow0,}
+$$
+
+Here $M(s)=\max_{x\in P}(F(x)+sG(x))$; write
+$\Delta(s)=M(s)-F(v)-sG(v)$ for the centered gain.
+
+Nonnegative combined coefficients supply the upper envelope automatically
+when a qualified minimum exists. Signed polynomials may need additional
+control near zeros of a non-positive initial form. Winning faces describe
+candidate **leading channels**; exact optimizer support and sharp
+coefficients require the corresponding reduced analysis.
+
+[Full theorem and proof →](docs/FORMAL_FACE_SELECTION.md) · [Sharp orthant constants →](docs/FORMAL_NEWTON_TROPICAL.md)
 
 ## The three-layer selection principle
 
 The theorem and backend share one end-to-end architecture:
 
-1. **Localization:** replace the original global polyhedron by the tangent
-   cone at a simple base-maximizing vertex fixed independently of the
-   perturbed optimizer.
-2. **Selection:** transport the perturbation into the feasible edge chart,
-   restrict it to cone faces, and rank admissible faces by exact weighted
-   degree.
-3. **Scaling:** convert the winning degree into the response exponent
-   `gamma = 1 / (1 - q_star)`.
+1. **[Localization](docs/FORMAL_FACE_SELECTION.md#2-global-isolation):** replace
+   the original global polyhedron by the tangent cone at a simple
+   base-maximizing vertex fixed independently of the perturbed optimizer.
+2. **[Selection](docs/FORMAL_FACE_SELECTION.md#5-faces-and-admissibility-defined-from-the-data-alone):**
+   transport the perturbation into the feasible edge chart, restrict it to
+   cone faces, and rank admissible faces by exact weighted degree.
+3. **[Scaling](docs/FORMAL_FACE_SELECTION.md#8-selection-qualified):** convert the
+   winning degree into the response exponent `gamma = 1 / (1 - q_star)`.
 
 This single hierarchy:
 
-- organizes the theory around one local geometric object;
-- explains the mechanism rather than merely fitting an exponent;
-- predicts the exponent before numerical measurement;
-- filters irrelevant directions without deleting their audit trail;
-- classifies perturbations as relevant, critical, subleading, or inactive;
-- identifies the constraints defining candidate leading channels;
-- identifies cancellation and geometric suppression independently;
-- groups perturbations into universality classes; and
-- generalizes from one example to finite families, portfolios, and parametric
-  phase diagrams.
+- organizes the theory around [one local geometric object](docs/FORMAL_FACE_SELECTION.md#1-setup);
+- [explains the mechanism](docs/FACE_SELECTION_BACKEND.md#mechanism-explanation) rather than merely fitting an exponent;
+- [predicts the exponent before numerical measurement](docs/FORMAL_FACE_SELECTION.md#5-faces-and-admissibility-defined-from-the-data-alone);
+- filters irrelevant directions [without deleting their audit trail](docs/FORMAL_AMBIENT_FACE_TRANSPORT.md#provenance-cancellation-and-suppression);
+- classifies perturbations as [relevant, critical, subleading, or inactive](docs/FACE_SELECTION_BACKEND.md#term-level-perturbation-classification);
+- identifies the [constraints defining candidate leading channels](docs/FACE_SELECTION_BACKEND.md#mechanism-explanation);
+- identifies [cancellation and geometric suppression](docs/FORMAL_AMBIENT_FACE_TRANSPORT.md#provenance-cancellation-and-suppression) independently;
+- groups perturbations into [universality classes](docs/FACE_SELECTION_BACKEND.md#universality-classes); and
+- generalizes from one example to [finite families](docs/FORMAL_EXPONENT_DISCOVERY_ENGINE.md#principle), [portfolios](docs/FACE_SELECTION_BACKEND.md#portfolio-comparison), and [parametric phase diagrams](docs/FORMAL_FACE_SELECTION_PHASE_FAN.md#theorem-v17--universality-phase-fan).
 
-Within its stated hypotheses, this is a theorem-backed selection law. Across
-the repository's checked examples—including the two ambient-axis
-counterexamples that motivated exact feasible-chart transport—the hierarchy
-has produced the correct mechanism and exponent. Unverified analytic
-hypotheses remain visible in the response, so successful calculation is never
-silently presented as a licensed theorem conclusion.
+The [theorem hypotheses](#main-theorem) justify the local reduction and
+response law. The [backend scope](docs/FACE_SELECTION_BACKEND.md#face-selection-status-semantics)
+records what each operation has checked; [finite-scale accuracy](docs/CURVED_FINITE_SCALE.md)
+requires its own bounds.
 
-The implementation lives in the
-[`categorical_polytope`](categorical_polytope/) package and is exposed as a
-reusable backend with Python and JSON process interfaces. Its complete data
-flow is:
+### From an orthant law to a polyhedral law
 
-```text
-ambient polynomial -> feasible edge chart -> tangent-cone faces
-                   -> Newton weights -> qualified q* -> gamma = 1/(1-q*)
-```
+The orthant law starts with feasible coordinates, base orders, and a
+perturbation polynomial already supplied. A polyhedral problem must first
+determine those coordinates and identify which directions its constraints
+actually permit.
 
-### The missing geometric step: from an orthant law to a polyhedral law
+At a simple vertex, the inward edge generators are linearly independent.
+Their linear map identifies the nonnegative orthant with the tangent cone;
+the translated chart $\Phi$ parametrizes the feasible set locally. Every
+cone face corresponds to a subset of released edge coordinates. Pulling
+the objectives through that chart therefore supplies both the Newton data
+and the feasible faces on which the balance can occur.
 
-The orthant Newton–tropical theorem answers a powerful but conditional
-question: once feasible coordinates `c_i >= 0`, base orders `beta_i`, and a
-perturbation polynomial are already given, which weighted monomial controls
-the balance? On its own, that theorem does not say how an arbitrary ambient
-polyhedron produces those coordinates, which coordinate subspaces are actual
-feasible faces, or whether a formal leading term can generate a positive
-improvement on such a face.
+This is the portability mechanism: **the geometry supplies the coordinates
+in which the same weighted selection rule applies**. The base vertex,
+face restrictions, and positivity tests are determined before the perturbed
+optimizer is known. Positive edge rescaling preserves weighted support and
+the selected exponent. The formulation requires a simple vertex and the
+stated principal-part, remainder, isolation, and gain-envelope conditions;
+other tangent cones need an extension.
 
-The face-selection note supplies exactly that missing geometry. At a simple
-vertex, the inward edge generators are linearly independent, so the edge map
+### The decisive example: feasibility comes before degree
 
-```text
-Phi(c) = v + sum_i c_i u_i,    c_i >= 0
-```
+At the simplex vertex $v=(0,1)$, take
 
-is an isomorphism from the nonnegative orthant onto the tangent cone. It
-transports the ambient base and perturbation into intrinsic feasible
-coordinates and identifies every cone face with a subset of released edge
-coordinates. The orthant balance law can then be applied face by face without
-changing its mechanism. In compact form:
+$$
+\begin{aligned}
+P&=\lbrace x_0,x_1\ge0:x_0+x_1\le1\rbrace,\cr
+F(x)&=-((x_0+x_1-1)^2+x_0^4),\qquad G(x)=x_0.
+\end{aligned}
+$$
 
-```text
-orthant balance law
-  + exact tangent-cone transport
-  + outcome-independent face qualification
-  = portable face-selection law at a simple polyhedral vertex
-```
+The ambient direction $(1,0)$ violates the tangent condition
+$d_0+d_1\le0$. Probing along it sees quadratic base decay and suggests
+an exponent of $2$.
 
-This is also what makes the principle **non-circular**. A face is admissible
-using only the localized data `(D_0, R)` and the candidate face `C_S`: its
-degree must be finite with `0 < q_S < 1`, its initial form must not vanish
-identically, and it must admit a relative-interior point where both the base
-cost and leading perturbation gain are positive. None of these tests refers
-to the eventual response exponent, the observed optimizer path, or a
-comparison with another face.
+The active constraints instead give the inward generators
+$u_0=(1,-1)$ and $u_1=(0,-1)$, hence
 
-The prohibited circular workflow would be:
+$$
+\Phi(c_0,c_1)=(c_0,1-c_0-c_1),\qquad
+D(c)=c_0^4+c_1^2,\qquad R(c)=c_0.
+$$
 
-```text
-observe a numerical optimizer path -> choose its face -> compute its exponent
-```
+The feasible perturbation has degree $q_\ast=1/4$, so the response exponent
+is $4/3$. Setting $c_1=0$ reduces the gain to $-c_0^4+s c_0$ and gives
+the exact optimum:
 
-The implemented predictive workflow reverses that logic:
+$$
+c_0=(s/4)^{1/3},\qquad c_1=0,\qquad
+\Delta(s)=\frac{3}{4^{4/3}}s^{4/3},\qquad 0\lt s\le4.
+$$
 
-```text
-fix the base vertex -> construct its tangent cone -> enumerate every face
--> transport and restrict exactly -> qualify each face independently
--> minimize q_S -> predict the active face and exponent -> test numerically
-```
+The sheared simplex has different edge generators and the same transported
+base and perturbation. Both examples are recorded in
+[V.20](docs/FORMAL_AMBIENT_FACE_TRANSPORT.md#the-two-canonical-counterexamples).
+They expose the structural obstruction: **ambient degree becomes relevant
+to the constrained law only after transport through the feasible geometry**.
 
-Thus the note is not another calculation layered on top of the orthant
-formula. It is the geometric compiler that turns that formula into a finite,
-portable, auditable selection principle for any simple polyhedral vertex
-satisfying the stated local and global analytic hypotheses. Simplicity is
-essential to this formulation: non-simple vertices require an additional
-cone decomposition or a separate extension theorem and are not silently
-claimed here.
+<details>
+<summary><strong>Read the exact chart construction</strong> · constraints, pullbacks, and provenance</summary>
 
-### The decisive insight: feasibility comes before degree
+For the independent active constraints $A_Sx=b_S$, solve
 
-Ambient coordinate axes are not intrinsic to a polyhedron. At a tilted
-vertex, an ambient axis may fail to point into the feasible set at all. Reading
-an order along that axis can therefore manufacture a mechanism that no
-admissible displacement realizes.
+$$
+A_Sv=b_S,\qquad A_Su_i=-e_i.
+$$
 
-The compiler instead solves, exactly,
+The generator map is linear and the translated chart $\Phi$ is affine.
+The [compiler](categorical_polytope/ambient_face_compiler.py) records the
+pullback of every ambient term, including cancellation and geometric
+suppression. Its rational arithmetic preserves the edge identities used
+to derive the Newton data.
 
-```text
-A_S v = b_S               selected simple vertex
-A_S u_i = -e_i            inward edge generators
-x = v + sum_i c_i u_i     feasible local chart, c_i >= 0
-```
-
-and only then pulls the base and perturbation back to the edge variables
-`c_i`. Positive rescaling of an edge changes coefficients, but not Newton
-support, weights, winning faces, or the response exponent. That is the
-coordinate-invariant content of the law.
-
-The two canonical ambient counterexamples make the distinction concrete. At
-the simplex and sheared vertices, exact transport gives the same localized
-problem:
-
-```text
-D_0(c) = c0^4 + c1^2      -> weights (1/4, 1/2)
-W(c)   = c0               -> q* = 1/4
-gamma  = 1/(1 - 1/4)      -> 4/3
-```
-
-An ambient-axis calculation predicts `2`; feasible-chart transport and direct
-measurement give `4/3`. These are not unrelated numerical exceptions. They
-identify one structural obstruction: **ambient degree is not authoritative
-until it has been transported through the tangent geometry**.
+</details>
 
 ### What the minimum over faces means
 
-`q_star` is not a sum of every directional degree and it is not simply the
-lowest monomial degree in the unreduced expression. For each tangent-cone
-face, the backend:
+Selection compares the first **nonzero, qualified face layers** after
+transport, restriction, and combination of like monomials. A negative
+initial layer cannot be skipped to reach a later positive one. A cancelled
+layer is absent from the combined polynomial.
 
-1. removes monomials that vanish on that face;
-2. combines like signatures exactly, exposing cancellation;
-3. takes the first non-cancelling weighted layer;
-4. requires `0 < q_F < 1` and a positive relative-interior witness; and
-5. minimizes `q_F` over the faces that remain qualified.
+This distinction explains how the mechanism can change:
 
-This explains several otherwise surprising facts:
+- A coefficient can change the leading amplitude while leaving the
+  qualified weighted degree unchanged.
+- A coefficient crossing zero can remove a mechanism or expose a new layer,
+  even when no degree laws cross.
+- A term can vanish because of a face restriction, or cancel against another
+  term with the same signature; the record distinguishes these causes.
+- Several faces can inherit the same lowest degree. Winning faces identify
+  candidate leading channels; exact optimizer support needs the reduced
+  and sometimes subleading analysis.
 
-- a coefficient can change the leading amplitude without changing the
-  exponent class;
-- a coefficient crossing zero can remove a mechanism and expose a new
-  exponent without any degree laws crossing;
-- a high-order ambient term may become low-order after feasible transport;
-- a seemingly dominant term may be inactive because it is geometrically
-  suppressed or cancels exactly; and
-- a larger face may inherit the same degree from a smaller face without
-  representing a distinct released-constraint mechanism.
+The resulting records support comparisons of exponent and mechanism classes
+across finite perturbation families. Supplied parameter laws then turn the
+same qualification and comparison steps into phase and cancellation walls.
 
-### From one exponent to a phase structure
+<details>
+<summary><strong>What changes across a parameter wall</strong> · qualification before comparison</summary>
 
-For a parameterized family with affine mechanism degrees
-`q_j(t) = a_j + b_j*t`, selection is the lower envelope of the qualified
-degrees. Every possible transition lies on a finite exact wall:
+For supplied affine degrees and coefficients,
 
-```text
-q_i(t) = q_j(t)    mechanisms exchange dominance
-q_i(t) = 0         zero-weight boundary
-q_i(t) = 1         critical boundary
-c_i(t) = 0         qualification/cancellation boundary
+$$
+q_j(\theta)=a_j+b_j\theta,\qquad
+c_j(\theta)=u_j+v_j\theta,
+$$
+
+the possible walls are
+
+$$
+q_i=q_j,\qquad q_i=0,\qquad q_i=1,\qquad c_i=0.
+$$
+
+Winning identities stay fixed between these walls; the value of
+$\gamma(\theta)=1/(1-q_\ast(\theta))$ can still vary inside a chamber.
+The implementation solves exact **one-parameter** affine diagrams. The
+multi-parameter theorem is expressed through hyperplane arrangements.
+Its robustness margin measures distance to a change in winning identities,
+not finite-scale accuracy.
+
+[V.17 phase theorem →](docs/FORMAL_FACE_SELECTION_PHASE_FAN.md) · [V.18 qualification →](docs/FORMAL_QUALIFIED_SELECTION_STRATIFICATION.md)
+
+</details>
+
+### Read the scope before using a prediction
+
+| Operation or evidence | What it establishes | Limit to retain |
+| :--- | :--- | :--- |
+| General face selector | Localized prediction with exact polynomial refinement where supported | Analytic admission still uses numerical hypothesis probes |
+| Affine phase operation | Exact walls and selection for supplied mechanisms | Analytic flags are caller attestations; the full objective and positive-gain envelope are not independently proved |
+| V.22 curved reduction | Exact checks for a supported two-dimensional polynomial family | Its separate scope does not cover every curved channel |
+| Finite-scale certificate | Rational response bounds and an accuracy decision at a requested scale | This decision is separate from the asymptotic license |
+| Discovery and portfolios | Classification and comparison of a finite supplied family | A completed screen is not exhaustive over all perturbations or a claim of literature novelty |
+
+The [backend guide](docs/FACE_SELECTION_BACKEND.md) defines each status and
+evidence field. It also distinguishes the numerical inverse face-matching
+block from exact forward refinement.
+
+### The signed-channel boundary
+
+The [mathematical audit](docs/MATHEMATICAL_AUDIT.md) gives a decisive example:
+
+$$
+D_0=x^6+y^6,\qquad R=-x^2+xy^2
+=\frac{y^4}{4}-\left(x-\frac{y^2}{2}\right)^2.
+$$
+
+The original selector has no qualified coordinate face, yet
+$\Delta(s)\sim s^3/432$. Its v8 guard retains the unresolved higher layer.
+The explicitly requested [V.22 operation](docs/FORMAL_CURVED_REDUCTION.md)
+resolves this example by quadratic elimination.
+
+For coefficients near cancellation, use the
+[finite-scale contract](docs/CURVED_FINITE_SCALE.md) to distinguish
+asymptotic validity from requested accuracy. The
+[activation/contact research note](docs/RESEARCH_ACTIVATION_CONTACT_LAW.md)
+and its [exact algebra script](experiments/activation_contact_check.py)
+study a further boundary; that classification is not a backend operation.
+
+## Completed mathematical and computational contributions
+
+| Result | Read it for | Executable connection |
+| :--- | :--- | :--- |
+| [V.1–V.14 · vertex-threshold series](docs/FORMAL_VERTEX_THRESHOLD.md) | Displacement, gap exponents, anisotropic balances, and failure regimes | [`vertex_threshold.py`](categorical_polytope/vertex_threshold.py) |
+| [V.15–V.16 · orthant law](docs/FORMAL_NEWTON_TROPICAL.md) | Sharp single-axis constants and selection by the lowest positive weighted layer | [`newton_tropical.py`](categorical_polytope/newton_tropical.py) |
+| [Polyhedral face-selection theorem](docs/FORMAL_FACE_SELECTION.md) | Feasible transport, independent qualification, and the conditional gap law | [Core codification](docs/FACE_SELECTION_CODIFICATION.md) |
+| [V.17](docs/FORMAL_FACE_SELECTION_PHASE_FAN.md) / [V.18](docs/FORMAL_QUALIFIED_SELECTION_STRATIFICATION.md) | Affine degree walls and coefficient-qualification strata | [`face_selection_phase.py`](categorical_polytope/face_selection_phase.py) |
+| [V.19 · positivity witness](docs/FORMAL_BINOMIAL_POSITIVITY_WITNESS.md) | Constructive relative-interior positivity for distinct-signature binomials | [Saved request](experiments/face_selection_binomial_v19_request.json) |
+| [V.20 · ambient transport](docs/FORMAL_AMBIENT_FACE_TRANSPORT.md) | Exact chart reconstruction, pullbacks, provenance, and suppression | [`ambient_face_compiler.py`](categorical_polytope/ambient_face_compiler.py) |
+| [V.21 · finite discovery](docs/FORMAL_EXPONENT_DISCOVERY_ENGINE.md) | Finite exponent spectra, mechanism classes, and registry-relative candidates | [Saved request](experiments/face_selection_discovery_v21_request.json) |
+| [V.22 · curved reduction](docs/FORMAL_CURVED_REDUCTION.md) | A supported signed family, sharp coefficients, and reduced-layer cancellation | [Reduction implementation](categorical_polytope/curved_reduction.py) |
+| [Finite-scale accuracy](docs/CURVED_FINITE_SCALE.md) | Certified objective intervals and tolerance decisions | [Rational bounds](categorical_polytope/curved_finite_scale.py) |
+| [Backend contract](docs/FACE_SELECTION_BACKEND.md) | Python/JSON integration, operations, scope, and version map | [Public boundary](categorical_polytope/adjudication/polyhedra/backend.py) |
+
+V.15 is the sharp-constant result; V.16 is the orthant selection result.
+The polyhedral theorem supplies its own geometric and analytic conditions.
+Formal result numbers, the current asset `portable-principle.v8`, and JSON
+schema versions identify different things.
+
+---
+
+## Navigate the repository
+
+| If you want to… | Start with | Then follow |
+| :--- | :--- | :--- |
+| Understand the central law | [Orthant theorem · V.15–V.16](docs/FORMAL_NEWTON_TROPICAL.md) | [Polyhedral selection](docs/FORMAL_FACE_SELECTION.md) → [Qualification · V.18](docs/FORMAL_QUALIFIED_SELECTION_STRATIFICATION.md) |
+| Reproduce a claimed result | [Runbook](docs/RUNBOOK.md) | Saved requests, expected outcomes, and preserved evidence |
+| Integrate the backend | [Python and JSON contract](docs/FACE_SELECTION_BACKEND.md) | [Backend implementation](categorical_polytope/adjudication/polyhedra/backend.py) |
+| Understand a refusal or curved channel | [Mathematical audit](docs/MATHEMATICAL_AUDIT.md) | [V.22 reduction](docs/FORMAL_CURVED_REDUCTION.md) → [Finite-scale accuracy](docs/CURVED_FINITE_SCALE.md) |
+| Trace the original categorical project | [Corrected short note](docs/SHORT_NOTE.md) | [Master overview](categorical_polytope/Overview.md) → [Corrected proofs](docs/FORMAL_THEOREMS.md) |
+| Inspect empirical and generated evidence | [Verification corpus](docs/VERIFICATION_CERTIFICATE.md) | [Campaign protocol](docs/CAMPAIGN.md) and [coverage audit](docs/COVERAGE_PROOF_AUDIT.md) |
+| Find a module or experiment | [Code map](#layout) | [Package](categorical_polytope/), [experiments](experiments/), and [tests](tests/) |
+
+**A useful first pass:** read the orthant and polyhedral statements, run one
+saved transport example, inspect its scope, then open the signed
+counterexample. The [runbook](docs/RUNBOOK.md) connects those steps.
+
+---
+
+## Quick start
+
+Run commands from the **repository root**, the directory containing
+`pyproject.toml`. Python **3.10 or newer** is required. The core backend and
+canonical reproduction runner use the standard library and local package;
+they need no model API key.
+
+```bash
+python experiments/reproduce_principle.py
 ```
 
-Between walls, the winning face and mechanism are constant and
-`gamma(t) = 1/(1-q_star(t))` is exact. The backend therefore returns a phase
-fan and robustness margin rather than a grid of sampled regimes. A narrow
-chamber cannot be skipped.
+The runner creates a fresh evidence directory under
+`tmp/principle-reproduction/`. It preserves requests, complete responses,
+explicit checks, and source hashes. Its current cases cover transport,
+positivity, phase and qualification walls, discovery, curved reduction,
+finite-scale accuracy, inverse matching, expected refusals, exact research
+checks, and documentation rendering.
 
-### How to read a result
+For one public backend example:
 
-| Question | Backend evidence |
-|---|---|
-| What caused the response? | Winning face, initial form, and ambient-term lineage |
-| Why this exponent? | Base orders, Newton weights, `q_star`, and the scaling map |
-| Which constraints define the leading channel? | Candidate released/binding constraints; exact optimizer support needs further analysis |
-| Which terms were ignored? | Per-face suppression, cancellation, criticality, or subleading status |
-| Is another perturbation equivalent? | Universality and mechanism class identifiers |
-| How close is a mechanism change? | Exact phase wall and robustness margin |
-| What does an observed exponent imply? | Inverse weight `q = 1 - 1/gamma` and consistent feasible faces |
-| Is the conclusion a theorem? | Named hypothesis evidence and explicit license blockers |
+```bash
+python -m categorical_polytope.adjudication.polyhedra.backend --input experiments/face_selection_ambient_v20_request.json --pretty
+```
 
-The distinction between a calculation and a theorem is deliberate. Exact
-finite algebra determines transport, qualification, selection, and scaling;
-local maximality, uniform remainder control, and global isolation are analytic
-hypotheses. If those hypotheses are not independently established, the backend
-returns the calculation as `unlicensed` rather than weakening the scope after
-seeing the result.
+The two-geometry portfolio returns `face-weight:1/4|response:4/3` for both
+cases while recording a change in the feasible chart.
+[Inspect the expected evidence →](docs/RUNBOOK.md#exact-feasible-chart-transport--v20)
+
+<details>
+<summary><strong>Use the Python interface</strong> · the same public boundary</summary>
 
 ```python
 from categorical_polytope import analyze_face_selection
@@ -286,294 +368,214 @@ result = analyze_face_selection({
 
 assert result["selection"]["weighted_degree"] == 0.25
 assert abs(result["scaling"]["response_exponent"] - 4 / 3) < 1e-9
+print(result["status"], result["scope"])
 ```
 
-Run the same capability as a JSON process:
+For a reusable process, batches, operation aliases, and response fields,
+read the [backend contract](docs/FACE_SELECTION_BACKEND.md).
+
+</details>
+
+### Requirements and optional tools
+
+| Work | Requirement |
+| :--- | :--- |
+| Core backend and canonical reproductions | Python 3.10+; standard library |
+| Regression suite | `pytest` |
+| Figures and notebook work | Optional plotting/notebook dependencies |
+| Installed CLI entry points | Optional editable package installation |
+| Model-generated candidate campaigns | A configured provider, accessible model, and credentials |
 
 ```bash
-python -m categorical_polytope.adjudication.polyhedra.backend --pretty \
-  < experiments/face_selection_ambient_v20_request.json
+python -m pip install -e ".[dev]"
+python -m pytest -q -p no:cacheprovider
 ```
 
-After `pip install -e .`, the process entry point is also available as
-`categorical-face-selection`. Beyond a single analysis, the backend supports
-finite-family `discover`, cross-case `portfolio`, and parametric
-`phase_diagram` operations. See [`docs/FACE_SELECTION_BACKEND.md`](docs/FACE_SELECTION_BACKEND.md)
-for the complete request and response contracts.
+The editable installation also provides `categorical-face-selection`.
+The [runbook](docs/RUNBOOK.md) separates lightweight checks from older
+experiment commands that regenerate tracked reports. Test counts and
+finite numerical results are recorded with evidence rather than treated as
+permanent repository guarantees.
 
-Correctness boundaries are explicit:
+---
 
-- polynomial transport, cancellation, Newton weights, and response exponents
-  retain exact rational arithmetic;
-- boundedness uses an exhaustive recession-cone check for the supported
-  dimensions rather than sampled directions;
-- the linear-programming control admits affine objectives only;
-- malformed batch items fail independently at a total JSON boundary;
-- API-generated candidates remain untrusted and are locally adjudicated;
-- shared campaign pacing uses locked, cross-process request reservations.
+## Earlier categorical and optimization theory (encoded)
 
-## Completed mathematical and computational contributions
+This is a second reading route through the repository: the original
+categorical motivation, the **corrected optimization statements**, and the
+demonstrations that encode those ideas. “Encoded” means that an implementation
+or example exists; it does not give every legacy certificate label the force
+of a theorem.
 
-| Contribution | What is established | Primary artifact |
-|---|---|---|
-| **Vertex localization and weighted scaling (V.1–V.14)** | Zero interaction threshold, displacement and gap laws, anisotropic balance `q = sum_i alpha_i/beta_i`, saturation ceilings, and explicit failure regimes | [`FORMAL_VERTEX_THRESHOLD.md`](docs/FORMAL_VERTEX_THRESHOLD.md) |
-| **Orthant Newton–tropical law (V.15)** | Weighted monomial degrees determine the finite candidate set and convert by `q -> 1/(1-q)` into response exponents | [`FORMAL_NEWTON_TROPICAL.md`](docs/FORMAL_NEWTON_TROPICAL.md) |
-| **Qualified face-selection law (V.16, V.18)** | Tangent-cone localization, face restriction, non-circular admissibility, minimum admissible degree, candidate leading-channel constraints, and sharp reduced-face asymptotics | [`FORMAL_FACE_SELECTION.md`](docs/FORMAL_FACE_SELECTION.md) and [`FORMAL_QUALIFIED_SELECTION_STRATIFICATION.md`](docs/FORMAL_QUALIFIED_SELECTION_STRATIFICATION.md) |
-| **Constructive binomial positivity (V.19)** | A mixed-sign binomial face initial form is certified positive in the relative interior by an explicit coordinate choice, turning an unresolved existence condition into an executable witness | [`FORMAL_BINOMIAL_POSITIVITY_WITNESS.md`](docs/FORMAL_BINOMIAL_POSITIVITY_WITNESS.md) |
-| **Exact ambient-to-face compiler (V.20)** | Active constraints are converted to an exact edge chart; ambient polynomials are transported with rational arithmetic; cancellation, lineage, and geometric suppression remain auditable | [`FORMAL_AMBIENT_FACE_TRANSPORT.md`](docs/FORMAL_AMBIENT_FACE_TRANSPORT.md) |
-| **Phase fan and discovery engine (V.17, V.21)** | Finite perturbation families are partitioned into exponent and mechanism classes; exact walls locate dominance, criticality, and cancellation transitions | [`FORMAL_FACE_SELECTION_PHASE_FAN.md`](docs/FORMAL_FACE_SELECTION_PHASE_FAN.md) and [`FORMAL_EXPONENT_DISCOVERY_ENGINE.md`](docs/FORMAL_EXPONENT_DISCOVERY_ENGINE.md) |
-| **Curved-channel quadratic elimination (V.22)** | Exact square completion resolves a certified family of signed perturbations missed by first-layer coordinate-face selection, including sharp coefficients and reduced-layer cancellation | [`FORMAL_CURVED_REDUCTION.md`](docs/FORMAL_CURVED_REDUCTION.md), [`CURVED_FINITE_SCALE.md`](docs/CURVED_FINITE_SCALE.md) and [`MATHEMATICAL_AUDIT.md`](docs/MATHEMATICAL_AUDIT.md) |
-| **First-class backend** | Python and JSON interfaces expose analysis, discovery, portfolios, phase diagrams, evidence, and fail-closed theorem licensing | [`FACE_SELECTION_BACKEND.md`](docs/FACE_SELECTION_BACKEND.md) |
+### Historical origin: the categorical-polytope lecture
 
-The progression is deliberate: V.15 gives the weighted law on an orthant;
-V.16 supplies the missing geometric and non-circular selection step; V.20
-compiles ambient problems into that theorem exactly; and V.21 applies the
-compiler across families to discover and classify new exponent laws; V.22
-resolves a signed curved-channel family by exact elimination.
+The lecture starts from cartesian closure and the obstruction to a
+coexponential left adjoint of coproduct in `Set`. It motivates operational
+optimization analogies. A Cartesian parameter block, a polyhedral vertex,
+and a categorical coproduct remain different mathematical objects.
 
-The V.22 statement is asymptotic in `s` with the coefficients held
-fixed. [`CURVED_FINITE_SCALE.md`](docs/CURVED_FINITE_SCALE.md) certifies
-objective bounds at a requested finite scale, and
-[`RESEARCH_ACTIVATION_CONTACT_LAW.md`](docs/RESEARCH_ACTIVATION_CONTACT_LAW.md)
-determines the activation boundary for the case a coefficient itself
-approaches cancellation. The latter is a mathematical extension with an
-exact verification script, not yet a backend capability.
+| Reading route | Purpose |
+| :--- | :--- |
+| [Short note](docs/SHORT_NOTE.md) | Concise corrected presentation |
+| [Master overview](categorical_polytope/Overview.md) | Conceptual narrative and diagrams |
+| [Corrected formal theorems](docs/FORMAL_THEOREMS.md) | The precise hypotheses and proofs |
+| [Expanded manuscript](docs/PAPER_DRAFT.md) / [paper outline](docs/PAPER_OUTLINE.md) | Longer development and publication structure |
+| [Original-note revision record](docs/ORIGINAL_NOTE_REVIEW.md) | Counterexamples to superseded claims and the reasons for correction |
 
-```bash
-python experiments/run_all.py            # quadratic + nonlinear JSON + figures
-python -m pytest -q                       # 624 tests + 24 subtests in the current suite
-pip install -e ".[dev]"                  # optional matplotlib, pytest
-```
+### What the corrected statements say
 
-Full reproduction: [`docs/RUNBOOK.md`](docs/RUNBOOK.md).
+| Topic | Statement to use | Implementation or proof |
+| :--- | :--- | :--- |
+| Cartesian closure | $\mathrm{Hom}(A\times X,Y)\cong\mathrm{Hom}(X,Y^A)$; the finite-set example exhibits currying | [`cartesian_closed.py`](categorical_polytope/cartesian_closed.py) |
+| Coexponential obstruction | For nonempty $A,Y$, no $L$ represents $\mathrm{Hom}(Y,A\sqcup-)$ on all sets; the empty cases are treated separately | [Proof and exceptions](docs/FORMAL_THEOREMS.md#0-the-categorical-obstruction-and-the-analogy), [finite-set code](categorical_polytope/set_category.py) |
+| Box vertex localization | A continuous, **separately quasiconvex full objective** on a compact box has at least one maximizing vertex | [Theorem 1](docs/FORMAL_THEOREMS.md#theorem-1--vertex-localization) |
+| Quadratic residual and separation | Positive definiteness, residual information, and curvature-normalized coupling supply the stated objective-gap bounds | [Theorem 2](docs/FORMAL_THEOREMS.md#theorem-2--quadratic-residual-and-separation-bounds) |
+| Candidate search | A feasible candidate is certified using a proved upper bound for the **same objective and feasible set** | [Theorem 3](docs/FORMAL_THEOREMS.md#theorem-3--a-certified-finite-candidate-search) |
 
-## Applications & conditional design warnings
-
-The evaluation material is a downstream application of the optimization
-theorems, not the repository's foundational claim. It translates geometric
-warnings about boundaries, coupling, finite coverage, non-smooth attacks, and
-tolerances into evaluation-design checks. These documents do **not** report
-measurements of a deployed system.
-
-- [`SAFETY_CAPACITY.md`](docs/SAFETY_CAPACITY.md) gives the conditional map
-  from the V-theorems to safety-evaluation design warnings.
-- [`EVAL_DESIGN_RECOMMENDATIONS.md`](docs/EVAL_DESIGN_RECOMMENDATIONS.md) and
-  [`EVAL_DESIGN_CHECKLIST.md`](docs/EVAL_DESIGN_CHECKLIST.md) separate
-  pointwise, distributional, geometric worst-case, and Lipschitz-margin
-  claims and provide a fail-closed six-condition evaluation card.
-- [`DISTRIBUTIONAL_COVERAGE_AUDIT.md`](docs/DISTRIBUTIONAL_COVERAGE_AUDIT.md)
-  proves IID, bounded-shift, and adaptive conditional-detection bounds while
-  keeping calibration and support-transfer assumptions explicit.
-- [`CANDIDATE_COVERAGE_CERTIFICATE.md`](docs/CANDIDATE_COVERAGE_CERTIFICATE.md)
-  records the versioned candidate-space normal form and exact Cartesian
-  covering radius; [`COVERAGE_CORRELATION.md`](docs/COVERAGE_CORRELATION.md)
-  reports the coverage × escape-search comparison.
-- [`VERIFICATION_CERTIFICATE.md`](docs/VERIFICATION_CERTIFICATE.md) records
-  the checkpointed adversarial theorem-verification corpus, its honest
-  denominators, and resolved or live numerical counterexamples.
-
-## Historical origin: the categorical-polytope lecture
-
-The project began with an optimization metaphor for cartesian closure, the
-failure of a coexponential left adjoint to coproduct in `Set`, and neighboring
-categorical constructions. That material remains useful context, but it is no
-longer the README's organizing result. See
-[`SHORT_NOTE.md`](docs/SHORT_NOTE.md),
-[`PAPER_OUTLINE.md`](docs/PAPER_OUTLINE.md), and the
-[`master overview`](categorical_polytope/Overview.md).
-
-The original coexponential obstruction motivated the search for an
-operational substitute; the face-selection law is that substitute in
-geometric form.
-
-The corrected vertex, quadratic-factorization, and constructive-search
-results are stated in [`FORMAL_THEOREMS.md`](docs/FORMAL_THEOREMS.md) and
-[`PAPER_DRAFT.md`](docs/PAPER_DRAFT.md). The original deliverables remain
-listed in the legacy manifest returned by `python -m categorical_polytope firsts`.
-
-In particular, [`formal_bounds.py`](categorical_polytope/formal_bounds.py)
-retains the original $\Phi(\varepsilon)$ comparison for reproducibility.
-It is not a universal separability bound; the
-[revision record](docs/ORIGINAL_NOTE_REVIEW.md#2-the-displayed-fisher-bound-is-not-a-universal-upper-bound)
-gives the counterexample and explains the correction.
-
-For the quadratic objective $Q(\theta)=c^\top\theta-\frac12\theta^\top F\theta$
-with $F=F^\top\succ0$, let $r_z=c-Fz$ for a candidate $z\in\mathbb R^n$.
-With an independently established $0\lt\mu\le\lambda_{\min}(F)$,
-the [corrected residual certificate](docs/FORMAL_THEOREMS.md#theorem-2--quadratic-residual-and-separation-bounds) is
+For example, for $Q(\theta)=c^\top\theta-\tfrac12\theta^\top F\theta$ with
+$F=F^\top\succ0$, let $r_z=c-Fz$. If
+$0\lt\mu\le\lambda_{\min}(F)$ is independently established, then
 
 $$
-Q(F^{-1}c)-Q(z)\le\frac{\|r_z\|_2^2}{2\mu}.
+Q(F^{-1}c)-Q(z)
+=\frac12r_z^\top F^{-1}r_z
+\le\frac{\|r_z\|_2^2}{2\mu}.
 $$
 
-## Requirements
+The historical $\Phi(\varepsilon)$ in
+[`formal_bounds.py`](categorical_polytope/formal_bounds.py) is retained for
+reproduction. It is **not a universal separability bound**. Small
+off-diagonal leakage alone does not supply a scale-free objective-gap
+certificate, and a local empirical Fisher matrix does not by itself give
+a global nonlinear bound.
 
-- Python 3.10+
-- Standard library only
+### Find the encoded demonstrations
 
-### Optional: model-backed candidate generation
+| Area | Files | How to interpret them |
+| :--- | :--- | :--- |
+| Conceptual polytope and parameter box | [Conceptual model](categorical_polytope/conceptual_polytope.py), [box objective](categorical_polytope/hypersurface_box.py) | Models and a specific default objective; general guarantees require the corrected full-objective hypotheses |
+| Componentwise and vertex probes | [Adversarial probe](categorical_polytope/adversarial_probe.py), [vertex probe](categorical_polytope/vertex_probe.py), [pruned search](categorical_polytope/fisher_pruned_search.py) | Candidate construction and legacy diagnostics; a certificate must be justified for the actual objective |
+| Fisher and decomposition diagnostics | [Factorization](categorical_polytope/fisher_factorization.py), [bridge](categorical_polytope/bridge_fisher_adversarial.py), [stability](categorical_polytope/decomposition_stability.py), [legacy comparisons](categorical_polytope/formal_bounds.py) | Coupling measurements and comparison quantities; use Theorem 2 for corrected bounds |
+| Nonlinear examples | [Nonlinear objective](categorical_polytope/nonlinear_objective.py) | Empirical comparisons, without an automatic global Fisher certificate |
+| Operational substitutes and manifest | [Substitute](categorical_polytope/extremal_substitute.py), [original deliverables](categorical_polytope/firsts.py) | Historical organization and demonstrations, not constructions of the missing adjoint |
 
-Every theorem, screen, and verdict runs offline on the standard library.
-The `--api` flags are candidate *generators* only: proposals are untrusted
-data, parsed under an AST whitelist and adjudicated locally, so the results
-do not depend on which model produced them.
+<details>
+<summary><strong>Neighboring vertices from the lecture</strong> · illustrative categorical constructions</summary>
 
-Any OpenAI-compatible endpoint works. Set one of `LOOP_API_KEY`,
-`OPENROUTER_API_KEY`, or `OPENAI_API_KEY` (see `scripts/set_api_key.ps1` /
-`.sh`), then pick a model with `--model` / `--base-url`, or a named preset
-with `--preset` / `LOOP_API_PRESET` (`openai`, `openrouter`, `nemotron`, `nemotron-super`).
+The [neighboring-vertices module](categorical_polytope/neighboring_vertices.py)
+contains small constructions and comparisons:
 
-A key alone is not enough: with no model chosen the default id is a paid one,
-so verification fails with `402 Payment Required` even when the key is good.
-Name a model you can reach —
+| Motif | What the example explores |
+| :--- | :--- |
+| Monoidal structure | Tensor/cardinality comparisons; these alone do not establish a closed structure for coproduct on `Set` |
+| Chu / Dialectica | Toy relational and predicate-pair duality |
+| Continuations | Splitting maps from a disjoint union into maps from its two summands |
+| Coalgebra / comonad | Observation and duplication motifs |
+
+These examples do not prove that every listed structure exists with all its
+categorical laws in the modeled setting, and they do not restore the missing
+coexponential. The [corrected obstruction](docs/FORMAL_THEOREMS.md#0-the-categorical-obstruction-and-the-analogy)
+is the reference statement.
+
+</details>
+
+<details>
+<summary><strong>Run the corrected examples or revisit the lecture</strong> · separate entry points</summary>
+
+For the corrected rational optimization examples:
 
 ```bash
-python experiments/run_loop_closure.py --check --preset nemotron-super
+python experiments/note_publication_check.py
 ```
 
-**For immediate use, pick `nemotron-super`.** Candidate generation asks for
-each batch as a single JSON object (`response_format={"type": "json_object"}`),
-so the endpoint has to support JSON mode — that includes the `--calibrate`
-pass in `run_campaign.py` and `run_code_properties.py`, which measures yield
-over one batch. `nemotron-super` advertises `response_format` and structured
-outputs; `nemotron` (lightning) advertises neither.
-
-That difference is invisible to `--check`, which lightning answers cleanly.
-It shows up only on real prompts, where lightning writes its plan as ordinary
-content and truncates before emitting any JSON — 0 of 12 candidates on the
-campaign prompts (2026-08-26), against 4 of 4 for super (2026-08-28).
-
-Size `--max-tokens` to cover hidden reasoning as well as candidates, roughly
-1,940 completion tokens per record on these prompts. Undersized, the request
-dies at `finish_reason: "length"` and the provider returns the partial
-reasoning trace in `content` — which looks exactly like a model with no JSON
-mode. That failure is a budget problem, not a reason to switch models.
-
-Presets are listed in `loop_closure.PRESETS` and documented in
-[`docs/RESEARCH_DIRECTIONS.md`](docs/RESEARCH_DIRECTIONS.md).
-
-## Run
+To inspect the historical manifest or run the original
+[lecture CLI](categorical_polytope/__main__.py):
 
 ```bash
-cd categorical_polytope
+python -m categorical_polytope firsts
 python -m categorical_polytope
 ```
 
+Run these from the repository root. Interpret legacy summaries and
+certificate labels through the [revision record](docs/ORIGINAL_NOTE_REVIEW.md).
+The [historical reproduction route](docs/RUNBOOK.md#historical-demos-and-paper-materials)
+explains the older experiments and their generated reports.
+
+</details>
+
+---
+
+## Layout
+
+The earlier modules are indexed above. This map locates the main research
+and execution paths.
+
+| Location | Responsibility |
+| :--- | :--- |
+| [`docs/`](docs/) | Theorem statements, proofs, contracts, audits, and research notes |
+| [`categorical_polytope/face_selection.py`](categorical_polytope/face_selection.py) | Face restrictions, qualification, rational weights, and conditional selection |
+| [`categorical_polytope/ambient_face_compiler.py`](categorical_polytope/ambient_face_compiler.py) | Exact ambient polynomial pullbacks and term provenance |
+| [`categorical_polytope/face_selection_phase.py`](categorical_polytope/face_selection_phase.py) | Exact affine phase and qualification calculations |
+| [`categorical_polytope/curved_reduction.py`](categorical_polytope/curved_reduction.py) / [`curved_finite_scale.py`](categorical_polytope/curved_finite_scale.py) | Supported curved channels and rational finite-scale bounds |
+| [`categorical_polytope/adjudication/`](categorical_polytope/adjudication/) | Domain-specific local adjudication and backend interfaces |
+| [`experiments/`](experiments/) | Saved requests, reproduction scripts, and campaign entry points |
+| [`tests/`](tests/) | Regression tests and executable examples |
+| [`tmp/`](docs/RUNBOOK.md#one-command-reproduction) | Ignored local evidence directories created by the reproduction runner |
+
+<details>
+<summary><strong>Research and candidate-generation routes</strong> · optional workflows</summary>
+
+| Work | Entry point |
+| :--- | :--- |
+| Interaction and base screening | [`interaction_search.py`](categorical_polytope/interaction_search.py), [`base_search.py`](categorical_polytope/base_search.py) |
+| Candidate campaigns and budgets | [Campaign protocol](docs/CAMPAIGN.md) |
+| Provider configuration and presets | [Configuration notes](docs/RESEARCH_DIRECTIONS.md), [preset implementation](categorical_polytope/loop_closure.py) |
+| Code-property campaigns | [Code properties](docs/CODE_PROPERTIES.md) |
+| Additional research sketches | [Research directions](docs/RESEARCH_DIRECTIONS.md), [discoveries](docs/RESEARCH_DISCOVERIES.md), [formal research notes](docs/FORMAL_RESEARCH_PROOFS.md) |
+
+Model APIs generate candidate data; the local code parses and adjudicates it.
+They are optional for reproducing the saved examples. For live runs, choose
+a model and endpoint your account can access and check the campaign's output
+requirements. Preset availability and provider behavior are configuration
+details, not mathematical assumptions.
+
+Research sketches and campaign reports retain their stated evidence levels;
+they are not blanket extensions of the current selection theorem.
+
+</details>
+
+## Applications & conditional design warnings
+
+The evaluation material applies optimization ideas to evaluation design.
+It does not report measurements of a deployed system.
+
+| Document | Read it for |
+| :--- | :--- |
+| [Safety capacity](docs/SAFETY_CAPACITY.md) | Conditional links between the V-theorems and evaluation design |
+| [Recommendations](docs/EVAL_DESIGN_RECOMMENDATIONS.md) / [checklist](docs/EVAL_DESIGN_CHECKLIST.md) | Pointwise, distributional, geometric, and margin-based claims |
+| [Distributional audit](docs/DISTRIBUTIONAL_COVERAGE_AUDIT.md) | Detection bounds and their calibration/transfer assumptions |
+| [Candidate coverage certificate](docs/CANDIDATE_COVERAGE_CERTIFICATE.md) | Candidate-space representation and covering radius |
+| [Coverage correlation](docs/COVERAGE_CORRELATION.md) | Recorded coverage and escape-search comparisons |
+| [Verification corpus](docs/VERIFICATION_CERTIFICATE.md) | Checkpointed evidence, denominators, and counterexample status |
+
 ## Publication control
 
-A proof that renders as literal text has not been published. GitHub's Markdown
-pass rewrites some characters before its math renderer sees them, and its KaTeX
-instance refuses a set of macros outright — silently, and only on github.com.
+Before publishing Markdown, run the repository's catalogue of observed
+GitHub math bugs:
 
 ```bash
 python experiments/ghmath.py README.md docs categorical_polytope experiments
 ```
 
-[`ghmath.py`](experiments/ghmath.py) checks every Markdown file against rules
-extracted from defects this repository actually shipped: bare `<` and `>`,
-`\operatorname`, escaped braces, literal asterisks, the LaTeX delimiters
-`\[ \] \( \)`, and indented `$$` blocks. It exits non-zero on a rendering error,
-so it can gate a merge; `--fix` repairs the mechanical ones and `--list-rules`
-prints the catalogue. It runs in the reproduction suite as the `docs-rendering`
-case. See the [runbook](docs/RUNBOOK.md#document-rendering) for its limits — it
-checks that math *can* render, not that the mathematics is right.
+[`ghmath.py`](experiments/ghmath.py) checks delimiters, unsupported macros,
+escaping, and indented display blocks. It is also the reproduction suite's
+`docs-rendering` case. Passing it does not prove the mathematics or replace
+visual inspection. [Rendering limits →](docs/RUNBOOK.md#document-rendering)
 
-## Layout
+The [principle-document revision record](docs/PRINCIPLE_DOCUMENTATION_REVIEW.md)
+and [original-note revision record](docs/ORIGINAL_NOTE_REVIEW.md) explain
+substantive corrections. Mathematical scope is part of the publication.
 
-| Module | Role |
-|--------|------|
-| `face_selection.py` | Exact face restriction, admissibility, weighted selection, and scaling |
-| `ambient_face_compiler.py` | Exact ambient-to-edge polynomial transport and term lineage |
-| `face_selection_phase.py` | Parametric Newton-weight chambers, walls, and transitions |
-| `curved_reduction.py` | Exact quadratic elimination of a curved channel (V.22) |
-| `curved_finite_scale.py` | Rational Bernstein bounds certifying the reduction at a finite scale |
-| `adjudication/polyhedra/backend.py` | Stable Python/JSON backend, discovery, portfolio, and audit contracts |
-| `vertex_threshold.py` | Vertex localization, weighted displacement, and gap laws |
-| `interaction_search.py` | Locally verified perturbation and interaction screening |
-| `base_search.py` | Base self-failure and off-corner maximizer search |
-| `set_category.py` | Finite `Set`: hom cardinalities, coexponential obstruction |
-| `cartesian_closed.py` | Product–exponential (curry) adjunction witness |
-| `conceptual_polytope.py` | Bounded diagram scores, extremal maximizers, coproduct blocks |
-| `neighboring_vertices.py` | Closed monoidal, Chu/Dialectica, continuations, coalgebra/comonad |
-| `hypersurface_box.py` | Box $H$: $C(b,k)$, quasiconvex $r(\lambda,\sigma)$, $\theta_{\max}\in\mathrm{ext}(H)$ |
-| `adversarial_probe.py` | Vertex localization + componentwise probe under cross-information bound |
-| `fisher_factorization.py` | Fisher off-diagonal leakage; when separable optimization is nearly optimal |
-| `bridge_fisher_adversarial.py` | Map cross-information proxy to Fisher coupling |
-| `extremal_substitute.py` | Operational substitute when coexponential is absent; limits |
-| `vertex_probe.py` | Constructive near-optimal probe: search only ext(H) with certificate |
-| `decomposition_stability.py` | Coproduct robustness to independence violations; design rules |
-| `formal_bounds.py` | Legacy $\epsilon_0$ and $\Phi(\varepsilon)$ comparison quantities; corrected bounds are in [Theorem 2](docs/FORMAL_THEOREMS.md#theorem-2--quadratic-residual-and-separation-bounds) |
-| `fisher_pruned_search.py` | Theorem 3: top-$k$ Fisher-pruned vertex search |
-| `firsts.py` | Deliverables manifest + run experiments |
-| `nonlinear_objective.py` | Non-quadratic $C$, empirical Fisher, vertex vs separable |
-| `__main__.py` | Demo CLI |
+---
 
-## Earlier categorical and optimization theory (encoded)
-
-1. **CCC corner** — $ \mathrm{Hom}(A \times X, Y) \cong \mathrm{Hom}(X, Y^A) $ as an explicit bijection on finite sets.
-2. **Vanishing corner** — No object $C$ with $|\mathrm{Hom}(C,Z)| = |\mathrm{Hom}(Y, A \sqcup Z)|$ for all $Z$ unless the functor is degenerate (cardinality obstruction).
-3. **Polytope metaphor** — Separate monotone objectives in composition vs naturality; quasiconvex adjunction directions; global max at vertices $\mathrm{ext}(\mathcal{P})$; coproduct blocks with bounded cross-naturality.
-4. **Neighboring vertices** — When coexponential ⊣ coproduct is empty in `Set`, walk to closed monoidal, Chu/Dialectica, continuations, or coalgebra/comonad corners (dual-flavored structure without set-theoretic co-curry).
-
-## Neighboring vertices (from the lecture)
-
-| Vertex | What you get instead of coexponential |
-|--------|----------------------------------------|
-| Closed monoidal ($\otimes \dashv [-,=]$) | Internal hom for tensor, not cartesian product |
-| Dialectica / Chu | Linear or relational duals, not set-theoretic co-curry |
-| Continuations | Right adjoints to sum-like types encoded differently |
-| Coalgebra / comonad | Final coalgebras, not left adjoint to $\sqcup$ |
-
-Reversing arrows is a **strategy**, not a guarantee of representability on the dual side.
-
-5. **Box $H$** — $C$ separately increasing in $b,k$; $r$ quasiconvex-decreasing in $\sigma$, increasing in $\lambda$; $\theta_{\max}\in\mathrm{ext}(H)$; for a box, $\theta_{\max}=(\lambda_{\max},\sigma_{\min},k_{\max},B_{\max})$.
-6. **Adversarial probe** — Bounded cross-information between blocks $\Rightarrow$ worst-case $\theta$ at block vertices; explicit componentwise probe.
-
-```python
-from categorical_polytope import default_hypersurface_problem
-
-problem = default_hypersurface_problem(cross_info_bound=0.25)
-probe = problem.build_componentwise_probe()
-worst = problem.localize_worst_case()
-print(probe.to_theta(), worst.to_theta())
-```
-
-7. **Fisher factorization** — Off-diagonal Fisher blocks quantify leakage; small $\varepsilon = \|F_{\mathrm{off}}\|_F/\|F_{\mathrm{diag}}\|_F$ implies separable per-block optimization is nearly optimal.
-
-```python
-from categorical_polytope import build_block_fisher, BlockLayout, QuadraticJointObjective
-
-layout = BlockLayout(names=("A", "B"), sizes=(2, 2))
-fisher = build_block_fisher(layout, off_diag_coupling=0.05)
-obj = QuadraticJointObjective(fisher=fisher, linear=(1.0, 0.5, 2.0, 3.0))
-print(obj.factorization_analysis())
-```
-
-8. **Vertex probe algorithm** — Constructive near-optimal probe by enumerating `ext(H)` only.
-
-```python
-from categorical_polytope import VertexProbeAlgorithm
-
-probe = VertexProbeAlgorithm(cross_info_bound=0.25).find_near_optimal_probe()
-print(probe.theta, probe.certificate.nearly_optimal)
-```
-
-9. **Decomposition stability** — Robustness of coproduct splits when Fisher off-diagonals are small.
-
-```python
-from categorical_polytope import build_block_fisher, BlockLayout, assess_decomposition
-
-fisher = build_block_fisher(BlockLayout(("A", "B"), (2, 2)), off_diag_coupling=0.08)
-report = assess_decomposition(fisher, linear=(1.0, 0.5, 2.0, 3.0))
-print(report.strategy, report.coproduct_robust, report.bounds)
-```
-
-10. **Non-quadratic $C$** — interaction terms beyond the quadratic proxy; local empirical Fisher.
-
-```python
-from categorical_polytope import NonlinearStudy
-
-report = NonlinearStudy().analyze(strength=0.15, interaction="bilinear")
-print(report.gap, report.leakage.epsilon, report.localization_at_vertex)
-python experiments/nonlinear_experiments.py
-```
+[**Return to the navigation guide ↑**](#navigate-the-repository) · [Reproduction runbook](docs/RUNBOOK.md) · [Backend contract](docs/FACE_SELECTION_BACKEND.md)

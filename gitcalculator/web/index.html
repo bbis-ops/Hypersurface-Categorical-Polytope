@@ -131,6 +131,9 @@ td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-spa
 .counter .more b { color: var(--ink); font-weight: 600; }
 @media (max-width: 560px) { .counter summary { grid-template-columns: minmax(0, 1fr); } .counter .detail { grid-column: 1; } .counter .more { margin-left: 0; } }
 .figures { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr)); }
+.stage { touch-action: pan-y; cursor: grab; border-radius: 8px; outline-offset: 3px; user-select: none; -webkit-user-select: none; }
+.stage:active { cursor: grabbing; }
+.stage-bar { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; margin-top: 6px; }
 figure { margin: 0; background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 14px; position: relative; min-width: 0; }
 figcaption { font-size: 13px; color: var(--ink-2); margin-top: 8px; }
 figure h3 { margin-bottom: 4px; }
@@ -484,9 +487,111 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
       dot.addEventListener("mouseleave", () => { tip.hidden = true; });
     });
   }
+  // ===== a small 3D view: orthographic, painter's order, drag or arrow keys to turn =====
+  const sub3 = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+  const cross3 = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  const dot3 = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  function orderFacet(points) {
+    const c = [0, 1, 2].map((k) => points.reduce((acc, p) => acc + p[k], 0) / points.length);
+    let normal = [0, 0, 0];
+    for (let i = 1; i < points.length && dot3(normal, normal) < 1e-18; i++) for (let j = i + 1; j < points.length && dot3(normal, normal) < 1e-18; j++) normal = cross3(sub3(points[i], points[0]), sub3(points[j], points[0]));
+    const u = sub3(points.find((p) => dot3(sub3(p, c), sub3(p, c)) > 1e-18) || points[0], c), w = cross3(normal, u);
+    return points.slice().sort((p, q) => Math.atan2(dot3(sub3(p, c), w), dot3(sub3(p, c), u)) - Math.atan2(dot3(sub3(q, c), w), dot3(sub3(q, c), u)));
+  }
+  function view3d(host, spec) {
+    host.innerHTML = `<h3>${spec.title}</h3><ul class="legend">${spec.legend}</ul><div class="stage" tabindex="0" role="img" aria-label="${esc(spec.aria)}. Drag sideways, or use the arrow keys, to turn it."></div>
+      <div class="stage-bar"><button type="button" class="quiet" data-reset>Reset view</button><span class="statement">Drag or use the arrow keys to turn the view.</span></div><figcaption>${spec.caption}</figcaption>`;
+    const stage = host.querySelector(".stage");
+    const all = [...spec.polygons.flatMap((p) => p.pts), ...spec.segments.flatMap((s) => [s.a, s.b]), ...spec.points.map((p) => p.p)];
+    const center = [0, 1, 2].map((k) => (Math.min(...all.map((p) => p[k])) + Math.max(...all.map((p) => p[k]))) / 2);
+    const radius = Math.max(1e-9, ...all.map((p) => Math.hypot(p[0] - center[0], p[1] - center[1], p[2] - center[2])));
+    const W = 340, H = 300, scale = 0.42 * Math.min(W, H) / radius, DEFAULT = { yaw: -0.62, pitch: 0.48 };
+    let view = { ...DEFAULT };
+    const turn = (x, y, z) => {
+      const cy = Math.cos(view.yaw), sy = Math.sin(view.yaw), cp = Math.cos(view.pitch), sp = Math.sin(view.pitch);
+      const x1 = x * cy - y * sy, y1 = x * sy + y * cy;
+      return [x1, -y1 * sp + z * cp, y1 * cp + z * sp];
+    };
+    const project = (p) => { const [x, up, depth] = turn(p[0] - center[0], p[1] - center[1], p[2] - center[2]); return [W / 2 + x * scale, H / 2 - up * scale, depth]; };
+    const fmt = (v) => v.toFixed(1);
+    function draw() {
+      let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%">`;
+      const polys = spec.polygons.map((poly) => { const q = poly.pts.map(project); return { poly, q, depth: q.reduce((a, b) => a + b[2], 0) / q.length }; }).sort((a, b) => b.depth - a.depth);
+      for (const { poly, q } of polys) svg += `<polygon points="${q.map((p) => fmt(p[0]) + "," + fmt(p[1])).join(" ")}" fill="${poly.fill}" fill-opacity="${poly.opacity ?? 0.14}" stroke="${poly.stroke}" stroke-width="${poly.width ?? 1}" stroke-linejoin="round"${poly.dash ? ` stroke-dasharray="${poly.dash}"` : ""}/>`;
+      for (const seg of spec.segments) { const a = project(seg.a), b = project(seg.b); svg += `<line x1="${fmt(a[0])}" y1="${fmt(a[1])}" x2="${fmt(b[0])}" y2="${fmt(b[1])}" stroke="${seg.stroke}" stroke-width="${seg.width ?? 1.4}" stroke-linecap="round"${seg.dash ? ` stroke-dasharray="${seg.dash}"` : ""}/>`; }
+      for (const { pt, q } of spec.points.map((pt) => ({ pt, q: project(pt.p) })).sort((a, b) => b.q[2] - a.q[2])) {
+        const r = pt.r ?? 4;
+        svg += pt.shape === "square" ? `<rect x="${fmt(q[0] - r)}" y="${fmt(q[1] - r)}" width="${2 * r}" height="${2 * r}" fill="${pt.fill}" stroke="${pt.stroke}" stroke-width="1.6"><title>${esc(pt.title || "")}</title></rect>`
+          : `<circle cx="${fmt(q[0])}" cy="${fmt(q[1])}" r="${r}" fill="${pt.fill}" stroke="${pt.stroke}" stroke-width="${pt.strokeWidth ?? 1.8}"><title>${esc(pt.title || "")}</title></circle>`;
+      }
+      for (const l of spec.labels) { const q = project(l.p); svg += `<text class="${l.cls || "lbl"}" x="${fmt(q[0] + (l.dx || 0))}" y="${fmt(q[1] + (l.dy || 0))}" text-anchor="${l.anchor || "middle"}">${esc(l.text)}</text>`; }
+      if (spec.axes) {
+        const o = [36, H - 34];
+        spec.axes.forEach((name, k) => { const e = [0, 0, 0]; e[k] = 1; const [x, up] = turn(...e); svg += `<line x1="${o[0]}" y1="${o[1]}" x2="${fmt(o[0] + x * 22)}" y2="${fmt(o[1] - up * 22)}" stroke="${css("--ink-3")}" stroke-width="1.2"/><text x="${fmt(o[0] + x * 34)}" y="${fmt(o[1] - up * 34 + 4)}" text-anchor="middle">${esc(name)}</text>`; });
+      }
+      return svg + "</svg>";
+    }
+    let drag = null, frame = 0;
+    const redraw = () => { if (!frame) frame = requestAnimationFrame(() => { frame = 0; stage.innerHTML = draw(); }); };
+    stage.addEventListener("pointerdown", (e) => { drag = { x: e.clientX, y: e.clientY, view: { ...view } }; stage.setPointerCapture?.(e.pointerId); });
+    stage.addEventListener("pointermove", (e) => { if (!drag) return; view.yaw = drag.view.yaw + (e.clientX - drag.x) * 0.01; view.pitch = Math.max(-1.45, Math.min(1.45, drag.view.pitch + (e.clientY - drag.y) * 0.01)); redraw(); });
+    for (const type of ["pointerup", "pointercancel", "lostpointercapture"]) stage.addEventListener(type, () => { drag = null; });
+    stage.addEventListener("keydown", (e) => {
+      const step = 0.12;
+      if (e.key === "ArrowLeft") view.yaw -= step; else if (e.key === "ArrowRight") view.yaw += step;
+      else if (e.key === "ArrowUp") view.pitch = Math.min(1.45, view.pitch + step); else if (e.key === "ArrowDown") view.pitch = Math.max(-1.45, view.pitch - step);
+      else return;
+      e.preventDefault(); redraw();
+    });
+    host.querySelector("[data-reset]").addEventListener("click", () => { view = { ...DEFAULT }; redraw(); });
+    stage.innerHTML = draw();
+  }
+  function renderGeometry3d(host, geo) {
+    const V = geo.vertices, v = geo.vertex;
+    const span = Math.max(...[0, 1, 2].map((k) => Math.max(...V.map((p) => p[k])) - Math.min(...V.map((p) => p[k]))), 1e-9);
+    const facets = geo.facets.map((f, j) => ({ f, j })).filter(({ f }) => f.length >= 3);
+    const atV = facets.filter(({ j }) => geo.active.includes(j)).length;
+    const polygons = facets.map(({ f, j }) => { const on = geo.active.includes(j); return { pts: orderFacet(f.map((i) => V[i])), fill: css(on ? "--brass" : "--sea"), stroke: css(on ? "--brass" : "--sea"), opacity: on ? 0.2 : 0.08, width: on ? 1.5 : 1 }; });
+    const segments = [], labels = [], points = [];
+    geo.generators.forEach((u, i) => {
+      const len = Math.hypot(...u) || 1, k = 0.38 * span / len, end = [v[0] + u[0] * k, v[1] + u[1] * k, v[2] + u[2] * k];
+      segments.push({ a: v, b: end, stroke: css("--ink-2"), dash: "4 4", width: 1.4 });
+      labels.push({ p: [v[0] + u[0] * k * 1.22, v[1] + u[1] * k * 1.22, v[2] + u[2] * k * 1.22], text: `c${i}`, dy: -4 });
+    });
+    const path = geo.path.filter((p) => p.x.length === 3 && p.x.every(Number.isFinite));
+    path.forEach((p, i) => { if (i) segments.push({ a: path[i - 1].x, b: p.x, stroke: css("--brass"), width: 2 }); points.push({ p: p.x, r: 2.6, fill: css("--brass"), stroke: css("--brass"), strokeWidth: 1, title: `s = ${p.s}: x = (${p.x.map((c) => c.toPrecision(4)).join(", ")})` }); });
+    points.push({ p: v, r: 5.5, fill: css("--ink"), stroke: css("--panel"), strokeWidth: 2, title: `v = (${v.map((c) => +c.toPrecision(6)).join(", ")})` });
+    labels.push({ p: v, text: "v", cls: "strong", dx: 10, dy: -9, anchor: "start" });
+    view3d(host, {
+      title: "Geometry", aria: `The polyhedron P in three dimensions with ${facets.length} facets, the vertex v, and the certified optimizer path`,
+      legend: `<li><span class="swatch" style="background:var(--sea)"></span>facets of P</li><li><span class="swatch" style="background:var(--brass)"></span>facets through v</li><li><span class="swatch" style="background:var(--ink-2)"></span>edge directions</li><li><span class="swatch pt" style="background:var(--brass)"></span>certified optimizer path</li>`,
+      caption: `${atV} facets meet at v. ` + (geo.simple ? "Three facets meet in three independent edges, so v is simple and has an edge chart." : "More than three facets meet at v, so the tangent cone is not simplicial and the theorem does not apply.") + (path.length ? " The brass points are certified witnesses x(s), approaching v as s shrinks." : ""),
+      polygons, segments, points, labels, axes: ["x0", "x1", "x2"],
+    });
+  }
+  function renderNewton3d(host, nd) {
+    const w = nd.weights.map((x) => E.Q.parse(x).toNumber()), beta = nd.principal.map(([b]) => b);
+    const qStar = nd.q_star ? E.Q.parse(nd.q_star).toNumber() : null;
+    const top = Math.max(...beta, ...nd.gain.flatMap((m) => m.exps)) + 1;
+    const winner = (e) => qStar != null && nd.winners.some((f) => e.every((x, i) => !x || f.includes(i))) && Math.abs(e.reduce((a, x, i) => a + x * w[i], 0) - qStar) < 1e-12;
+    const plane = (q) => [0, 1, 2].map((k) => { const p = [0, 0, 0]; p[k] = q / w[k]; return p; });
+    const polygons = [{ pts: plane(1), fill: css("--sea"), stroke: css("--sea"), opacity: 0.12, width: 1.2 }];
+    if (qStar != null) polygons.push({ pts: plane(qStar), fill: css("--brass"), stroke: css("--brass"), opacity: 0.18, width: 1.4, dash: "5 4" });
+    const segments = [0, 1, 2].map((k) => { const e = [0, 0, 0]; e[k] = top; return { a: [0, 0, 0], b: e, stroke: css("--ink-3"), width: 1.2 }; });
+    const labels = [0, 1, 2].map((k) => { const e = [0, 0, 0]; e[k] = top + 0.5; return { p: e, text: `${nd.axes[k]} · β=${beta[k]}` }; });
+    const points = beta.map((b, k) => { const e = [0, 0, 0]; e[k] = b; return { p: e, r: 4.5, shape: "square", fill: "none", stroke: css("--sea"), title: `D₀ term ${nd.axes[k]}^${b}` }; });
+    for (const m of nd.gain) { const win = winner(m.exps); points.push({ p: m.exps, r: win ? 7 : 5, fill: m.sign > 0 ? css(win ? "--brass" : "--ink") : css("--panel"), stroke: css(win ? "--brass" : "--ink"), title: `${m.coefficient}·${E.monomialText(m.exps, nd.axes)}, weighted degree ${m.degree}` }); }
+    view3d(host, {
+      title: "Newton diagram", aria: "Exponents of the transported perturbation in three dimensions, with the base plane and the q* plane",
+      legend: `<li><span class="swatch pt"></span>positive term of R</li><li><span class="swatch pt" style="background:var(--panel);border:1.5px solid var(--ink)"></span>negative term</li><li><span class="swatch" style="background:var(--brass)"></span>q* plane</li><li><span class="swatch" style="background:var(--sea)"></span>base plane, weight 1</li>`,
+      caption: `Weights ${esc(nd.weights.join(", "))}. A term qualifies below the base plane; the brass plane through the winners is q*${nd.q_star ? " = " + esc(nd.q_star) : ""}.`,
+      polygons, segments, points, labels,
+    });
+  }
   function renderNewton(nd) {
     const host = $("fig-newton");
-    if (!nd || nd.axes.length !== 2 || !nd.weights) { host.innerHTML = `<h3>Newton diagram</h3><p class="empty">${esc(!nd ? "No transported data for this input." : nd.axes.length !== 2 ? "Drawn for two-dimensional problems; the face table in the ledger covers this one." : "Weights need the exact diagonal principal part.")}</p>`; return; }
+    if (nd && nd.weights && nd.principal && nd.axes.length === 3) { renderNewton3d(host, nd); return; }
+    if (!nd || nd.axes.length !== 2 || !nd.weights) { host.innerHTML = `<h3>Newton diagram</h3><p class="empty">${esc(!nd ? "No transported data for this input." : nd.axes.length > 3 ? "Drawn for two and three dimensions; the face table in the ledger covers this one." : "Weights need the exact diagonal principal part.")}</p>`; return; }
     const w = nd.weights.map((x) => E.Q.parse(x).toNumber()), beta = nd.principal.map(([b]) => b);
     const pts = nd.gain.map((m) => m.exps).concat(nd.loss.map((m) => m.exps));
     const maxA = Math.max(beta[0], ...pts.map((e) => e[0])) + 1, maxB = Math.max(beta[1], ...pts.map((e) => e[1])) + 1;
@@ -516,7 +621,8 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
   }
   function renderGeometry(geo) {
     const host = $("fig-geometry");
-    if (!geo || geo.n !== 2) { host.innerHTML = `<h3>Geometry</h3><p class="empty">${esc(!geo ? "No vertex for this input." : "Drawn for two-dimensional polyhedra.")}</p>`; return; }
+    if (geo && geo.n === 3) { renderGeometry3d(host, geo); return; }
+    if (!geo || geo.n !== 2) { host.innerHTML = `<h3>Geometry</h3><p class="empty">${esc(!geo ? "No vertex for this input." : "Drawn for polyhedra in two and three dimensions.")}</p>`; return; }
     const V = geo.vertices, cx = V.reduce((a, p) => a + p[0], 0) / V.length, cy = V.reduce((a, p) => a + p[1], 0) / V.length;
     const hull = V.slice().sort((p, q) => Math.atan2(p[1] - cy, p[0] - cx) - Math.atan2(q[1] - cy, q[0] - cx));
     const xs = V.map((p) => p[0]), ysv = V.map((p) => p[1]), pad = 0.08 * Math.max(Math.max(...xs) - Math.min(...xs), Math.max(...ysv) - Math.min(...ysv), 1e-9);

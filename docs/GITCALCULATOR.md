@@ -402,7 +402,15 @@ The build writes three files:
   the backend, the gitcalculator, and the cited documents.
 
 The page computes every mode live with the exact JavaScript engine, in any
-browser and inside a Claude artifact. For each preset it also shows the
+browser and inside a Claude artifact. Solve draws the mechanism in two and
+three dimensions. The geometry view shows $P$ with its facets, the facets that
+meet at $v$, the edge directions of the tangent cone, and the certified
+optimizer path. A non-simple vertex shows its extra facets, which is why the
+theorem refuses it. The Newton view plots the exponents of the transported
+perturbation against the base layer and the $q_\ast$ layer, as lines in two
+dimensions and as planes in three. The three-dimensional views turn when
+dragged or with the arrow keys, and the browser engine computes their facets
+exactly; a test compares them with Python. For each preset it also shows the
 repository's recorded Python receipt and whether the two implementations agree.
 Where the browser allows WebAssembly, *Also run the repository's Python* loads
 [Pyodide](https://pyodide.org) 0.26.4, writes the bundled blobs into its file

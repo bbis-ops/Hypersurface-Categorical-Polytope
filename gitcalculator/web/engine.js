@@ -60,9 +60,11 @@
     toNumber() {
       if (this.n === 0n) return 0;
       const neg = this.n < 0n, n = neg ? -this.n : this.n;
+      // Small terms: one correctly rounded division.
+      if (n <= 9007199254740991n && this.d <= 9007199254740991n) return Number(this.n) / Number(this.d);
       const k = 17 - (n.toString().length - this.d.toString().length);
       const scaled = k >= 0 ? (n * 10n ** BigInt(k)) / this.d : n / (this.d * 10n ** BigInt(-k));
-      const v = Number(scaled) * Math.pow(10, -k);
+      const v = k >= 0 ? Number(scaled) / Math.pow(10, k) : Number(scaled) * Math.pow(10, -k);
       return neg ? -v : v;
     }
   }
@@ -385,6 +387,13 @@
     const bestCorners = corners.filter((_, i) => values[i].eq(best));
     const vertex = bestCorners[0];
     const active = rows.map((r, j) => (dot(r, vertex).eq(rhs[j]) ? j : -1)).filter((j) => j >= 0);
+    // The polyhedron itself, for pictures: each constraint's facet as the exact
+    // list of vertices on it, recorded before the simplicity check.
+    result.geometry = {
+      n, vertices: corners.map((c) => c.map((x) => x.toNumber())), vertex: vertex.map((x) => x.toNumber()),
+      vertex_index: corners.indexOf(vertex), active,
+      facets: rows.map((r, j) => corners.map((c, i) => (dot(r, c).eq(rhs[j]) ? i : -1)).filter((i) => i >= 0)),
+    };
     if (active.length !== n) {
       links.push(link("standing", bounded ? "exact" : "unresolved", "exact recession test and vertex enumeration", `P is bounded with ${corners.length} vertices.`));
       links.push(link("vertex", "failed", "exact active-set count", `The best vertex (${vertex.map(String).join(", ")}) has ${active.length} active constraints in dimension ${n}: its tangent cone is not simplicial, which the theorem excludes.`, { active }));

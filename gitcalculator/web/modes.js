@@ -150,11 +150,14 @@
       q_star: cert.q_star || null, winners: cert._table ? minimalFaces(cert._table) : [],
     };
   }
-  function geometryData(model, measurement) {
-    if (!model) return null;
-    return { n: model.n, vertices: model.corners.map((c) => c.map((x) => x.toNumber())), vertex: model.vertex.map((x) => x.toNumber()),
-      generators: model.generators.map((u) => u.map((x) => x.toNumber())), rho: model.rho.toNumber(), active: model.active,
-      path: (measurement.rows || []).filter((r) => r.lower_bound !== "0").map((r) => ({ s: r.s, x: r.witness_x })) };
+  function geometryData(local, measurement) {
+    const base = local.result.geometry;
+    if (!base) return null;
+    const model = local.model;
+    return Object.assign({}, base, {
+      generators: model ? model.generators.map((u) => u.map((x) => x.toNumber())) : [], rho: model ? model.rho.toNumber() : null,
+      simple: !!model, path: (measurement.rows || []).filter((r) => r.lower_bound !== "0").map((r) => ({ s: r.s, x: r.witness_x })),
+    });
   }
   function solve(request, options = {}) {
     const started = Date.now();
@@ -202,7 +205,7 @@
       schema: "gitcalculator.receipt.v1", engine: ENGINE_VERSION, input: inputs,
       answer: { verdict, meaning: VERDICTS[verdict], headline, gamma, q_star: qStar, coefficient, backend_status: "not run (browser engine)", certificate_status: cert.status },
       steps, certificate, alternatives, measurement, counterarguments: counter,
-      newton: newtonData(model || local.model, cert), geometry: geometryData(local.model, measurement),
+      newton: newtonData(model || local.model, cert), geometry: geometryData(local, measurement),
       provenance: { git: options.git || {}, code_id: "browser engine", calculator_id: options.engineBlob || ENGINE_VERSION, sources: {}, documents: {}, runtime: { engine: "javascript", python: "—" } },
       timings: { total: (Date.now() - started) / 1000 }, signature,
     };

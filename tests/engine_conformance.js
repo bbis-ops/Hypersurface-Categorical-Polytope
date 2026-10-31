@@ -21,6 +21,10 @@ function run(job) {
       ambient: r.alternatives.ambient_axes ? r.alternatives.ambient_axes.gamma : null,
     };
   }
+  if (job.mode === "geometry") {
+    const g = G.solve(job.request, { measure: false }).geometry;
+    return { n: g.n, vertex_index: g.vertex_index, active: g.active, simple: g.simple, facets: g.facets };
+  }
   if (job.mode === "design") {
     const d = G.design(job.request);
     return { status: d.status, spectrum: (d.spectrum || []).map((e) => [e.q, e.gamma]),

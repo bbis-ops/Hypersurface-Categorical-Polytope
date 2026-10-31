@@ -321,3 +321,20 @@ def test_attack_generates_counterexamples_and_keeps_the_control():
     assert by_kind["control"][0]["changed"] is False
     assert by_kind["intrusion"][0]["outcome"]["gamma"] == "4/3"
     assert any(m["changed"] for m in by_kind["facet tilt"]) and not all(m["changed"] for m in by_kind["facet tilt"])
+
+
+@pytest.mark.skipif(NODE is None, reason="node is not installed")
+def test_browser_engine_facets_match_exact_python_geometry():
+    """The 3D picture draws facets the browser computes; Python recomputes them exactly."""
+    from gitcalculator.certify import parse_system
+    names = ("cube-3d", "pyramid-apex", "tilted-simplex")
+    results = _browser([{"mode": "geometry", "request": preset_request(n)} for n in names])
+    for name, js in zip(names, results):
+        rows, rhs = parse_system(preset_request(name)["system"])
+        corners = X.vertices(rows, rhs)
+        expected = [[i for i, c in enumerate(corners) if X.dot(row, c) == b] for row, b in zip(rows, rhs)]
+        assert js["facets"] == expected, name
+    cube, pyramid, _ = results
+    assert sorted(len(f) for f in cube["facets"]) == [4] * 6 and cube["simple"] and len(cube["active"]) == 3
+    assert sorted(len(f) for f in pyramid["facets"] if len(f) >= 3) == [3, 3, 3, 3, 4]
+    assert not pyramid["simple"] and len(pyramid["active"]) == 4

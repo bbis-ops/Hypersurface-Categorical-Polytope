@@ -9,7 +9,6 @@ installed. The browser build uses the same function under Pyodide.
 from __future__ import annotations
 
 import hashlib
-import os
 import platform
 import subprocess
 import sys
@@ -140,7 +139,3 @@ def provenance(cited_documents: Iterable[str] = ()) -> dict:
         "runtime": runtime(),
         "verify": "git cat-file -p <blob> prints the exact bytes of any listed file",
     }
-
-
-def environment_flag(name: str) -> bool:
-    return os.environ.get(name, "").strip().lower() in {"1", "true", "yes"}

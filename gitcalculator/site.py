@@ -92,7 +92,9 @@ def build(out: Path, *, pyodide: Path | None = None, fragment: bool = False) -> 
     bundle["head"]["link_ref"] = ref
     (out / "bundle.json").write_text(json.dumps(bundle, ensure_ascii=False), encoding="utf-8")
 
-    ledger = {"schema": "gitcalculator.ledger.v1", "head": bundle["head"], "linkable": linkable, "presets": {},
+    remote_commits = (_git("rev-list", "--remotes") or "").split()
+    ledger = {"schema": "gitcalculator.ledger.v1", "head": bundle["head"], "linkable": linkable,
+              "remote_commits": remote_commits, "presets": {},
               "counterarguments": counter_catalogue(), "witnesses": check_witnesses(backend().handle)}
     for name, preset in PRESETS.items():
         receipt = calculate(preset_request(name))

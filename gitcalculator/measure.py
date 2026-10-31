@@ -155,7 +155,9 @@ class _Search:
 
 
 def _certify_point(model: LocalModel, c_float: Sequence[float], s: Fraction) -> dict[str, Any]:
-    c = [min(model.rho, Fraction(f"{ci:.12e}")) if ci > 0 else Fraction(0) for ci in c_float]
+    # Twelve significant digits, printed exactly below, so the receipt's own
+    # numbers reproduce the certified inequality.
+    c = [min(model.rho, Fraction(f"{ci:.11e}")) if ci > 0 else Fraction(0) for ci in c_float]
     x = model.point(c)
     feasible = model.contains(x)
     gain = (X.evaluate_exact(model.base_tree, x) - model.base_at_vertex
@@ -163,7 +165,7 @@ def _certify_point(model: LocalModel, c_float: Sequence[float], s: Fraction) -> 
     chart_gain = -X.poly_evaluate(model.loss, c) + s * X.poly_evaluate(model.gain, c)
     lower = gain if feasible and gain > 0 else Fraction(0)
     return {
-        "s": floor_decimal(s, 6) if s.denominator != 1 else str(s),
+        "s": floor_decimal(s, 6),
         "lower_bound": floor_decimal(lower),
         "witness_c": [floor_decimal(v) if v else "0" for v in c],
         "support": [a for a, v in zip(model.axes, c) if v > 0],
@@ -230,7 +232,7 @@ def measure(model: LocalModel | None, predictions: Sequence[dict[str, Any]] = ()
     search = _Search(model, settings)
     rows: list[dict[str, Any]] = []
     for k in range(settings["steps"]):
-        s = Fraction(f"{10 ** (-k / 2):.6e}")
+        s = Fraction(f"{10 ** (-k / 2):.5e}")  # six significant digits, printed exactly
         row = _certify_point(model, search.best(float(s)), s)
         row["s_value"] = str(float(s))
         rows.append(row)

@@ -1,0 +1,79 @@
+{
+  "schema": "gitcalculator.tape.v1",
+  "name": "curved-cancellation",
+  "input": {
+    "system": "([[-1,0],[0,-1],[1,0],[0,1]], [0,0,1,1])",
+    "base": "-(x0**6+x1**6)",
+    "perturbation": "-x0**2+x0*x1**2-x1**4/4+x1**5"
+  },
+  "receipt_id": "gc-2f4f8ec330b3ac24",
+  "answer": {
+    "verdict": "proved-v22",
+    "headline": "Δ(s) ~ 3125/46656·s^6",
+    "gamma": "6",
+    "q_star": null
+  },
+  "signature": {
+    "verdict": "proved-v22",
+    "gamma": "6",
+    "q_star": null,
+    "backend": {
+      "status": "refused",
+      "licensed": false,
+      "gamma": null,
+      "q_star": null,
+      "blockers": [
+        "higher_order_unresolved"
+      ],
+      "refusal": "no face of the tangent cone carries the perturbation"
+    },
+    "certificate": {
+      "status": "incomplete",
+      "links": {
+        "standing": "exact",
+        "vertex": "exact",
+        "transport": "exact",
+        "H2": "exact",
+        "H1": "exact",
+        "H0": "exact",
+        "H3": "exact",
+        "faces": "exact",
+        "H5": "unresolved",
+        "selection": "not_reached"
+      }
+    },
+    "curved": {
+      "status": "licensed",
+      "gamma": "6",
+      "coefficient": "3125/46656",
+      "effective_weight": "5/6",
+      "eliminated_axis": "c0",
+      "identity": "R = S(y) - a*(x - H(y)/(2*a))**2",
+      "proof_basis": "exact full-polynomial transport and quadratic elimination"
+    },
+    "ambient_gamma": null,
+    "measurement": {
+      "curved": "consistent"
+    },
+    "counter": {
+      "signed-channel": "blocks",
+      "empty-not-zero": "caveat",
+      "finite-scale": "caveat",
+      "homogeneity-probe": "averted",
+      "isolation-probe": "averted",
+      "ambient-axes": "clear",
+      "signed-sharp": "clear",
+      "interior-zero": "clear",
+      "active-set": "clear",
+      "critical-layer": "clear",
+      "tied-coefficient": "clear",
+      "inverse-tolerance": "clear",
+      "non-simple": "clear"
+    }
+  },
+  "recorded_with": {
+    "commit": "6c6010032331d8fa4f5a1628ce07dbde6f25b5e4",
+    "code_id": "code-23ad9e729a48",
+    "calculator_id": "calc-3463f3690e6b"
+  }
+}

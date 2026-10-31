@@ -1,0 +1,61 @@
+{
+  "schema": "gitcalculator.tape.v1",
+  "name": "pyramid-apex",
+  "input": {
+    "system": "([[-1,0,0],[0,-1,0],[1,0,0],[0,1,0],[0,0,-1],[1,0,1],[-1,0,1],[0,1,1],[0,-1,1]], [0,0,1,1,0,1,0,1,0])",
+    "base": "x2",
+    "perturbation": "x0"
+  },
+  "receipt_id": "gc-9e1c82688982b475",
+  "answer": {
+    "verdict": "refused",
+    "headline": "no exponent",
+    "gamma": null,
+    "q_star": null
+  },
+  "signature": {
+    "verdict": "refused",
+    "gamma": null,
+    "q_star": null,
+    "backend": {
+      "status": "refused",
+      "licensed": false,
+      "gamma": null,
+      "q_star": null,
+      "blockers": [
+        "analytic hypotheses were not reached"
+      ],
+      "refusal": "no simple vertex with an edge basis"
+    },
+    "certificate": {
+      "status": "incomplete",
+      "links": {
+        "standing": "exact",
+        "vertex": "failed"
+      }
+    },
+    "curved": null,
+    "ambient_gamma": null,
+    "measurement": {},
+    "counter": {
+      "non-simple": "blocks",
+      "empty-not-zero": "caveat",
+      "ambient-axes": "clear",
+      "signed-channel": "clear",
+      "signed-sharp": "clear",
+      "interior-zero": "clear",
+      "active-set": "clear",
+      "homogeneity-probe": "clear",
+      "isolation-probe": "clear",
+      "critical-layer": "clear",
+      "tied-coefficient": "clear",
+      "finite-scale": "clear",
+      "inverse-tolerance": "clear"
+    }
+  },
+  "recorded_with": {
+    "commit": "6c6010032331d8fa4f5a1628ce07dbde6f25b5e4",
+    "code_id": "code-23ad9e729a48",
+    "calculator_id": "calc-3463f3690e6b"
+  }
+}

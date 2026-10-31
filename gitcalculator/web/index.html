@@ -237,7 +237,7 @@ svg .lbl { font: 12px var(--sans); fill: var(--ink-2); }
   "use strict";
   const $ = (id) => document.getElementById(id);
   const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  const sup = (text) => esc(text).replace(/s\^([0-9/.]+)/g, "s<sup>$1</sup>").replace(/\^([0-9/]+)/g, "<sup>$1</sup>");
+  const sup = (text) => esc(text).replace(/\^(\d+(?:[./]\d+)?)/g, "<sup>$1</sup>");
   const GROUPS = [
     ["Worked examples", ["tilted-simplex", "sheared-simplex", "cube-3d", "tied-faces", "active-set"]],
     ["Counterexamples", ["signed-channel", "signed-sharp", "interior-zero", "cross-term", "tied-maximizers"]],
@@ -252,6 +252,7 @@ svg .lbl { font: 12px var(--sans); fill: var(--ink-2); }
   // --- links into the repository at the pinned commit ---------------------
   function repoUrl() { const r = (store.ledger?.head?.remote || "").replace(/\.git$/, ""); return r.startsWith("https://github.com/") ? r : null; }
   function linkRef() { return store.ledger?.head?.link_ref || store.ledger?.head?.commit; }
+  function onRemote(commit) { const known = store.ledger?.remote_commits; return Boolean(commit) && (!known || known.includes(commit)); }
   function docLink(path, label) {
     const url = repoUrl(); const ref = linkRef(); const [file, anchor] = String(path).split("#");
     const linkable = store.ledger?.linkable;
@@ -309,10 +310,10 @@ svg .lbl { font: 12px var(--sans); fill: var(--ink-2); }
     $("ledger").innerHTML = receipt.steps.map((s) => `<tr>
       <td><div class="clause">${docLink(s.doc, s.clause)}</div><div class="statement">${esc(s.statement)}</div></td>
       <td class="mono">${esc(s.backend)}</td>
-      <td><div class="status s-${esc(s.certificate.status)}">${esc(s.certificate.status.replace("_", " "))}</div><div>${esc(s.certificate.detail)}</div><div class="statement">${esc(s.certificate.method)}</div></td>
+      <td><div class="status s-${esc(s.certificate.status)}">${esc(s.certificate.status.replace("_", " "))}</div><div>${sup(s.certificate.detail)}</div><div class="statement">${esc(s.certificate.method)}</div></td>
       <td><div class="tags">${s.challenges.map((c) => `<span class="tag e-${esc(c.effect)}" title="${esc(effect[c.id]?.detail)}">${esc(c.id)} · ${esc(c.effect)}</span>`).join("") || '<span class="statement">—</span>'}</div></td></tr>`).join("");
     $("counters").innerHTML = receipt.counterarguments.map((c) => `<details class="counter">
-      <summary><span class="effect e-${esc(c.effect)}">${esc(c.effect)}</span><span class="title">${esc(c.title)}</span><span class="detail">${esc(c.detail)}</span></summary>
+      <summary><span class="effect e-${esc(c.effect)}">${esc(c.effect)}</span><span class="title">${esc(c.title)}</span><span class="detail">${sup(c.detail)}</span></summary>
       <div class="more"><div><b>Refuted claim.</b> ${esc(c.claim)}</div><div><b>Counterexample.</b> ${esc(c.refutation)}</div>
       <div><b>Sources.</b> ${c.sources.map((s) => docLink(s)).join(" · ")}</div></div></details>`).join("");
     renderMeasurement(receipt.measurement);
@@ -324,7 +325,7 @@ svg .lbl { font: 12px var(--sans); fill: var(--ink-2); }
     $("rows").innerHTML = (m.rows || []).map((r) => `<tr><td class="mono">${esc(r.s)}</td><td class="mono">${esc(r.lower_bound)}</td><td class="mono">(${esc(r.witness_c.join(", "))})</td><td class="mono">{${esc(r.support.join(", "))}}</td><td>${r.feasible ? "yes" : "no"}</td></tr>`).join("")
       || `<tr><td colspan="5" class="empty">${esc(m.reason || m.summary || "No measurement for this input.")}</td></tr>`;
     const verdicts = m.verdicts || [];
-    $("verdicts").innerHTML = verdicts.map((v) => `<div><b style="color:var(${SERIES[v.id] || "--ink"})">${esc(v.label || v.id)}</b> · γ = ${esc(v.gamma)} · <span class="effect ${v.verdict === "contradicted" ? "e-blocks" : v.verdict === "consistent" ? "e-averted" : "e-caveat"}">${esc(v.verdict)}</span>${v.detail ? " — " + esc(v.detail) : ""}</div>`).join("")
+    $("verdicts").innerHTML = verdicts.map((v) => `<div><b style="color:var(${SERIES[v.id] || "--ink"})">${esc(v.label || v.id)}</b> · γ = ${esc(v.gamma)} · <span class="effect ${v.verdict === "contradicted" ? "e-blocks" : v.verdict === "consistent" ? "e-averted" : "e-caveat"}">${esc(v.verdict)}</span>${v.detail ? " — " + sup(v.detail) : ""}</div>`).join("")
       || `<div>${esc(m.status === "complete" ? (m.positive_gain_found ? "No prediction to compare." : "No positive gain was found at any tested s.") : (m.reason || ""))}</div>`;
     const host = $("chart"), legend = $("legend");
     if (rows.length < 2) { host.innerHTML = `<p class="empty" style="padding:12px 4px">${esc(m.reason || (m.positive_gain_found ? "Too few points to plot." : "No positive certified gain: L(s) = 0 at every tested s."))}</p>`; legend.innerHTML = ""; return; }
@@ -353,7 +354,7 @@ svg .lbl { font: 12px var(--sans); fill: var(--ink-2); }
     for (const l of labels) {
       const c = color(SERIES[l.v.id]);
       svg += `<line x1="${X(last.x)}" y1="${Y(l.y0)}" x2="${X(xmax)}" y2="${Y(l.y1)}" stroke="${c}" stroke-width="2" stroke-linecap="round"${l.v.verdict === "contradicted" ? ' stroke-dasharray="6 5"' : ""}/>`;
-      svg += `<text class="lbl" x="${X(xmax) + 8}" y="${l.ly + 4}">s^${esc(l.v.gamma)} · ${esc(l.v.verdict)}</text>`;
+      svg += `<text class="lbl" x="${X(xmax) + 8}" y="${l.ly + 4}">s<tspan dy="-5" font-size="9.5">${esc(l.v.gamma)}</tspan><tspan dy="5"> · ${esc(l.v.verdict)}</tspan></text>`;
     }
     pts.forEach((p, i) => { svg += `<circle data-i="${i}" cx="${X(p.x)}" cy="${Y(p.y)}" r="4.5" fill="${color("--ink")}" stroke="${color("--panel")}" stroke-width="2"/><circle data-i="${i}" cx="${X(p.x)}" cy="${Y(p.y)}" r="13" fill="transparent"/>`; });
     host.innerHTML = svg + "</svg>";
@@ -372,7 +373,7 @@ svg .lbl { font: 12px var(--sans); fill: var(--ink-2); }
     $("history-lede").textContent = `${history.commit_count} commits collapse to ${history.state_count} code states; ${history.answered_state_count} of them have the face-selection backend.`;
     const changes = Object.fromEntries((history.changes || []).map((c) => [c.code_id, c]));
     const url = repoUrl();
-    const commitLink = (c) => (url && c.commit !== "working-tree") ? `<a href="${esc(url)}/commit/${esc(c.commit)}" target="_blank" rel="noopener">${esc(c.short)}</a>` : esc(c.short);
+    const commitLink = (c) => (url && onRemote(c.commit)) ? `<a href="${esc(url)}/commit/${esc(c.commit)}" target="_blank" rel="noopener">${esc(c.short)}</a>` : esc(c.short);
     host.innerHTML = history.states.map((s) => {
       const wrong = (s.audit || []).filter((a) => a.verdict === "contradicted");
       const none = s.answer?.backend?.status === "unavailable";
@@ -390,7 +391,7 @@ svg .lbl { font: 12px var(--sans); fill: var(--ink-2); }
     const p = receipt.provenance, g = p.git || {}, url = repoUrl();
     const rowsFor = (entries) => Object.entries(entries).map(([path, blob]) => `<tr><td>${docLink(path)}</td><td class="mono">${esc(blob || "missing")}</td></tr>`).join("");
     $("provenance").innerHTML = `<dl class="kv">
-      <dt>Commit</dt><dd class="mono">${url && g.commit ? `<a href="${esc(url)}/commit/${esc(g.commit)}" target="_blank" rel="noopener">${esc(g.commit)}</a>` : esc(g.commit || "—")}${g.branch ? " on " + esc(g.branch) : ""}${g.dirty ? " · working tree differs" : ""}</dd>
+      <dt>Commit</dt><dd class="mono">${url && onRemote(g.commit) ? `<a href="${esc(url)}/commit/${esc(g.commit)}" target="_blank" rel="noopener">${esc(g.commit)}</a>` : esc(g.commit || "—")}${g.branch ? " on " + esc(g.branch) : ""}${g.dirty ? " · working tree differs" : ""}</dd>
       <dt>Code state</dt><dd class="mono">${esc(p.code_id)} (blob ids of categorical_polytope/**/*.py)</dd>
       <dt>Calculator</dt><dd class="mono">${esc(p.calculator_id)}</dd>
       <dt>Runtime</dt><dd class="mono">${esc(p.runtime.engine)} · Python ${esc(p.runtime.python)}</dd>

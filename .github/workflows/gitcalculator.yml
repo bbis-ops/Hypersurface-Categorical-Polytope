@@ -1,0 +1,56 @@
+name: gitcalculator
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # history replays need every commit
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pytest
+      - name: Regression tests
+        run: python -m pytest -q -p no:cacheprovider tests/test_gitcalculator.py
+      - name: Counter-argument witnesses
+        run: python -m gitcalculator counter
+      - name: Recorded calculations have not drifted
+        run: python -m gitcalculator tape verify
+
+  pages:
+    # Opt in: Settings -> Pages -> Source "GitHub Actions", and a repository
+    # variable GITCALCULATOR_PAGES set to true.
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' && vars.GITCALCULATOR_PAGES == 'true'
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build the web calculator
+        run: python -m gitcalculator site --out _site
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deploy
+        uses: actions/deploy-pages@v4

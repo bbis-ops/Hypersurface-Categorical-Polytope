@@ -23,10 +23,14 @@ notebook = ["matplotlib>=3.7", "jupyter>=1.0"]
 [project.scripts]
 categorical-polytope = "categorical_polytope.__main__:main"
 categorical-face-selection = "categorical_polytope.adjudication.polyhedra.backend:main"
+gitcalculator = "gitcalculator.__main__:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["categorical_polytope*"]
+include = ["categorical_polytope*", "gitcalculator*"]
+
+[tool.setuptools.package-data]
+gitcalculator = ["web/index.html"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

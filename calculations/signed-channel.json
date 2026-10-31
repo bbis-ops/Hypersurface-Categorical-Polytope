@@ -6,7 +6,7 @@
     "base": "-(x0**6+x1**6)",
     "perturbation": "-x0**2+x0*x1**2"
   },
-  "receipt_id": "gc-943fcb4df6aa5eba",
+  "receipt_id": "gc-7ba8515960d4c385",
   "answer": {
     "verdict": "proved-v22",
     "headline": "Δ(s) ~ 1/432·s^3",
@@ -72,8 +72,8 @@
     }
   },
   "recorded_with": {
-    "commit": "5a456c8e9c05e13edef0a3cb546b40aa028e49f0",
+    "commit": "8a3fb6f5284478dcde0694427d41f9131c4e01e3",
     "code_id": "code-23ad9e729a48",
-    "calculator_id": "calc-0eaba755e5e6"
+    "calculator_id": "calc-0165fb52752a"
   }
 }

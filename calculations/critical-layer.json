@@ -6,7 +6,7 @@
     "base": "-(x0**2 + x1**2)",
     "perturbation": "x0**2"
   },
-  "receipt_id": "gc-d574c7a1050e7106",
+  "receipt_id": "gc-1ba96aea3db88640",
   "answer": {
     "verdict": "proved",
     "headline": "Δ(s) = 0 for all sufficiently small s > 0",
@@ -65,8 +65,8 @@
     }
   },
   "recorded_with": {
-    "commit": "5a456c8e9c05e13edef0a3cb546b40aa028e49f0",
+    "commit": "8a3fb6f5284478dcde0694427d41f9131c4e01e3",
     "code_id": "code-23ad9e729a48",
-    "calculator_id": "calc-0eaba755e5e6"
+    "calculator_id": "calc-0165fb52752a"
   }
 }

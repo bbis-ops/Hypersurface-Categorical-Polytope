@@ -217,3 +217,14 @@ def test_command_line_prints_a_json_receipt_and_checks_witnesses():
     assert code == 0 and json.loads(out.getvalue())["answer"]["verdict"] == "proved"
     with redirect_stdout(io.StringIO()):
         assert main(["counter"]) == 0
+
+
+def test_command_line_applies_an_observed_exponent_to_a_preset():
+    """Regression: --observed was dropped whenever --preset was given."""
+    out = io.StringIO()
+    with redirect_stdout(out):
+        main(["calc", "--preset", "tilted-simplex", "--observed", "2", "--budget", "quick", "--json"])
+    receipt = json.loads(out.getvalue())
+    assert receipt["input"]["observed_exponent"] == 2.0
+    inverse = next(c for c in receipt["counterarguments"] if c["id"] == "inverse-tolerance")
+    assert inverse["effect"] == "caveat" and "no_face_match" in inverse["detail"]

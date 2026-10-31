@@ -12,11 +12,12 @@ from .presets import PRESETS, preset_request
 
 def _request(args: argparse.Namespace) -> dict:
     if args.preset:
-        return preset_request(args.preset)
-    missing = [name for name in ("system", "base", "perturbation") if not getattr(args, name)]
-    if missing:
-        raise SystemExit(f"give --preset, or all of --system --base --perturbation (missing: {', '.join(missing)})")
-    request = {"system": args.system, "base": args.base, "perturbation": args.perturbation}
+        request = preset_request(args.preset)
+    else:
+        missing = [name for name in ("system", "base", "perturbation") if not getattr(args, name)]
+        if missing:
+            raise SystemExit(f"give --preset, or all of --system --base --perturbation (missing: {', '.join(missing)})")
+        request = {"system": args.system, "base": args.base, "perturbation": args.perturbation}
     if getattr(args, "observed", None):
         from fractions import Fraction
         request["observed_exponent"] = float(Fraction(args.observed))

@@ -31,7 +31,7 @@ statements to executable calculations and their evidence.
 The categorical-polytope lecture is the project's historical origin.
 The Newton–tropical selection principle is its mathematical center.
 
-[**Read the theorem ↓**](#main-theorem) · [Why it is portable](#from-an-orthant-law-to-a-polyhedral-law) · [Reproduce a result](#quick-start) · [Repository guide](#navigate-the-repository) · [Earlier theory](#earlier-categorical-and-optimization-theory-encoded)
+[**Read the theorem ↓**](#main-theorem) · [Why it is portable](#from-an-orthant-law-to-a-polyhedral-law) · [Calculate with it](#the-gitcalculator) · [Reproduce a result](#quick-start) · [Repository guide](#navigate-the-repository) · [Earlier theory](#earlier-categorical-and-optimization-theory-encoded)
 
 ---
 
@@ -306,11 +306,54 @@ schema versions identify different things.
 
 ---
 
+## The gitcalculator
+
+The [gitcalculator](docs/GITCALCULATOR.md) turns the theorem, the backend, and
+the counter-arguments into one instrument. Each calculation is computed by the
+public backend and certified against the theorem's hypotheses in exact rational
+arithmetic. It is then tested against thirteen counter-arguments drawn from the
+[mathematical audit](docs/MATHEMATICAL_AUDIT.md) and the revision records, and
+against certified lower bounds on $\Delta(s)$. Finally it is pinned to the git
+blob id of every file that produced it.
+
+```bash
+python -m gitcalculator calc --preset tilted-simplex
+```
+
+```bash
+python -m gitcalculator history --preset signed-sharp
+```
+
+It answers five kinds of question about the law: **Solve** (the exponent and its
+proof), **Design** (which exponents a vertex can produce at all, and a
+perturbation for each), **Sweep** (the exact phase walls of a family $G_t$),
+**Attack** (counterexamples generated for the input), and **History** (what every
+commit of the backend answered). Each mode runs in Python and in an independent
+exact JavaScript engine, and a regression test requires them to agree.
+
+The first command proves $\Delta(s)=\Theta(s^{4/3})$ for the tilted simplex in
+exact arithmetic, and its certified bounds contradict the ambient-axis exponent
+$2$. The second replays the audit's sharpened signed counterexample across
+every code state in the repository's history. The exact core licensed
+$\gamma=6$ when the backend was introduced; commit `90105c2` withdrew that
+license, and V.22 gives $\gamma=3$. The [web calculator](docs/GITCALCULATOR.md#the-web-calculator)
+runs every mode in the browser, and can also run the repository's own Python
+there after checking each file against its git blob id.
+
+**Use it in a browser.** Once GitHub Pages is switched on for this repository
+(Settings → Pages → Source: *GitHub Actions*), each push to `main` publishes the
+calculator at **https://bbis-ops.github.io/Hypersurface-Categorical-Polytope/**.
+Nothing needs installing, and any calculation can be shared as a link. For the
+command line in a browser tab, open the repository in
+[GitHub Codespaces](https://codespaces.new/bbis-ops/Hypersurface-Categorical-Polytope).
+Locally, `python -m gitcalculator serve` serves the same page.
+
 ## Navigate the repository
 
 | If you want to… | Start with | Then follow |
 | :--- | :--- | :--- |
 | Understand the central law | [Orthant theorem · V.15–V.16](docs/FORMAL_NEWTON_TROPICAL.md) | [Polyhedral selection](docs/FORMAL_FACE_SELECTION.md) → [Qualification · V.18](docs/FORMAL_QUALIFIED_SELECTION_STRATIFICATION.md) |
+| Calculate, certify, and challenge one input | [gitcalculator](docs/GITCALCULATOR.md) | `python -m gitcalculator calc`, history replay, and the web calculator |
 | Reproduce a claimed result | [Runbook](docs/RUNBOOK.md) | Saved requests, expected outcomes, and preserved evidence |
 | Integrate the backend | [Python and JSON contract](docs/FACE_SELECTION_BACKEND.md) | [Backend implementation](categorical_polytope/adjudication/polyhedra/backend.py) |
 | Understand a refusal or curved channel | [Mathematical audit](docs/MATHEMATICAL_AUDIT.md) | [V.22 reduction](docs/FORMAL_CURVED_REDUCTION.md) → [Finite-scale accuracy](docs/CURVED_FINITE_SCALE.md) |
@@ -518,6 +561,8 @@ and execution paths.
 | [`categorical_polytope/face_selection_phase.py`](categorical_polytope/face_selection_phase.py) | Exact affine phase and qualification calculations |
 | [`categorical_polytope/curved_reduction.py`](categorical_polytope/curved_reduction.py) / [`curved_finite_scale.py`](categorical_polytope/curved_finite_scale.py) | Supported curved channels and rational finite-scale bounds |
 | [`categorical_polytope/adjudication/`](categorical_polytope/adjudication/) | Domain-specific local adjudication and backend interfaces |
+| [`gitcalculator/`](gitcalculator/) | Exact certificate, certified measurement, counter-arguments, history replay, and the web calculator |
+| [`calculations/`](calculations/) | The calculator's recorded tape, checked by `python -m gitcalculator tape verify` |
 | [`experiments/`](experiments/) | Saved requests, reproduction scripts, and campaign entry points |
 | [`tests/`](tests/) | Regression tests and executable examples |
 | [`tmp/`](docs/RUNBOOK.md#one-command-reproduction) | Ignored local evidence directories created by the reproduction runner |

@@ -1,0 +1,79 @@
+{
+  "schema": "gitcalculator.tape.v1",
+  "name": "signed-channel",
+  "input": {
+    "system": "([[-1,0],[0,-1],[1,0],[0,1]], [0,0,1,1])",
+    "base": "-(x0**6+x1**6)",
+    "perturbation": "-x0**2+x0*x1**2"
+  },
+  "receipt_id": "gc-aef2b5a16c8cca5e",
+  "answer": {
+    "verdict": "proved-v22",
+    "headline": "Δ(s) ~ 1/432·s^3",
+    "gamma": "3",
+    "q_star": null
+  },
+  "signature": {
+    "verdict": "proved-v22",
+    "gamma": "3",
+    "q_star": null,
+    "backend": {
+      "status": "refused",
+      "licensed": false,
+      "gamma": null,
+      "q_star": null,
+      "blockers": [
+        "higher_order_unresolved"
+      ],
+      "refusal": "no face of the tangent cone carries the perturbation"
+    },
+    "certificate": {
+      "status": "incomplete",
+      "links": {
+        "standing": "exact",
+        "vertex": "exact",
+        "transport": "exact",
+        "H2": "exact",
+        "H1": "exact",
+        "H0": "exact",
+        "H3": "exact",
+        "faces": "exact",
+        "H5": "unresolved",
+        "selection": "not_reached"
+      }
+    },
+    "curved": {
+      "status": "licensed",
+      "gamma": "3",
+      "coefficient": "1/432",
+      "effective_weight": "2/3",
+      "eliminated_axis": "c0",
+      "identity": "R = S(y) - a*(x - H(y)/(2*a))**2",
+      "proof_basis": "exact full-polynomial transport and quadratic elimination"
+    },
+    "ambient_gamma": null,
+    "measurement": {
+      "curved": "consistent"
+    },
+    "counter": {
+      "signed-channel": "blocks",
+      "empty-not-zero": "caveat",
+      "finite-scale": "caveat",
+      "homogeneity-probe": "averted",
+      "isolation-probe": "averted",
+      "ambient-axes": "clear",
+      "signed-sharp": "clear",
+      "interior-zero": "clear",
+      "active-set": "clear",
+      "critical-layer": "clear",
+      "tied-coefficient": "clear",
+      "inverse-tolerance": "clear",
+      "non-simple": "clear"
+    }
+  },
+  "recorded_with": {
+    "commit": "b6e4350d854e5eb017691f2651f37b46fbf3a864",
+    "code_id": "code-23ad9e729a48",
+    "calculator_id": "calc-d0fa59fc8cee"
+  }
+}

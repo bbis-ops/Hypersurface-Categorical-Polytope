@@ -1,0 +1,76 @@
+{
+  "schema": "gitcalculator.tape.v1",
+  "name": "interior-zero",
+  "input": {
+    "system": "([[-1,0],[0,-1],[1,0],[0,1]], [0,0,1,1])",
+    "base": "-(x0**4+x1**4)",
+    "perturbation": "-(x0-x1)**2+x0**3"
+  },
+  "receipt_id": "gc-16c800b406afad60",
+  "answer": {
+    "verdict": "unlicensed",
+    "headline": "candidate Δ(s) = Θ(s^4), not licensed",
+    "gamma": "4",
+    "q_star": "3/4"
+  },
+  "signature": {
+    "verdict": "unlicensed",
+    "gamma": "4",
+    "q_star": "3/4",
+    "backend": {
+      "status": "unlicensed",
+      "licensed": false,
+      "gamma": "4",
+      "q_star": "3/4",
+      "blockers": [
+        "positivity_unresolved"
+      ],
+      "refusal": null
+    },
+    "certificate": {
+      "status": "incomplete",
+      "links": {
+        "standing": "exact",
+        "vertex": "exact",
+        "transport": "exact",
+        "H2": "exact",
+        "H1": "exact",
+        "H0": "exact",
+        "H3": "exact",
+        "faces": "unresolved",
+        "H5": "unresolved",
+        "selection": "not_reached"
+      }
+    },
+    "curved": {
+      "status": "outside_scope",
+      "blockers": [
+        "no exact feasible simple vertex satisfies the quadratic-reduction hypotheses"
+      ]
+    },
+    "ambient_gamma": null,
+    "measurement": {
+      "backend": "consistent"
+    },
+    "counter": {
+      "signed-channel": "blocks",
+      "interior-zero": "blocks",
+      "finite-scale": "caveat",
+      "homogeneity-probe": "averted",
+      "isolation-probe": "averted",
+      "ambient-axes": "clear",
+      "signed-sharp": "clear",
+      "empty-not-zero": "clear",
+      "active-set": "clear",
+      "critical-layer": "clear",
+      "tied-coefficient": "clear",
+      "inverse-tolerance": "clear",
+      "non-simple": "clear"
+    }
+  },
+  "recorded_with": {
+    "commit": "b6e4350d854e5eb017691f2651f37b46fbf3a864",
+    "code_id": "code-23ad9e729a48",
+    "calculator_id": "calc-d0fa59fc8cee"
+  }
+}

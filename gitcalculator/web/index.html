@@ -1,0 +1,860 @@
+<title>Face-Selection gitcalculator</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: an instrument with five modes. A keypad (problem, presets) beside a
+   display that changes with the mode: Solve prints the tape, Design draws the
+   exponent spectrum, Sweep the phase strip, Attack the counterexample table,
+   History the git timeline. Dark-first, in the repository's ink-teal and brass. */
+:root {
+  --bg: #091924; --panel: #0f2532; --panel-2: #143040; --rule: #23414f;
+  --ink: #f4efe5; --ink-2: #b9cbd0; --ink-3: #86a0a8;
+  --brass: #d9b77b; --brass-ink: #f5d298; --sea: #87b8bd;
+  --ok: #6cc4a1; --warn: #e5a04f; --bad: #ef7d7d; --muted: #8fa3aa;
+  --s1: #3d86e0; --s2: #cf7a30; --s3: #2f9e78; --s4: #9a7bdc;
+  --display: Georgia, "Times New Roman", serif;
+  --sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) {
+  --bg: #f4efe5; --panel: #fbf8f1; --panel-2: #efe8d9; --rule: #d8ccb7;
+  --ink: #102734; --ink-2: #3c5460; --ink-3: #5f747c;
+  --brass: #86621f; --brass-ink: #6c4c12; --sea: #2c666d;
+  --ok: #1f7a5a; --warn: #a1570f; --bad: #b03636; --muted: #5f7177;
+  --s1: #2a78d6; --s2: #c8752a; --s3: #2f8f6f; --s4: #8a5bc4;
+  color-scheme: light;
+} }
+:root[data-theme="light"] {
+  --bg: #f4efe5; --panel: #fbf8f1; --panel-2: #efe8d9; --rule: #d8ccb7;
+  --ink: #102734; --ink-2: #3c5460; --ink-3: #5f747c;
+  --brass: #86621f; --brass-ink: #6c4c12; --sea: #2c666d;
+  --ok: #1f7a5a; --warn: #a1570f; --bad: #b03636; --muted: #5f7177;
+  --s1: #2a78d6; --s2: #c8752a; --s3: #2f8f6f; --s4: #8a5bc4;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 var(--sans); }
+[hidden] { display: none !important; }
+a { color: var(--sea); text-underline-offset: 2px; }
+a:hover { color: var(--brass-ink); }
+:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; border-radius: 3px; }
+.wrap { max-width: 1320px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.masthead { border-bottom: 1px solid var(--rule); }
+.masthead .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; justify-content: space-between; padding-block: 16px 0; }
+.brand { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; min-width: 0; padding-bottom: 14px; }
+.wordmark { font: 400 30px/1 var(--display); letter-spacing: -0.01em; }
+.wordmark b { font-weight: 400; color: var(--brass); }
+.tagline { font: 14px/1.4 var(--sans); color: var(--ink-3); }
+.eyebrow { font: 500 11px/1.4 var(--sans); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+.engine { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font: 13px/1.4 var(--sans); color: var(--ink-2); padding-bottom: 14px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--ok); flex: none; }
+.dot.busy { background: var(--brass); animation: pulse 1.2s ease-in-out infinite; } .dot.off { background: var(--warn); }
+@keyframes pulse { 50% { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) { .dot.busy { animation: none; } }
+.modes { display: flex; gap: 2px; overflow-x: auto; flex: 1 0 100%; scrollbar-width: none; }
+.modes a { flex: none; display: grid; gap: 1px; padding: 9px 16px 11px; text-decoration: none; color: var(--ink-3); border-bottom: 2px solid transparent; }
+.modes a b { font: 500 15px/1.2 var(--sans); color: var(--ink-2); }
+.modes a span { font: 12px/1.3 var(--sans); }
+.modes a[aria-current="page"] { border-bottom-color: var(--brass); }
+.modes a[aria-current="page"] b { color: var(--ink); }
+button { font: 500 14px/1 var(--sans); border-radius: 6px; padding: 10px 14px; cursor: pointer; border: 1px solid var(--rule); background: var(--panel-2); color: var(--ink); }
+button.primary { background: var(--brass); border-color: var(--brass); color: var(--bg); }
+button.quiet { padding: 6px 10px; font-size: 13px; }
+button.link { background: none; border: 0; padding: 0; color: var(--sea); text-decoration: underline; text-underline-offset: 2px; font: inherit; }
+button:disabled { opacity: .55; cursor: progress; }
+.layout { display: grid; gap: 28px; padding-block: 24px 64px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 1000px) { .layout { grid-template-columns: minmax(290px, 350px) minmax(0, 1fr); align-items: start; } .keypad { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); } }
+.keypad, .display { display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0; }
+.keypad { gap: 18px; } .display { gap: 26px; }
+.keypad > *, .display > * { min-width: 0; }
+.panel { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 18px; min-width: 0; }
+form { display: grid; gap: 12px; }
+label { display: grid; gap: 5px; font: 500 13px/1.3 var(--sans); color: var(--ink-2); }
+label small { font-weight: 400; color: var(--ink-3); }
+textarea, input { width: 100%; font: 13.5px/1.45 var(--mono); color: var(--ink); background: var(--bg); border: 1px solid var(--rule); border-radius: 6px; padding: 9px 10px; }
+textarea { min-height: 72px; resize: vertical; }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.note { margin: 0; font-size: 13px; color: var(--ink-2); overflow-wrap: anywhere; }
+.cmd { display: block; white-space: pre-wrap; word-break: break-all; font: 12.5px/1.5 var(--mono); background: var(--bg); border: 1px solid var(--rule); border-radius: 6px; padding: 8px 10px; margin-top: 8px; color: var(--ink); }
+.presets { display: grid; gap: 14px; }
+.preset-group { display: grid; gap: 7px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font: 13px/1.2 var(--sans); padding: 7px 10px; border-radius: 999px; background: transparent; border: 1px solid var(--rule); color: var(--ink-2); }
+.chip[aria-pressed="true"] { border-color: var(--brass); color: var(--ink); background: var(--panel-2); }
+.readout { background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; padding: 22px 24px; display: grid; gap: 12px; }
+.verdict { justify-self: start; font: 600 12px/1 var(--sans); letter-spacing: .16em; text-transform: uppercase; padding: 7px 10px 6px; border-radius: 4px; border: 1px solid currentColor; }
+.v-proved, .v-proved-v22, .v-reachable { color: var(--ok); } .v-licensed { color: var(--brass); } .v-unlicensed, .v-fragile { color: var(--warn); }
+.v-refused, .v-unreachable { color: var(--muted); } .v-contradicted { color: var(--bad); }
+.headline { font: 400 clamp(26px, 4.4vw, 44px)/1.15 var(--display); letter-spacing: -0.01em; text-wrap: balance; overflow-wrap: anywhere; }
+sup { font-size: .62em; line-height: 0; }
+.numbers { display: flex; flex-wrap: wrap; gap: 10px 28px; margin: 0; }
+.numbers div { display: grid; gap: 2px; }
+.numbers dt { font: 500 12px/1 var(--sans); letter-spacing: .04em; color: var(--ink-3); }
+.numbers dd { margin: 0; font: 500 19px/1.2 var(--mono); font-variant-numeric: tabular-nums; }
+.meaning { margin: 0; color: var(--ink-2); max-width: 72ch; }
+.stamp { margin: 0; font: 12px/1.6 var(--mono); color: var(--ink-3); overflow-wrap: anywhere; }
+.stamp b { color: var(--brass-ink); font-weight: 500; }
+h2 { font: 400 23px/1.2 var(--display); margin: 0 0 4px; text-wrap: balance; }
+h3 { font: 600 14px/1.3 var(--sans); margin: 0 0 8px; }
+.sec-head { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+.sec-head p { margin: 0; color: var(--ink-2); font-size: 14px; max-width: 70ch; }
+.scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+tr:last-child td { border-bottom: 0; }
+th { font: 500 11px/1.3 var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); background: var(--panel-2); white-space: nowrap; }
+th.m { text-transform: none; letter-spacing: 0; font-size: 13px; }
+td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ledger td:first-child { min-width: 190px; } .ledger td.col-backend { min-width: 200px; } .ledger td.col-cert { min-width: 250px; } .ledger td:last-child { min-width: 160px; }
+.clause { font-weight: 600; } .statement { color: var(--ink-2); font-size: 13px; margin-top: 3px; }
+.mono { font-family: var(--mono); font-size: 12.5px; overflow-wrap: anywhere; }
+.status { display: inline-flex; align-items: center; gap: 6px; font: 600 11px/1 var(--sans); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 5px; }
+.status::before { content: ""; width: 8px; height: 8px; border-radius: 2px; background: currentColor; }
+.s-exact { color: var(--ok); } .s-probed { color: var(--brass); } .s-unresolved { color: var(--warn); } .s-failed { color: var(--bad); } .s-not_reached, .s-not_applicable { color: var(--muted); }
+.tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.tag { font: 12px/1.2 var(--mono); padding: 4px 7px; border-radius: 4px; border: 1px solid var(--rule); color: var(--ink-2); background: transparent; }
+.e-blocks, .e-breaks { color: var(--bad); border-color: currentColor; } .e-caveat { color: var(--warn); border-color: currentColor; }
+.e-averted, .e-holds { color: var(--ok); border-color: currentColor; } .e-clear { color: var(--muted); }
+.counters { display: grid; gap: 8px; }
+.counter { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 12px 14px; }
+.counter summary { cursor: pointer; display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 4px 12px; align-items: baseline; list-style: none; }
+.counter summary::-webkit-details-marker { display: none; }
+.effect { font: 600 11px/1.2 var(--sans); letter-spacing: .12em; text-transform: uppercase; }
+.counter .title { font-weight: 600; }
+.counter .detail { grid-column: 2; color: var(--ink-2); font-size: 14px; }
+.counter .more { margin: 10px 0 2px 104px; display: grid; gap: 6px; font-size: 14px; color: var(--ink-2); overflow-wrap: anywhere; }
+.counter .more b { color: var(--ink); font-weight: 600; }
+@media (max-width: 560px) { .counter summary { grid-template-columns: minmax(0, 1fr); } .counter .detail { grid-column: 1; } .counter .more { margin-left: 0; } }
+.figures { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr)); }
+.stage { touch-action: pan-y; cursor: grab; border-radius: 8px; outline-offset: 3px; user-select: none; -webkit-user-select: none; }
+.stage:active { cursor: grabbing; }
+.stage-bar { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; margin-top: 6px; }
+figure { margin: 0; background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 14px; position: relative; min-width: 0; }
+figcaption { font-size: 13px; color: var(--ink-2); margin-top: 8px; }
+figure h3 { margin-bottom: 4px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--ink-2); margin: 0 0 6px; padding: 0; list-style: none; }
+.legend li { display: inline-flex; align-items: center; gap: 7px; }
+.swatch { width: 18px; height: 2px; border-radius: 1px; display: inline-block; }
+.swatch.pt { width: 9px; height: 9px; border-radius: 50%; background: var(--ink); }
+svg text { font: 11.5px var(--sans); fill: var(--ink-3); }
+svg .lbl { font: 12px var(--sans); fill: var(--ink-2); }
+svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
+.tip { position: absolute; pointer-events: none; background: var(--panel-2); border: 1px solid var(--rule); border-radius: 6px; padding: 8px 10px; font: 12px/1.5 var(--mono); color: var(--ink); max-width: 320px; box-shadow: 0 6px 18px rgb(0 0 0 / .25); z-index: 2; }
+.verdicts { display: grid; gap: 6px; margin-top: 10px; }
+.verdicts div { font-size: 14px; color: var(--ink-2); }
+.agree { display: flex; gap: 12px; align-items: flex-start; }
+.agree .mark { font: 600 18px/1 var(--sans); }
+.timeline { list-style: none; margin: 0; padding: 0; display: grid; }
+.state { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 0 12px; }
+.rail { position: relative; } .rail::before { content: ""; position: absolute; left: 9px; top: 0; bottom: 0; width: 2px; background: var(--rule); }
+.rail::after { content: ""; position: absolute; left: 4px; top: 16px; width: 12px; height: 12px; border-radius: 50%; background: var(--panel); border: 2px solid var(--sea); }
+.state.wrong .rail::after { border-color: var(--bad); background: var(--bad); } .state.none .rail::after { border-color: var(--muted); }
+.state-body { padding: 10px 0 14px; min-width: 0; }
+.state-head { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; font: 12.5px/1.4 var(--mono); color: var(--ink-3); }
+.state-sum { margin: 4px 0 0; font-size: 14px; overflow-wrap: anywhere; }
+.flag { color: var(--bad); font-weight: 600; }
+.change { margin: 8px 0 0; padding: 8px 10px; border-left: 2px solid var(--brass); background: var(--panel); border-radius: 0 6px 6px 0; font-size: 13px; }
+.change .mono { display: block; color: var(--ink-2); }
+.kv { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 16px; margin: 0; font-size: 14px; }
+.kv dt { color: var(--ink-3); } .kv dd { margin: 0; overflow-wrap: anywhere; }
+.empty { color: var(--ink-2); font-size: 14px; margin: 0; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 0; font-size: 14px; color: var(--ink-2); }
+.facts b { color: var(--ink); font-family: var(--mono); font-weight: 500; }
+.toast { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--panel-2); border: 1px solid var(--rule); color: var(--ink); padding: 9px 14px; border-radius: 8px; font-size: 14px; z-index: 5; }
+</style>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="brand">
+      <span class="wordmark"><b>git</b>calculator</span>
+      <span class="tagline">Newton–tropical face selection · γ = 1/(1 − q*)</span>
+    </div>
+    <div class="engine" id="engine" aria-live="polite"><span class="dot" id="engine-dot"></span><span id="engine-text">Exact engine ready</span>
+      <button type="button" class="quiet" id="engine-start" hidden>Also run the repository's Python</button></div>
+    <nav class="modes" aria-label="Modes">
+      <a href="#solve" data-mode="solve"><b>Solve</b><span>exponent, proof, attacks</span></a>
+      <a href="#design" data-mode="design"><b>Design</b><span>which γ are possible</span></a>
+      <a href="#sweep" data-mode="sweep"><b>Sweep</b><span>phase walls in t</span></a>
+      <a href="#attack" data-mode="attack"><b>Attack</b><span>break this answer</span></a>
+      <a href="#history" data-mode="history"><b>History</b><span>every commit's answer</span></a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap layout">
+  <aside class="keypad" aria-label="Problem">
+    <div class="panel">
+      <form id="form" autocomplete="off">
+        <label for="system">Polyhedron (A, b) with A·x ≤ b
+          <textarea id="system" spellcheck="false"></textarea></label>
+        <label for="base">Base objective F <small>in x0, x1, …</small>
+          <input id="base" spellcheck="false"></label>
+        <label for="perturbation" data-for="solve attack history sweep"><span id="pert-label">Perturbation G</span>
+          <input id="perturbation" spellcheck="false"></label>
+        <label for="target" data-for="design">Target exponent γ <small>optional, such as 3/2</small>
+          <input id="target" spellcheck="false" placeholder="3/2"></label>
+        <div class="pair" data-for="sweep">
+          <label for="from">t from <input id="from" spellcheck="false" value="-1"></label>
+          <label for="to">t to <input id="to" spellcheck="false" value="1"></label>
+        </div>
+        <label for="observed" data-for="solve">Observed exponent <small>optional, for the inverse check</small>
+          <input id="observed" spellcheck="false" placeholder="4/3"></label>
+        <div class="actions"><button type="submit" class="primary" id="run">Solve</button><button type="button" id="share" hidden>Copy link</button></div>
+        <p class="note" id="form-note"></p>
+      </form>
+    </div>
+    <div class="presets" id="presets"></div>
+  </aside>
+
+  <div class="display">
+    <!-- SOLVE -->
+    <section data-view="solve" class="readout" aria-live="polite" aria-label="Answer">
+      <span class="verdict" id="verdict">—</span>
+      <div class="headline" id="headline">—</div>
+      <dl class="numbers" id="numbers"></dl>
+      <p class="meaning" id="meaning"></p>
+      <p class="stamp" id="stamp"></p>
+    </section>
+    <section data-view="solve" class="panel" id="agree-panel" hidden></section>
+    <section data-view="solve" aria-labelledby="h-pictures">
+      <div class="sec-head"><h2 id="h-pictures">The mechanism, drawn</h2><p>Left: the Newton diagram in edge coordinates, where the perturbation monomial nearest the origin in the weighted sense wins. Right: P with its vertex and the certified optimizer path as s shrinks.</p></div>
+      <div class="figures"><figure id="fig-newton"></figure><figure id="fig-geometry"></figure></div>
+    </section>
+    <section data-view="solve" aria-labelledby="h-ledger">
+      <div class="sec-head"><h2 id="h-ledger">Theorem ledger</h2><p>Each clause of the polyhedral theorem, the exact check made for it, and the counter-arguments aimed at that step.</p></div>
+      <div class="scroll"><table class="ledger"><thead id="ledger-head"></thead><tbody id="ledger"></tbody></table></div>
+    </section>
+    <section data-view="solve" aria-labelledby="h-counter">
+      <div class="sec-head"><h2 id="h-counter">Counter-arguments</h2><p>The repository's refuted claims, each applied to this input. Open one for the refuting example and its sources.</p></div>
+      <div class="counters" id="counters"></div>
+    </section>
+    <section data-view="solve" aria-labelledby="h-measure">
+      <div class="sec-head"><h2 id="h-measure">Measurement</h2><p>Certified lower bounds: every point is a witness verified to lie in P, with Δ(s) ≥ L(s) evaluated in exact rational arithmetic. Lines show each prediction's slope.</p></div>
+      <figure id="fig-measure"><ul class="legend" id="legend"></ul><div id="chart"></div><div class="tip" id="tip" hidden></div></figure>
+      <div class="verdicts" id="verdicts"></div>
+      <details style="margin-top:12px"><summary class="note" style="cursor:pointer">Show the witness table</summary>
+        <div class="scroll" style="margin-top:8px"><table><thead><tr><th class="m">s</th><th class="m">L(s) ≥</th><th>Witness c</th><th>Support</th><th>In P</th></tr></thead><tbody id="rows"></tbody></table></div></details>
+    </section>
+    <section data-view="solve" aria-labelledby="h-prov">
+      <div class="sec-head"><h2 id="h-prov">Provenance</h2><p>What produced this answer, by git blob id where it came from the repository.</p></div>
+      <div class="panel" id="provenance"></div>
+    </section>
+
+    <!-- DESIGN -->
+    <section data-view="design" class="readout" aria-live="polite">
+      <span class="verdict" id="d-verdict">—</span>
+      <div class="headline" id="d-headline">—</div>
+      <p class="meaning" id="d-meaning"></p>
+      <dl class="facts" id="d-facts"></dl>
+    </section>
+    <section data-view="design" aria-labelledby="h-spectrum">
+      <div class="sec-head"><h2 id="h-spectrum">Exponent spectrum</h2><p>In the edge chart the coordinates are the active constraints' slacks, so a monomial c^α is the perturbation ∏ slackᵢ^αᵢ with weighted degree Σ αᵢ/βᵢ. Every exponent a qualified face or a V.22 channel can produce here is on this line.</p></div>
+      <figure id="fig-spectrum"></figure>
+    </section>
+    <section data-view="design" aria-labelledby="h-mech">
+      <div class="sec-head"><h2 id="h-mech">Mechanisms</h2><p>Each exponent, the slack monomials that produce it, and a perturbation to try. Solve one to see its full certificate.</p></div>
+      <div class="scroll"><table><thead><tr><th class="m">γ</th><th class="m">q</th><th>Edge monomials</th><th>Perturbation G</th><th></th></tr></thead><tbody id="d-table"></tbody></table></div>
+    </section>
+
+    <!-- SWEEP -->
+    <section data-view="sweep" class="readout" aria-live="polite">
+      <span class="verdict" id="w-verdict">—</span>
+      <div class="headline" id="w-headline">—</div>
+      <p class="meaning" id="w-meaning"></p>
+    </section>
+    <section data-view="sweep" aria-labelledby="h-strip">
+      <div class="sec-head"><h2 id="h-strip">Phase strip</h2><p>The family's exact walls: where a transported coefficient vanishes, and certified brackets around any other change of outcome, such as a positivity wall. Each chamber is certified at sample points.</p></div>
+      <figure id="fig-strip"></figure>
+    </section>
+    <section data-view="sweep" aria-labelledby="h-walls">
+      <div class="sec-head"><h2 id="h-walls">Walls and chambers</h2><p id="w-laws"></p></div>
+      <div class="scroll"><table><thead><tr><th class="m">t</th><th>Kind</th><th>Outcome</th><th class="m">γ</th><th>Winning faces</th></tr></thead><tbody id="w-table"></tbody></table></div>
+    </section>
+
+    <!-- ATTACK -->
+    <section data-view="attack" class="readout" aria-live="polite">
+      <span class="verdict" id="a-verdict">—</span>
+      <div class="headline" id="a-headline">—</div>
+      <p class="meaning" id="a-meaning"></p>
+    </section>
+    <section data-view="attack" aria-labelledby="h-mut">
+      <div class="sec-head"><h2 id="h-mut">Generated counterexamples</h2><p>Lower-order intrusions and suppressions from the exponent spectrum, sign flips of the winning terms, base cross terms at the principal weight, and facet tilts about the vertex. Each mutated input is re-certified.</p></div>
+      <div class="scroll"><table><thead><tr><th>Result</th><th>Mutation</th><th>New answer</th><th></th></tr></thead><tbody id="a-table"></tbody></table></div>
+    </section>
+
+    <!-- HISTORY -->
+    <section data-view="history" aria-labelledby="h-history">
+      <div class="sec-head"><h2 id="h-history">History</h2><p id="history-lede">The same input answered by every code state in the repository's git history.</p></div>
+      <ol class="timeline" id="timeline"></ol>
+    </section>
+  </div>
+</main>
+<div class="toast" id="toast" hidden></div>
+
+<script src="engine.js"></script>
+<script src="modes.js"></script>
+<script>
+(() => {
+  "use strict";
+  const E = window.GitCalc, BUILD = window.GITCALC_BUILD || {};
+  const $ = (id) => document.getElementById(id);
+  const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const sup = (text) => esc(text).replace(/\^(\d+(?:[./]\d+)?)/g, "<sup>$1</sup>");
+  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const fmtQ = (text) => { if (text == null) return "—"; const q = E.Q.parse(text); return q.d <= 1000000n ? String(q) : "≈" + q.toNumber().toPrecision(15).replace(/\.?0+$/, ""); };
+  const qCell = (text) => `<span title="${esc(text)}">${esc(fmtQ(text))}</span>`;
+  const MODES = { solve: "Solve", design: "Find the spectrum", sweep: "Sweep", attack: "Attack", history: "Replay history" };
+  const SERIES = { backend: "--s1", "exact-faces": "--s1", curved: "--s3", "ambient-axes": "--s4" };
+  const SQUARE = "([[-1,0],[0,-1],[1,0],[0,1]], [0,0,1,1])", SIMPLEX = "([[-1,0],[0,-1],[1,1]], [0,0,1])";
+  const CUBE = "([[-1,0,0],[0,-1,0],[0,0,-1],[1,0,0],[0,1,0],[0,0,1]], [0,0,0,1,1,1])";
+  const SOLVE_GROUPS = [
+    ["Worked examples", ["tilted-simplex", "sheared-simplex", "cube-3d", "tied-faces", "active-set"]],
+    ["Counterexamples", ["signed-channel", "signed-sharp", "interior-zero", "cross-term", "tied-maximizers"]],
+    ["Boundaries", ["curved-cancellation", "critical-layer", "pyramid-apex"]],
+  ];
+  const DESIGN_PRESETS = [
+    { title: "Tilted simplex", note: "Orders 4 and 2: only γ = 4/3, 2, 4 are possible.", request: { system: SIMPLEX, base: "-((x0+x1-1)**2 + x0**4)", target: "3/2" } },
+    { title: "Square, orders 4 and 6", note: "Ten exponents, from 6/5 to 12.", request: { system: SQUARE, base: "-(x0**4+x1**6)", target: "3/2" } },
+    { title: "Square, orders 6 and 6", note: "The signed channel's geometry.", request: { system: SQUARE, base: "-(x0**6+x1**6)", target: "3" } },
+    { title: "Cube, orders 2, 4, 6", note: "Three weights in three dimensions.", request: { system: CUBE, base: "-(x0**2+x1**4+x2**6)", target: "6/5" } },
+  ];
+  const SWEEP_PRESETS = [
+    { title: "Qualification wall", note: "V.18's example: the x0 coefficient crosses zero at t = 1/3.", request: { system: SQUARE, base: "-(x0**4 + x1**2)", perturbation: "(t - 1/3)*x0 + x1", from: "-1", to: "1" } },
+    { title: "Positivity wall", note: "No coefficient vanishes at t = 2, yet the outcome changes there.", request: { system: SQUARE, base: "-(x0**4+x1**4)", perturbation: "-x0**2 + t*x0*x1 - x1**2", from: "0", to: "4" } },
+    { title: "Curved channel switch", note: "V.22 turns on with the driver's sign.", request: { system: SQUARE, base: "-(x0**6+x1**6)", perturbation: "-x0**2 + t*x0*x1**2", from: "-1", to: "1" } },
+    { title: "Simplex edge race", note: "The quartic edge wins only for positive t.", request: { system: SIMPLEX, base: "-((x0+x1-1)**2 + x0**4)", perturbation: "t*x0 + (1 - x0 - x1)", from: "-1", to: "1" } },
+  ];
+  const store = { ledger: null, bundle: null, mode: "solve", preset: { solve: "tilted-simplex", design: 0, sweep: 0, attack: "tilted-simplex", history: "signed-sharp" }, worker: null, ready: false, starting: null, pending: new Map(), seq: 0 };
+
+  function toast(message) { const t = $("toast"); t.textContent = message; t.hidden = false; clearTimeout(toast.timer); toast.timer = setTimeout(() => { t.hidden = true; }, 2600); }
+  function engineStatus(kind, text, canStart) { $("engine-dot").className = "dot " + kind; $("engine-text").textContent = text; $("engine-start").hidden = !canStart; }
+  function repoUrl() { const r = (store.ledger?.head?.remote || "").replace(/\.git$/, ""); return r.startsWith("https://github.com/") ? r : null; }
+  function onRemote(commit) { const known = store.ledger?.remote_commits; return Boolean(commit) && (!known || known.includes(commit)); }
+  function docLink(path, label) {
+    const url = repoUrl(), ref = store.ledger?.head?.link_ref || store.ledger?.head?.commit, [file, anchor] = String(path).split("#");
+    const linkable = store.ledger?.linkable;
+    if (!url || !ref || (linkable && !linkable.includes(file))) return `<span class="mono">${esc(label || path)}</span>`;
+    return `<a href="${esc(url)}/blob/${esc(ref)}/${esc(file)}${anchor ? "#" + esc(anchor) : ""}" target="_blank" rel="noopener">${esc(label || path)}</a>`;
+  }
+  const commitLink = (c) => (repoUrl() && onRemote(c.commit) ? `<a href="${esc(repoUrl())}/commit/${esc(c.commit)}" target="_blank" rel="noopener">${esc(c.short)}</a>` : esc(c.short));
+
+  // ===== form, presets, modes =================================================
+  function readForm() {
+    const value = (id) => $(id).value.trim();
+    const request = { system: value("system"), base: value("base") };
+    if (!request.system || !request.base) throw new Error("Enter the polyhedron and the base objective.");
+    if (store.mode === "design") { request.target = value("target"); return request; }
+    request.perturbation = value("perturbation");
+    if (!request.perturbation) throw new Error(store.mode === "sweep" ? "Enter a family G(t) that uses t." : "Enter the perturbation G.");
+    if (store.mode === "sweep") { request.from = value("from") || "-1"; request.to = value("to") || "1"; if (!/\bt\b/.test(request.perturbation)) throw new Error("A sweep needs the parameter t in G, for example (t - 1/3)*x0 + x1."); }
+    if (store.mode === "solve" && value("observed")) { const [p, q] = value("observed").split("/"); const v = q ? Number(p) / Number(q) : Number(p); if (!Number.isFinite(v)) throw new Error("The observed exponent must be a number such as 4/3."); request.observed_exponent = v; }
+    return request;
+  }
+  function fill(request) {
+    for (const id of ["system", "base", "perturbation", "target", "from", "to"]) if (request[id] != null) $(id).value = request[id];
+    if (request.observed != null) $("observed").value = request.observed;
+    else if (request.observed_exponent == null) $("observed").value = "";
+  }
+  const cli = (mode, r) => {
+    const q = (v) => "'" + String(v).replace(/'/g, "'\\''") + "'";
+    const cmd = { solve: "calc", design: "design", sweep: "sweep", attack: "attack", history: "history" }[mode];
+    let s = `python -m gitcalculator ${cmd} --system ${q(r.system)} --base ${q(r.base)}`;
+    if (mode === "design") return s + (r.target ? ` --target ${q(r.target)}` : "");
+    s += ` --perturbation ${q(r.perturbation)}`;
+    if (mode === "sweep") s += ` --from ${q(r.from)} --to ${q(r.to)}`;
+    return s;
+  };
+  function presetChips() {
+    const host = $("presets"); host.innerHTML = "";
+    const group = (title, items) => {
+      const g = document.createElement("div"); g.className = "preset-group"; g.innerHTML = `<span class="eyebrow">${esc(title)}</span><div class="chips"></div>`;
+      for (const [id, label, note, request] of items) {
+        const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = label; b.title = note; b.dataset.id = String(id);
+        b.setAttribute("aria-pressed", String(String(store.preset[store.mode]) === String(id)));
+        b.addEventListener("click", () => { store.preset[store.mode] = id; fill(request); $("form-note").textContent = note; presetChips(); run(); });
+        g.querySelector(".chips").appendChild(b);
+      }
+      host.appendChild(g);
+    };
+    if (store.mode === "design") group("Geometries", DESIGN_PRESETS.map((p, i) => [i, p.title, p.note, p.request]));
+    else if (store.mode === "sweep") group("Families", SWEEP_PRESETS.map((p, i) => [i, p.title, p.note, p.request]));
+    else for (const [title, names] of SOLVE_GROUPS) group(title, names.filter((n) => store.ledger?.presets?.[n] || PRESET_INPUTS[n]).map((n) => {
+      const p = store.ledger?.presets?.[n] || PRESET_INPUTS[n];
+      return [n, p.title, p.note, p.request];
+    }));
+  }
+  function setMode(mode) {
+    if (!MODES[mode]) mode = "solve";
+    store.mode = mode;
+    for (const a of document.querySelectorAll(".modes a")) { if (a.dataset.mode === mode) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); }
+    for (const el of document.querySelectorAll("[data-view]")) el.hidden = el.dataset.view !== mode;
+    for (const el of document.querySelectorAll("[data-for]")) el.hidden = !el.dataset.for.split(" ").includes(mode);
+    $("pert-label").textContent = mode === "sweep" ? "Family G(t), using t" : "Perturbation G";
+    $("run").textContent = MODES[mode];
+    const preset = store.preset[mode];
+    const solveLike = store.ledger?.presets?.[preset] || PRESET_INPUTS[preset] || PRESET_INPUTS["tilted-simplex"];
+    const chosen = mode === "design" ? DESIGN_PRESETS[preset] : mode === "sweep" ? SWEEP_PRESETS[preset] : solveLike;
+    const shared = store.fromLink;
+    store.fromLink = null;
+    const keep = shared || (mode !== "design" && mode !== "sweep" && store.lastSolveLike);
+    fill(keep || chosen.request);
+    $("form-note").textContent = shared ? "Opened from a shared link." : keep ? "" : chosen.note;
+    presetChips();
+    run();
+  }
+
+  // ===== Solve ===================================================================
+  function renderReceipt(receipt) {
+    const a = receipt.answer;
+    const v = $("verdict"); v.className = "verdict v-" + a.verdict; v.textContent = a.verdict === "proved-v22" ? "Proved · V.22" : a.verdict;
+    $("headline").innerHTML = sup(a.headline);
+    const lowest = (receipt.measurement.verdicts || []).find((x) => x.coefficient_ratio);
+    const coefficient = a.coefficient ? (a.coefficient.exact || Number(a.coefficient.value).toPrecision(6)) : "—";
+    $("numbers").innerHTML = [["γ", a.gamma ?? "—"], ["q*", a.q_star ?? "—"], ["C", coefficient], ["Certificate", a.certificate_status], ["Engine", receipt.engine ? "exact JS" : "Python"]]
+      .map(([k, val]) => `<div><dt>${esc(k)}</dt><dd>${esc(val)}</dd></div>`).join("");
+    $("meaning").textContent = a.meaning + (a.coefficient ? ` The coefficient is ${a.coefficient.source}.` : "") + (lowest ? ` At the smallest scale the certified bound is ${lowest.coefficient_ratio}× the predicted leading term.` : "");
+    const p = receipt.provenance, g = p.git || {};
+    $("stamp").innerHTML = `receipt <b>${esc(receipt.id)}</b> · ${receipt.engine ? `exact JS engine ${esc(BUILD.engine_blob ? BUILD.engine_blob.slice(0, 12) : receipt.engine)}` : `Python ${esc(p.code_id)} · ${esc(p.calculator_id)}`} · commit ${esc(g.short || store.ledger?.head?.short || "—")} · ${esc(((receipt.timings || {}).total ?? Object.values(receipt.timings || {}).reduce((x, y) => x + y, 0)).toFixed(3))}s`;
+    const effect = Object.fromEntries(receipt.counterarguments.map((c) => [c.id, c]));
+    const withBackend = receipt.steps.some((s) => s.backend);
+    $("ledger-head").innerHTML = `<tr><th>Theorem clause</th>${withBackend ? "<th>Backend computed</th>" : ""}<th>Exact certificate</th><th>Challenged by</th></tr>`;
+    $("ledger").innerHTML = receipt.steps.map((s) => `<tr>
+      <td><div class="clause">${docLink(s.doc, s.clause)}</div><div class="statement">${esc(s.statement)}</div></td>
+      ${withBackend ? `<td class="mono col-backend">${esc(s.backend)}</td>` : ""}
+      <td class="col-cert"><div class="status s-${esc(s.certificate.status)}">${esc(s.certificate.status.replace("_", " "))}</div><div>${sup(s.certificate.detail)}</div><div class="statement">${esc(s.certificate.method)}</div></td>
+      <td><div class="tags">${s.challenges.map((c) => `<span class="tag e-${esc(c.effect)}" title="${esc(effect[c.id]?.detail)}">${esc(c.id)} · ${esc(c.effect)}</span>`).join("") || '<span class="statement">—</span>'}</div></td></tr>`).join("");
+    $("counters").innerHTML = receipt.counterarguments.map((c) => `<details class="counter"><summary><span class="effect e-${esc(c.effect)}">${esc(c.effect)}</span><span class="title">${esc(c.title)}</span><span class="detail">${sup(c.detail)}</span></summary>
+      <div class="more"><div><b>Refuted claim.</b> ${esc(c.claim)}</div><div><b>Counterexample.</b> ${esc(c.refutation)}</div><div><b>Sources.</b> ${c.sources.map((s) => docLink(s)).join(" · ")}</div></div></details>`).join("");
+    renderMeasurement(receipt.measurement);
+    renderNewton(receipt.newton);
+    renderGeometry(receipt.geometry);
+    renderProvenance(receipt);
+  }
+  function renderAgreement(js, recorded) {
+    const host = $("agree-panel");
+    if (!recorded) { host.hidden = true; return; }
+    const py = recorded.signature, jl = js.signature.certificate.links, pl = py.certificate.links;
+    const diffs = Object.keys({ ...pl, ...jl }).filter((k) => pl[k] !== jl[k] && !(pl[k] === "probed" && jl[k] === "unresolved"));
+    const pyGamma = recorded.certificate?.gamma ?? null, jsGamma = js.certificate.gamma ?? null;
+    const same = !diffs.length && pyGamma === jsGamma && py.certificate.status === js.signature.certificate.status;
+    host.hidden = false;
+    host.innerHTML = `<div class="agree"><span class="mark" style="color:var(${same ? "--ok" : "--warn"})">${same ? "✓" : "≠"}</span><div>
+      <h3>${same ? "Two independent implementations agree" : "The two implementations differ"}</h3>
+      <p class="note">This page's exact JavaScript engine and the repository's Python (recorded receipt ${esc(recorded.id)}, Python verdict <b>${esc(recorded.answer.verdict)}</b>) ${same ? `give the same certificate (${esc(js.signature.certificate.status)}, γ = ${esc(jsGamma ?? "—")}) and the same status on all ${Object.keys(jl).length} links.` : `differ on ${esc(diffs.join(", ") || "the exponent")}.`}
+      ${recorded.answer.verdict === "licensed" ? " The Python backend also licenses this answer by numerical probes; the exact certificate does not." : ""}
+      ${recorded.answer.verdict !== js.answer.verdict && recorded.answer.verdict !== "licensed" ? ` Python's γ = ${esc(recorded.answer.gamma)} comes from its numerical predictor, which this engine does not run.` : ""}</p></div></div>`;
+  }
+  function renderMeasurement(m) {
+    const rows = (m.rows || []).filter((r) => r.lower_bound !== "0");
+    $("rows").innerHTML = (m.rows || []).map((r) => `<tr><td class="num">${esc(r.s)}</td><td class="num">${esc(r.lower_bound)}</td><td class="mono">(${esc(r.witness_c.join(", "))})</td><td class="mono">{${esc(r.support.join(", "))}}</td><td>${r.feasible ? "yes" : "no"}</td></tr>`).join("")
+      || `<tr><td colspan="5" class="empty">${esc(m.reason || m.summary || "No measurement for this input.")}</td></tr>`;
+    const verdicts = m.verdicts || [];
+    $("verdicts").innerHTML = verdicts.map((v) => `<div><b style="color:var(${SERIES[v.id] || "--ink"})">${esc(v.label || v.id)}</b> · γ = ${esc(v.gamma)} · <span class="effect ${v.verdict === "contradicted" ? "e-blocks" : v.verdict === "consistent" ? "e-averted" : "e-caveat"}">${esc(v.verdict)}</span>${v.detail ? " — " + sup(v.detail) : ""}</div>`).join("")
+      || `<div>${esc(m.status === "complete" ? (m.positive_gain_found ? "No prediction to compare." : "No positive gain was found at any tested s.") : (m.reason || ""))}</div>`;
+    const host = $("chart"), legend = $("legend");
+    if (rows.length < 2) { host.innerHTML = `<p class="empty" style="padding:12px 4px">${esc(m.reason || (m.positive_gain_found ? "Too few points to plot." : "No positive certified gain: L(s) = 0 at every tested s."))}</p>`; legend.innerHTML = ""; return; }
+    const W = 760, H = 320, L = 64, R = 170, T = 14, B = 42;
+    const lg = (dec) => { const [mant, exp] = dec.split("e"); return Math.log10(Number(mant)) + Number(exp); };
+    const pts = rows.map((r) => ({ x: Math.log10(Number(r.s_value)), y: lg(r.lower_bound), r }));
+    const xmin = Math.min(...pts.map((p) => p.x)), xmax = Math.max(...pts.map((p) => p.x)), last = pts.reduce((a, b) => (b.x < a.x ? b : a));
+    const lines = verdicts.filter((v) => v.gamma && SERIES[v.id]).map((v) => { const g = v.gamma.includes("/") ? v.gamma.split("/").reduce((p, q) => Number(p) / Number(q)) : Number(v.gamma); return { v, y0: last.y, y1: last.y + g * (xmax - last.x) }; });
+    const ys = pts.map((p) => p.y).concat(lines.flatMap((l) => [l.y0, l.y1]));
+    let ymin = Math.floor(Math.min(...ys)), ymax = Math.ceil(Math.max(...ys)); if (ymax === ymin) ymax += 1;
+    const X = (x) => L + (x - xmin) / ((xmax - xmin) || 1) * (W - L - R), Y = (y) => T + (ymax - y) / (ymax - ymin) * (H - T - B);
+    const span = ymax - ymin, step = span > 24 ? 6 : span > 12 ? 4 : span > 6 ? 2 : 1;
+    let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Certified lower bounds of the response on log-log axes">`;
+    for (let y = Math.ceil(ymin / step) * step; y <= ymax; y += step) svg += `<line x1="${L}" x2="${W - R}" y1="${Y(y)}" y2="${Y(y)}" stroke="${css("--rule")}"/><text x="${L - 8}" y="${Y(y) + 4}" text-anchor="end">1e${y}</text>`;
+    for (let x = Math.ceil(xmin); x <= Math.floor(xmax); x += 1) svg += `<line x1="${X(x)}" x2="${X(x)}" y1="${H - B}" y2="${H - B + 5}" stroke="${css("--ink-3")}"/><text x="${X(x)}" y="${H - B + 19}" text-anchor="middle">1e${x}</text>`;
+    svg += `<line x1="${L}" x2="${W - R}" y1="${H - B}" y2="${H - B}" stroke="${css("--ink-3")}"/><text x="${(L + W - R) / 2}" y="${H - 6}" text-anchor="middle">perturbation size s</text><text x="14" y="${(T + H - B) / 2}" text-anchor="middle" transform="rotate(-90 14 ${(T + H - B) / 2})">certified L(s)</text>`;
+    const labels = lines.map((l) => ({ ...l, ly: Y(l.y1) })).sort((a, b) => a.ly - b.ly);
+    for (let i = 1; i < labels.length; i++) if (labels[i].ly - labels[i - 1].ly < 15) labels[i].ly = labels[i - 1].ly + 15;
+    for (const l of labels) {
+      svg += `<line x1="${X(last.x)}" y1="${Y(l.y0)}" x2="${X(xmax)}" y2="${Y(l.y1)}" stroke="${css(SERIES[l.v.id])}" stroke-width="2" stroke-linecap="round"${l.v.verdict === "contradicted" ? ' stroke-dasharray="6 5"' : ""}/>`;
+      svg += `<text class="lbl" x="${X(xmax) + 8}" y="${l.ly + 4}">s<tspan dy="-5" font-size="9.5">${esc(l.v.gamma)}</tspan><tspan dy="5"> · ${esc(l.v.verdict)}</tspan></text>`;
+    }
+    pts.forEach((p, i) => { svg += `<circle data-i="${i}" cx="${X(p.x)}" cy="${Y(p.y)}" r="4.5" fill="${css("--ink")}" stroke="${css("--panel")}" stroke-width="2"/><circle data-i="${i}" cx="${X(p.x)}" cy="${Y(p.y)}" r="13" fill="transparent"/>`; });
+    host.innerHTML = svg + "</svg>";
+    legend.innerHTML = `<li><span class="swatch pt"></span>certified lower bound</li>` + lines.map((l) => `<li><span class="swatch" style="background:var(${SERIES[l.v.id]})"></span>${esc(l.v.label || l.v.id)}, slope ${esc(l.v.gamma)}</li>`).join("");
+    const tip = $("tip"), wrap = $("fig-measure");
+    host.querySelectorAll("circle[data-i]").forEach((dot) => {
+      dot.addEventListener("mouseenter", () => { const p = pts[Number(dot.dataset.i)]; tip.innerHTML = `s = ${esc(p.r.s)}<br>L(s) ≥ ${esc(p.r.lower_bound)}<br>c = (${esc(p.r.witness_c.join(", "))})<br>support {${esc(p.r.support.join(", "))}}`; tip.hidden = false;
+        const box = dot.getBoundingClientRect(), outer = wrap.getBoundingClientRect(); tip.style.left = Math.max(8, Math.min(box.left - outer.left + 14, outer.width - 250)) + "px"; tip.style.top = (box.top - outer.top + 14) + "px"; });
+      dot.addEventListener("mouseleave", () => { tip.hidden = true; });
+    });
+  }
+  // ===== a small 3D view: orthographic, painter's order, drag or arrow keys to turn =====
+  const sub3 = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+  const cross3 = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  const dot3 = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  function orderFacet(points) {
+    const c = [0, 1, 2].map((k) => points.reduce((acc, p) => acc + p[k], 0) / points.length);
+    let normal = [0, 0, 0];
+    for (let i = 1; i < points.length && dot3(normal, normal) < 1e-18; i++) for (let j = i + 1; j < points.length && dot3(normal, normal) < 1e-18; j++) normal = cross3(sub3(points[i], points[0]), sub3(points[j], points[0]));
+    const u = sub3(points.find((p) => dot3(sub3(p, c), sub3(p, c)) > 1e-18) || points[0], c), w = cross3(normal, u);
+    return points.slice().sort((p, q) => Math.atan2(dot3(sub3(p, c), w), dot3(sub3(p, c), u)) - Math.atan2(dot3(sub3(q, c), w), dot3(sub3(q, c), u)));
+  }
+  function view3d(host, spec) {
+    host.innerHTML = `<h3>${spec.title}</h3><ul class="legend">${spec.legend}</ul><div class="stage" tabindex="0" role="img" aria-label="${esc(spec.aria)}. Drag sideways, or use the arrow keys, to turn it."></div>
+      <div class="stage-bar"><button type="button" class="quiet" data-reset>Reset view</button><span class="statement">Drag or use the arrow keys to turn the view.</span></div><figcaption>${spec.caption}</figcaption>`;
+    const stage = host.querySelector(".stage");
+    const all = [...spec.polygons.flatMap((p) => p.pts), ...spec.segments.flatMap((s) => [s.a, s.b]), ...spec.points.map((p) => p.p)];
+    const center = [0, 1, 2].map((k) => (Math.min(...all.map((p) => p[k])) + Math.max(...all.map((p) => p[k]))) / 2);
+    const radius = Math.max(1e-9, ...all.map((p) => Math.hypot(p[0] - center[0], p[1] - center[1], p[2] - center[2])));
+    const W = 340, H = 300, scale = 0.42 * Math.min(W, H) / radius, DEFAULT = { yaw: -0.62, pitch: 0.48 };
+    let view = { ...DEFAULT };
+    const turn = (x, y, z) => {
+      const cy = Math.cos(view.yaw), sy = Math.sin(view.yaw), cp = Math.cos(view.pitch), sp = Math.sin(view.pitch);
+      const x1 = x * cy - y * sy, y1 = x * sy + y * cy;
+      return [x1, -y1 * sp + z * cp, y1 * cp + z * sp];
+    };
+    const project = (p) => { const [x, up, depth] = turn(p[0] - center[0], p[1] - center[1], p[2] - center[2]); return [W / 2 + x * scale, H / 2 - up * scale, depth]; };
+    const fmt = (v) => v.toFixed(1);
+    function draw() {
+      let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%">`;
+      const polys = spec.polygons.map((poly) => { const q = poly.pts.map(project); return { poly, q, depth: q.reduce((a, b) => a + b[2], 0) / q.length }; }).sort((a, b) => b.depth - a.depth);
+      for (const { poly, q } of polys) svg += `<polygon points="${q.map((p) => fmt(p[0]) + "," + fmt(p[1])).join(" ")}" fill="${poly.fill}" fill-opacity="${poly.opacity ?? 0.14}" stroke="${poly.stroke}" stroke-width="${poly.width ?? 1}" stroke-linejoin="round"${poly.dash ? ` stroke-dasharray="${poly.dash}"` : ""}/>`;
+      for (const seg of spec.segments) { const a = project(seg.a), b = project(seg.b); svg += `<line x1="${fmt(a[0])}" y1="${fmt(a[1])}" x2="${fmt(b[0])}" y2="${fmt(b[1])}" stroke="${seg.stroke}" stroke-width="${seg.width ?? 1.4}" stroke-linecap="round"${seg.dash ? ` stroke-dasharray="${seg.dash}"` : ""}/>`; }
+      for (const { pt, q } of spec.points.map((pt) => ({ pt, q: project(pt.p) })).sort((a, b) => b.q[2] - a.q[2])) {
+        const r = pt.r ?? 4;
+        svg += pt.shape === "square" ? `<rect x="${fmt(q[0] - r)}" y="${fmt(q[1] - r)}" width="${2 * r}" height="${2 * r}" fill="${pt.fill}" stroke="${pt.stroke}" stroke-width="1.6"><title>${esc(pt.title || "")}</title></rect>`
+          : `<circle cx="${fmt(q[0])}" cy="${fmt(q[1])}" r="${r}" fill="${pt.fill}" stroke="${pt.stroke}" stroke-width="${pt.strokeWidth ?? 1.8}"><title>${esc(pt.title || "")}</title></circle>`;
+      }
+      for (const l of spec.labels) { const q = project(l.p); svg += `<text class="${l.cls || "lbl"}" x="${fmt(q[0] + (l.dx || 0))}" y="${fmt(q[1] + (l.dy || 0))}" text-anchor="${l.anchor || "middle"}">${esc(l.text)}</text>`; }
+      if (spec.axes) {
+        const o = [36, H - 34];
+        spec.axes.forEach((name, k) => { const e = [0, 0, 0]; e[k] = 1; const [x, up] = turn(...e); svg += `<line x1="${o[0]}" y1="${o[1]}" x2="${fmt(o[0] + x * 22)}" y2="${fmt(o[1] - up * 22)}" stroke="${css("--ink-3")}" stroke-width="1.2"/><text x="${fmt(o[0] + x * 34)}" y="${fmt(o[1] - up * 34 + 4)}" text-anchor="middle">${esc(name)}</text>`; });
+      }
+      return svg + "</svg>";
+    }
+    let drag = null, frame = 0;
+    const redraw = () => { if (!frame) frame = requestAnimationFrame(() => { frame = 0; stage.innerHTML = draw(); }); };
+    stage.addEventListener("pointerdown", (e) => { drag = { x: e.clientX, y: e.clientY, view: { ...view } }; stage.setPointerCapture?.(e.pointerId); });
+    stage.addEventListener("pointermove", (e) => { if (!drag) return; view.yaw = drag.view.yaw + (e.clientX - drag.x) * 0.01; view.pitch = Math.max(-1.45, Math.min(1.45, drag.view.pitch + (e.clientY - drag.y) * 0.01)); redraw(); });
+    for (const type of ["pointerup", "pointercancel", "lostpointercapture"]) stage.addEventListener(type, () => { drag = null; });
+    stage.addEventListener("keydown", (e) => {
+      const step = 0.12;
+      if (e.key === "ArrowLeft") view.yaw -= step; else if (e.key === "ArrowRight") view.yaw += step;
+      else if (e.key === "ArrowUp") view.pitch = Math.min(1.45, view.pitch + step); else if (e.key === "ArrowDown") view.pitch = Math.max(-1.45, view.pitch - step);
+      else return;
+      e.preventDefault(); redraw();
+    });
+    host.querySelector("[data-reset]").addEventListener("click", () => { view = { ...DEFAULT }; redraw(); });
+    stage.innerHTML = draw();
+  }
+  function renderGeometry3d(host, geo) {
+    const V = geo.vertices, v = geo.vertex;
+    const span = Math.max(...[0, 1, 2].map((k) => Math.max(...V.map((p) => p[k])) - Math.min(...V.map((p) => p[k]))), 1e-9);
+    const facets = geo.facets.map((f, j) => ({ f, j })).filter(({ f }) => f.length >= 3);
+    const atV = facets.filter(({ j }) => geo.active.includes(j)).length;
+    const polygons = facets.map(({ f, j }) => { const on = geo.active.includes(j); return { pts: orderFacet(f.map((i) => V[i])), fill: css(on ? "--brass" : "--sea"), stroke: css(on ? "--brass" : "--sea"), opacity: on ? 0.2 : 0.08, width: on ? 1.5 : 1 }; });
+    const segments = [], labels = [], points = [];
+    geo.generators.forEach((u, i) => {
+      const len = Math.hypot(...u) || 1, k = 0.38 * span / len, end = [v[0] + u[0] * k, v[1] + u[1] * k, v[2] + u[2] * k];
+      segments.push({ a: v, b: end, stroke: css("--ink-2"), dash: "4 4", width: 1.4 });
+      labels.push({ p: [v[0] + u[0] * k * 1.22, v[1] + u[1] * k * 1.22, v[2] + u[2] * k * 1.22], text: `c${i}`, dy: -4 });
+    });
+    const path = geo.path.filter((p) => p.x.length === 3 && p.x.every(Number.isFinite));
+    path.forEach((p, i) => { if (i) segments.push({ a: path[i - 1].x, b: p.x, stroke: css("--brass"), width: 2 }); points.push({ p: p.x, r: 2.6, fill: css("--brass"), stroke: css("--brass"), strokeWidth: 1, title: `s = ${p.s}: x = (${p.x.map((c) => c.toPrecision(4)).join(", ")})` }); });
+    points.push({ p: v, r: 5.5, fill: css("--ink"), stroke: css("--panel"), strokeWidth: 2, title: `v = (${v.map((c) => +c.toPrecision(6)).join(", ")})` });
+    labels.push({ p: v, text: "v", cls: "strong", dx: 10, dy: -9, anchor: "start" });
+    view3d(host, {
+      title: "Geometry", aria: `The polyhedron P in three dimensions with ${facets.length} facets, the vertex v, and the certified optimizer path`,
+      legend: `<li><span class="swatch" style="background:var(--sea)"></span>facets of P</li><li><span class="swatch" style="background:var(--brass)"></span>facets through v</li><li><span class="swatch" style="background:var(--ink-2)"></span>edge directions</li><li><span class="swatch pt" style="background:var(--brass)"></span>certified optimizer path</li>`,
+      caption: `${atV} facets meet at v. ` + (geo.simple ? "Three facets meet in three independent edges, so v is simple and has an edge chart." : "More than three facets meet at v, so the tangent cone is not simplicial and the theorem does not apply.") + (path.length ? " The brass points are certified witnesses x(s), approaching v as s shrinks." : ""),
+      polygons, segments, points, labels, axes: ["x0", "x1", "x2"],
+    });
+  }
+  function renderNewton3d(host, nd) {
+    const w = nd.weights.map((x) => E.Q.parse(x).toNumber()), beta = nd.principal.map(([b]) => b);
+    const qStar = nd.q_star ? E.Q.parse(nd.q_star).toNumber() : null;
+    const top = Math.max(...beta, ...nd.gain.flatMap((m) => m.exps)) + 1;
+    const winner = (e) => qStar != null && nd.winners.some((f) => e.every((x, i) => !x || f.includes(i))) && Math.abs(e.reduce((a, x, i) => a + x * w[i], 0) - qStar) < 1e-12;
+    const plane = (q) => [0, 1, 2].map((k) => { const p = [0, 0, 0]; p[k] = q / w[k]; return p; });
+    const polygons = [{ pts: plane(1), fill: css("--sea"), stroke: css("--sea"), opacity: 0.12, width: 1.2 }];
+    if (qStar != null) polygons.push({ pts: plane(qStar), fill: css("--brass"), stroke: css("--brass"), opacity: 0.18, width: 1.4, dash: "5 4" });
+    const segments = [0, 1, 2].map((k) => { const e = [0, 0, 0]; e[k] = top; return { a: [0, 0, 0], b: e, stroke: css("--ink-3"), width: 1.2 }; });
+    const labels = [0, 1, 2].map((k) => { const e = [0, 0, 0]; e[k] = top + 0.5; return { p: e, text: `${nd.axes[k]} · β=${beta[k]}` }; });
+    const points = beta.map((b, k) => { const e = [0, 0, 0]; e[k] = b; return { p: e, r: 4.5, shape: "square", fill: "none", stroke: css("--sea"), title: `D₀ term ${nd.axes[k]}^${b}` }; });
+    for (const m of nd.gain) { const win = winner(m.exps); points.push({ p: m.exps, r: win ? 7 : 5, fill: m.sign > 0 ? css(win ? "--brass" : "--ink") : css("--panel"), stroke: css(win ? "--brass" : "--ink"), title: `${m.coefficient}·${E.monomialText(m.exps, nd.axes)}, weighted degree ${m.degree}` }); }
+    view3d(host, {
+      title: "Newton diagram", aria: "Exponents of the transported perturbation in three dimensions, with the base plane and the q* plane",
+      legend: `<li><span class="swatch pt"></span>positive term of R</li><li><span class="swatch pt" style="background:var(--panel);border:1.5px solid var(--ink)"></span>negative term</li><li><span class="swatch" style="background:var(--brass)"></span>q* plane</li><li><span class="swatch" style="background:var(--sea)"></span>base plane, weight 1</li>`,
+      caption: `Weights ${esc(nd.weights.join(", "))}. A term qualifies below the base plane; the brass plane through the winners is q*${nd.q_star ? " = " + esc(nd.q_star) : ""}.`,
+      polygons, segments, points, labels,
+    });
+  }
+  function renderNewton(nd) {
+    const host = $("fig-newton");
+    if (nd && nd.weights && nd.principal && nd.axes.length === 3) { renderNewton3d(host, nd); return; }
+    if (!nd || nd.axes.length !== 2 || !nd.weights) { host.innerHTML = `<h3>Newton diagram</h3><p class="empty">${esc(!nd ? "No transported data for this input." : nd.axes.length > 3 ? "Drawn for two and three dimensions; the face table in the ledger covers this one." : "Weights need the exact diagonal principal part.")}</p>`; return; }
+    const w = nd.weights.map((x) => E.Q.parse(x).toNumber()), beta = nd.principal.map(([b]) => b);
+    const pts = nd.gain.map((m) => m.exps).concat(nd.loss.map((m) => m.exps));
+    const maxA = Math.max(beta[0], ...pts.map((e) => e[0])) + 1, maxB = Math.max(beta[1], ...pts.map((e) => e[1])) + 1;
+    const W = 340, H = 300, L = 36, T = 16, R = 16, B = 34;
+    const X = (a) => L + (a / maxA) * (W - L - R), Y = (b) => H - B - (b / maxB) * (H - T - B);
+    let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Newton diagram of the transported perturbation">`;
+    for (let a = 0; a <= maxA; a++) svg += `<line x1="${X(a)}" x2="${X(a)}" y1="${Y(0)}" y2="${Y(maxB)}" stroke="${css("--rule")}" stroke-width=".6"/><text x="${X(a)}" y="${H - B + 16}" text-anchor="middle">${a}</text>`;
+    for (let b = 0; b <= maxB; b++) svg += `<line x1="${X(0)}" x2="${X(maxA)}" y1="${Y(b)}" y2="${Y(b)}" stroke="${css("--rule")}" stroke-width=".6"/><text x="${L - 8}" y="${Y(b) + 4}" text-anchor="end">${b}</text>`;
+    svg += `<text x="${W - R}" y="${H - 4}" text-anchor="end">power of ${esc(nd.axes[0])}</text><text x="${L + 6}" y="${T + 10}" class="lbl">power of ${esc(nd.axes[1])}</text>`;
+    const line = (q, color, dash, text) => {
+      // w0·a + w1·b = q, clipped to the box
+      const a0 = q / w[0], b0 = q / w[1];
+      svg += `<line x1="${X(Math.min(a0, maxA))}" y1="${Y(a0 <= maxA ? 0 : (q - w[0] * maxA) / w[1])}" x2="${X(b0 <= maxB ? 0 : (q - w[1] * maxB) / w[0])}" y2="${Y(Math.min(b0, maxB))}" stroke="${color}" stroke-width="1.6"${dash ? ' stroke-dasharray="5 4"' : ""}/>`;
+      const by = Math.min(b0, maxB), bx = b0 <= maxB ? 0 : (q - w[1] * maxB) / w[0];
+      svg += `<text class="lbl" x="${X(bx) + 8}" y="${Y(by) - 6}">${esc(text)}</text>`;
+    };
+    line(1, css("--sea"), false, "D₀: weight 1");
+    if (nd.q_star) line(E.Q.parse(nd.q_star).toNumber(), css("--brass"), true, `q* = ${nd.q_star}`);
+    for (const m of nd.loss) svg += `<rect x="${X(m.exps[0]) - 4.5}" y="${Y(m.exps[1]) - 4.5}" width="9" height="9" fill="none" stroke="${css("--sea")}" stroke-width="1.6"/>`;
+    const winner = (e) => nd.q_star && nd.winners.some((f) => e.every((x, i) => !x || f.includes(i))) && Math.abs(e[0] * w[0] + e[1] * w[1] - E.Q.parse(nd.q_star).toNumber()) < 1e-12;
+    for (const m of nd.gain) {
+      const pos = m.sign > 0, win = winner(m.exps);
+      svg += `<circle cx="${X(m.exps[0])}" cy="${Y(m.exps[1])}" r="${win ? 7 : 5}" fill="${pos ? (win ? css("--brass") : css("--ink")) : css("--panel")}" stroke="${win ? css("--brass") : css("--ink")}" stroke-width="1.8"><title>${esc(m.coefficient)}·${esc(E.monomialText(m.exps, nd.axes))}, weighted degree ${esc(m.degree)}</title></circle>`;
+    }
+    host.innerHTML = `<h3>Newton diagram</h3><ul class="legend"><li><span class="swatch pt"></span>positive term of R</li><li><span class="swatch pt" style="background:var(--panel);border:1.5px solid var(--ink)"></span>negative term</li><li><span class="swatch" style="background:var(--brass)"></span>q* line</li><li><span class="swatch" style="background:var(--sea)"></span>base, weight 1</li></ul>${svg}</svg>
+      <figcaption>Weights ${esc(nd.weights.join(", "))}. Terms below the base line are relevant; the brass line through the winners is q*.</figcaption>`;
+  }
+  function renderGeometry(geo) {
+    const host = $("fig-geometry");
+    if (geo && geo.n === 3) { renderGeometry3d(host, geo); return; }
+    if (!geo || geo.n !== 2) { host.innerHTML = `<h3>Geometry</h3><p class="empty">${esc(!geo ? "No vertex for this input." : "Drawn for polyhedra in two and three dimensions.")}</p>`; return; }
+    const V = geo.vertices, cx = V.reduce((a, p) => a + p[0], 0) / V.length, cy = V.reduce((a, p) => a + p[1], 0) / V.length;
+    const hull = V.slice().sort((p, q) => Math.atan2(p[1] - cy, p[0] - cx) - Math.atan2(q[1] - cy, q[0] - cx));
+    const xs = V.map((p) => p[0]), ysv = V.map((p) => p[1]), pad = 0.08 * Math.max(Math.max(...xs) - Math.min(...xs), Math.max(...ysv) - Math.min(...ysv), 1e-9);
+    const x0 = Math.min(...xs) - pad, x1 = Math.max(...xs) + pad, y0 = Math.min(...ysv) - pad, y1 = Math.max(...ysv) + pad;
+    const W = 340, H = 300, scale = Math.min((W - 20) / (x1 - x0), (H - 20) / (y1 - y0));
+    const X = (x) => 10 + (x - x0) * scale, Y = (y) => H - 10 - (y - y0) * scale;
+    let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="The polyhedron, its vertex, and the certified optimizer path">`;
+    svg += `<polygon points="${hull.map((p) => `${X(p[0])},${Y(p[1])}`).join(" ")}" fill="${css("--panel-2")}" stroke="${css("--sea")}" stroke-width="1.4"/>`;
+    const v = geo.vertex;
+    geo.generators.forEach((u, i) => {
+      const len = Math.hypot(u[0], u[1]) || 1, k = 0.42 * Math.min(x1 - x0, y1 - y0) / len;
+      svg += `<line x1="${X(v[0])}" y1="${Y(v[1])}" x2="${X(v[0] + u[0] * k)}" y2="${Y(v[1] + u[1] * k)}" stroke="${css("--ink-3")}" stroke-width="1.4" stroke-dasharray="4 4"/><text class="lbl" x="${X(v[0] + u[0] * k * 1.08)}" y="${Y(v[1] + u[1] * k * 1.08)}" text-anchor="middle">c${i}</text>`;
+    });
+    const path = geo.path.filter((p) => p.x.every(Number.isFinite));
+    if (path.length) svg += `<polyline points="${path.map((p) => `${X(p.x[0])},${Y(p.x[1])}`).join(" ")}" fill="none" stroke="${css("--brass")}" stroke-width="1.8"/>` + path.map((p, i) => `<circle cx="${X(p.x[0])}" cy="${Y(p.x[1])}" r="${i === path.length - 1 ? 3.5 : 3}" fill="${css("--brass")}"><title>s = ${esc(p.s)}: x = (${p.x.map((c) => c.toPrecision(4)).join(", ")})</title></circle>`).join("");
+    svg += `<circle cx="${X(v[0])}" cy="${Y(v[1])}" r="5.5" fill="${css("--ink")}" stroke="${css("--panel")}" stroke-width="2"/><text class="strong" x="${X(v[0]) + 9}" y="${Y(v[1]) - 8}">v</text>`;
+    host.innerHTML = `<h3>Geometry</h3><ul class="legend"><li><span class="swatch" style="background:var(--sea)"></span>P</li><li><span class="swatch" style="background:var(--ink-3)"></span>edge directions</li><li><span class="swatch" style="background:var(--brass)"></span>certified optimizer path</li></ul>${svg}</svg>
+      <figcaption>Witnesses x(s) for decreasing s converge to v along the leading channel${path.length ? "" : "; no positive gain was found"}.</figcaption>`;
+  }
+  function renderProvenance(receipt) {
+    const p = receipt.provenance, g = Object.keys(p.git || {}).length ? p.git : store.ledger?.head || {}, url = repoUrl();
+    const rows = (entries) => Object.entries(entries || {}).map(([path, blob]) => `<tr><td>${docLink(path)}</td><td class="mono">${esc(blob || "missing")}</td></tr>`).join("");
+    const isJs = !!receipt.engine;
+    $("provenance").innerHTML = `<dl class="kv">
+      <dt>Commit</dt><dd class="mono">${url && onRemote(g.commit) ? `<a href="${esc(url)}/commit/${esc(g.commit)}" target="_blank" rel="noopener">${esc(g.commit)}</a>` : esc(g.commit || "—")}${g.branch ? " on " + esc(g.branch) : ""}</dd>
+      <dt>Engine</dt><dd class="mono">${isJs ? `exact JavaScript engine, git blobs ${esc((BUILD.engine_blob || "—").slice(0, 12))} (engine.js) and ${esc((BUILD.modes_blob || "—").slice(0, 12))} (modes.js)` : `${esc(p.runtime.engine)} · Python ${esc(p.runtime.python)} · ${esc(p.code_id)} · ${esc(p.calculator_id)}`}</dd></dl>
+      ${isJs ? "" : `<details><summary class="note" style="cursor:pointer">Source files that ran (${Object.keys(p.sources).length})</summary><div class="scroll" style="margin-top:8px"><table><thead><tr><th>Path</th><th>Git blob</th></tr></thead><tbody>${rows(p.sources)}</tbody></table></div></details>`}
+      <div style="margin-top:12px"><span class="note">Reproduce with the repository's Python</span><code class="cmd" id="cli">${esc(cli("solve", receipt.input))}</code><button type="button" class="quiet" id="copy-cli" style="margin-top:6px">Copy command</button></div>`;
+    $("copy-cli").addEventListener("click", () => copy(cli("solve", receipt.input)));
+  }
+  function copy(text) {
+    const fallback = () => { const r = document.createRange(); r.selectNodeContents($("cli")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast("Press Ctrl+C or ⌘C to copy"); };
+    navigator.clipboard ? navigator.clipboard.writeText(text).then(() => toast("Command copied"), fallback) : fallback();
+  }
+
+  // ===== Design ==================================================================
+  function renderDesign(d, request) {
+    const v = $("d-verdict"), t = d.target;
+    if (d.status !== "complete") { v.className = "verdict v-refused"; v.textContent = "not applicable"; $("d-headline").textContent = "No spectrum"; $("d-meaning").textContent = d.reason; $("d-facts").innerHTML = ""; $("fig-spectrum").innerHTML = ""; $("d-table").innerHTML = ""; return; }
+    if (t && !t.error) { v.className = "verdict " + (t.achievable ? "v-reachable" : "v-unreachable"); v.textContent = t.achievable ? "reachable" : "not reachable"; $("d-headline").innerHTML = t.achievable ? `γ = ${esc(t.gamma)} with G = <span class="mono" style="font-size:.6em">${esc(t.candidates[0].perturbation)}</span>` : `γ = ${esc(t.gamma)} is impossible here`; }
+    else { v.className = "verdict v-proved"; v.textContent = "spectrum"; $("d-headline").innerHTML = `${d.spectrum.length} possible exponents`; }
+    $("d-meaning").innerHTML = t && !t.error ? (t.achievable ? `Certified: ${t.candidates.map((c) => `<span class="mono">${esc(c.perturbation)}</span> → ${esc(c.check.verdict)} γ = ${esc(c.check.gamma)}`).join("; ")}.` : `No perturbation qualifies with γ = ${esc(t.gamma)} at this vertex. The nearest exponents are ${esc(t.nearest_below || "none")} below and ${esc(t.nearest_above || "none")} above.`) + (d.base_proved ? "" : " Hypotheses 0–2 are not all proved here, so certificates may be incomplete.")
+      : esc(t && t.error ? t.error : "Every exponent the qualified-face law or a V.22 channel can produce at this vertex.");
+    $("d-facts").innerHTML = `<div>vertex <b>(${esc(d.vertex.join(", "))})</b></div><div>edge orders <b>${esc(d.orders.join(", "))}</b></div><div>weights <b>${esc(d.weights.join(", "))}</b></div>` + d.slacks.map((s) => `<div>${esc(s.axis)} = <b>${esc(s.expression)}</b></div>`).join("");
+    const W = 760, H = 150, L = 24, R = 24, Y0 = 84, X = (q) => L + q * (W - L - R);
+    let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Exponent spectrum on the weight line">`;
+    svg += `<line x1="${X(0)}" x2="${X(1)}" y1="${Y0}" y2="${Y0}" stroke="${css("--ink-3")}" stroke-width="1.4"/>`;
+    svg += `<text x="${X(0)}" y="${Y0 + 34}" text-anchor="middle">q = 0</text><text x="${X(1)}" y="${Y0 + 34}" text-anchor="middle">q = 1</text>`;
+    const qT = t && !t.error ? E.Q.parse(t.q).toNumber() : null;
+    let lastLabel = -1e9;
+    d.spectrum.forEach((e) => {
+      const q = E.Q.parse(e.q).toNumber(), hit = t && t.achievable && e.q === t.q, x = X(q);
+      svg += `<line x1="${x}" x2="${x}" y1="${Y0 - 14}" y2="${Y0 + 8}" stroke="${hit ? css("--brass") : css("--ink")}" stroke-width="${hit ? 3 : 2}"><title>γ = ${esc(e.gamma)}, q = ${esc(e.q)}</title></line>`;
+      if (x - lastLabel > 34) { svg += `<text class="${hit ? "strong" : "lbl"}" x="${x}" y="${Y0 - 22}" text-anchor="middle">${esc(e.gamma)}</text><text x="${x}" y="${Y0 + 22}" text-anchor="middle">${esc(e.q)}</text>`; lastLabel = x; }
+    });
+    if (qT != null && !t.achievable) svg += `<line x1="${X(qT)}" x2="${X(qT)}" y1="${Y0 - 40}" y2="${Y0 + 10}" stroke="${css("--bad")}" stroke-width="2" stroke-dasharray="4 3"/><text class="strong" x="${X(qT)}" y="${Y0 - 46}" text-anchor="middle">target ${esc(t.gamma)}: no channel</text>`;
+    svg += `<text class="lbl" x="${X(0)}" y="18">γ = 1/(1 − q) above each tick; q below</text>`;
+    $("fig-spectrum").innerHTML = svg + "</svg>" + `<figcaption>${d.truncated ? "The enumeration was truncated. " : ""}Gaps on this line are exponents no polynomial perturbation can produce at this vertex under the theorem's hypotheses.</figcaption>`;
+    $("d-table").innerHTML = d.spectrum.map((e, i) => `<tr><td class="num">${esc(e.gamma)}</td><td class="num">${esc(e.q)}</td><td class="mono">${e.mechanisms.map((m) => esc(m.monomial)).join(", ")}${e.mechanism_count > e.mechanisms.length ? ` … (${e.mechanism_count})` : ""}</td><td class="mono">${esc(e.mechanisms[0].perturbation)}</td><td><button type="button" class="link" data-solve="${i}">Solve this</button></td></tr>`).join("");
+    $("d-table").querySelectorAll("[data-solve]").forEach((b) => b.addEventListener("click", () => { const e = d.spectrum[Number(b.dataset.solve)]; openSolve({ system: request.system, base: request.base, perturbation: e.mechanisms[0].perturbation }); }));
+  }
+
+  // ===== Sweep ===================================================================
+  const VERDICT_COLOR = { proved: "--ok", "proved-v22": "--ok", unlicensed: "--warn", refused: "--muted" };
+  function renderSweep(s) {
+    const v = $("w-verdict");
+    if (s.status !== "complete") { v.className = "verdict v-refused"; v.textContent = "not applicable"; $("w-headline").textContent = "No phase fan"; $("w-meaning").textContent = s.reason; $("fig-strip").innerHTML = ""; $("w-table").innerHTML = ""; $("w-laws").textContent = ""; return; }
+    const walls = s.walls, chambers = s.chambers;
+    v.className = "verdict v-proved"; v.textContent = `${walls.length} wall${walls.length === 1 ? "" : "s"}`;
+    const classes = [...new Set(chambers.map((c) => c.outcome.gamma ? `γ = ${c.outcome.gamma}` : c.outcome.verdict === "proved" ? "Δ = 0" : "no exponent"))];
+    $("w-headline").textContent = classes.join(" → ");
+    $("w-meaning").textContent = `Over t ∈ [${s.range[0]}, ${s.range[1]}] the family passes through ${chambers.length} chamber${chambers.length === 1 ? "" : "s"}. Exact walls come from vanishing coefficients; bracketed walls are outcome changes located by certified bisection.`;
+    $("w-laws").innerHTML = "Transported coefficient laws: " + s.coefficient_laws.map((l) => `<span class="mono">${esc(l.monomial)}</span>: <span class="mono">${esc(l.law)}</span>`).join("; ");
+    const lo = E.Q.parse(s.range[0]).toNumber(), hi = E.Q.parse(s.range[1]).toNumber(), W = 760, H = 140, L = 20, R = 20, X = (t) => L + (t - lo) / (hi - lo) * (W - L - R);
+    let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Phase strip of the family">`;
+    chambers.forEach((c) => {
+      const x0 = X(c.from_value), x1 = X(c.to_value), color = css(VERDICT_COLOR[c.outcome.verdict] || "--muted");
+      svg += `<rect x="${x0}" y="34" width="${Math.max(1, x1 - x0)}" height="44" fill="${color}" fill-opacity=".22" stroke="${color}" stroke-width="1"/>`;
+      if (x1 - x0 > 70) svg += `<text class="strong" x="${(x0 + x1) / 2}" y="${55}" text-anchor="middle">${esc(c.outcome.gamma ? "γ = " + c.outcome.gamma : c.outcome.verdict === "proved" ? "Δ = 0" : c.outcome.verdict)}</text><text class="lbl" x="${(x0 + x1) / 2}" y="${71}" text-anchor="middle">${esc(c.outcome.winners || (c.outcome.open && c.outcome.open.length ? "open: " + c.outcome.open.join(", ") : c.outcome.verdict))}</text>`;
+    });
+    walls.forEach((w) => { const x = X(w.value); svg += `<line x1="${x}" x2="${x}" y1="24" y2="88" stroke="${css(w.kind === "coefficient" ? "--brass" : "--bad")}" stroke-width="2"/><text class="lbl" x="${x}" y="${104}" text-anchor="middle">${esc(w.at || "≈" + w.value.toPrecision(6))}</text>`; });
+    svg += `<text x="${L}" y="${128}">t = ${esc(s.range[0])}</text><text x="${W - R}" y="${128}" text-anchor="end">t = ${esc(s.range[1])}</text>`;
+    $("fig-strip").innerHTML = svg + "</svg>" + `<ul class="legend" style="margin-top:6px"><li><span class="swatch" style="background:var(--brass)"></span>coefficient wall (exact)</li><li><span class="swatch" style="background:var(--bad)"></span>outcome wall (certified bracket)</li></ul>`;
+    const rows = [];
+    chambers.forEach((c, i) => {
+      rows.push(`<tr><td class="num">(${qCell(c.from)}, ${qCell(c.to)})</td><td>chamber</td><td>${esc(c.outcome.verdict)}${c.outcome.open && c.outcome.open.length ? `<div class="statement">open: ${esc(c.outcome.open.join(", "))}</div>` : ""}</td><td class="num">${esc(c.outcome.gamma ?? "—")}</td><td class="mono">${esc(c.outcome.winners || "—")}</td></tr>`);
+      const w = walls.find((x) => Math.abs(x.value - c.to_value) < 1e-12 * (1 + Math.abs(x.value)) || (x.lo && Math.abs(E.Q.parse(x.lo).toNumber() - c.to_value) < 1e-12));
+      if (w && i < chambers.length - 1) rows.push(`<tr><td class="num">${w.at ? qCell(w.at) : `[${qCell(w.lo)}, ${qCell(w.hi)}]`}</td><td>${esc(w.kind)} wall${w.monomial ? " · " + esc(w.monomial) : ""}</td><td>${esc(w.outcome ? w.outcome.verdict : "between chambers")}</td><td class="num">${esc(w.outcome ? w.outcome.gamma ?? "—" : "—")}</td><td class="mono">${esc(w.outcome ? w.outcome.winners || "—" : "")}</td></tr>`);
+    });
+    $("w-table").innerHTML = rows.join("");
+  }
+
+  // ===== Attack ==================================================================
+  function renderAttack(a) {
+    const v = $("a-verdict");
+    if (a.status !== "complete") { v.className = "verdict v-refused"; v.textContent = "not applicable"; $("a-headline").textContent = "Nothing to attack"; $("a-meaning").textContent = a.reason; $("a-table").innerHTML = ""; return; }
+    const s = a.summary;
+    v.className = "verdict " + (s.changed ? "v-fragile" : "v-proved"); v.textContent = s.changed ? "fragile" : "robust";
+    $("a-headline").innerHTML = `${s.changed} of ${s.total} mutations break <span style="white-space:nowrap">${a.base.gamma ? "γ = " + esc(a.base.gamma) : esc(a.base.verdict)}</span>`;
+    $("a-meaning").textContent = `The answer under attack: ${a.base.verdict}${a.base.gamma ? `, γ = ${a.base.gamma}` : ""}${a.base.winners ? ` via ${a.base.winners}` : ""}. It holds under ${s.kinds_stable.join(", ") || "none of the mutation kinds"}; it breaks under ${s.kinds_changed.join(", ") || "none"}.`;
+    $("a-table").innerHTML = a.mutations.map((m, i) => `<tr><td><span class="tag ${m.changed ? "e-breaks" : "e-holds"}">${m.changed ? "breaks" : "holds"}</span></td>
+      <td><b>${esc(m.kind)}</b> · ${sup(m.description)}<div class="statement mono">${esc(m.kind === "facet tilt" ? "A, b = " + m.input.system : m.kind === "base cross term" ? "F = " + m.input.base : "G = " + m.input.perturbation)}</div></td>
+      <td>${esc(m.outcome.verdict)}${m.outcome.gamma ? ` · γ = ${esc(m.outcome.gamma)}` : ""}${m.outcome.open && m.outcome.open.length ? `<div class="statement">open: ${esc(m.outcome.open.join(", "))}</div>` : ""}</td>
+      <td><button type="button" class="link" data-solve="${i}">Solve this</button></td></tr>`).join("");
+    $("a-table").querySelectorAll("[data-solve]").forEach((b) => b.addEventListener("click", () => openSolve(a.mutations[Number(b.dataset.solve)].input)));
+  }
+
+  // ===== History =================================================================
+  function renderHistory(history, request) {
+    const host = $("timeline");
+    if (!history) {
+      $("history-lede").textContent = "Replays need git or the bundled snapshots. Recorded histories cover the presets; replay any input on your machine:";
+      host.innerHTML = `<li class="empty"><code class="cmd">${esc(cli("history", request))}</code></li>`; return;
+    }
+    $("history-lede").textContent = `${history.commit_count} commits collapse to ${history.state_count} code states; ${history.answered_state_count} of them have the face-selection backend.`;
+    const changes = Object.fromEntries((history.changes || []).map((c) => [c.code_id, c]));
+    host.innerHTML = history.states.map((s) => {
+      const wrong = (s.audit || []).filter((x) => x.verdict === "contradicted"), none = s.answer?.backend?.status === "unavailable", change = changes[s.code_id];
+      const span = s.commit_count === 1 ? commitLink(s.first_commit) : `${commitLink(s.first_commit)}…${commitLink(s.last_commit)}`;
+      return `<li class="state${wrong.length ? " wrong" : ""}${none ? " none" : ""}"><div class="rail"></div><div class="state-body">
+        <div class="state-head"><span>${esc(s.code_id)}</span><span>${span}</span><span>${esc((s.first_commit.date || "").slice(0, 10))}</span><span>${s.commit_count} commit${s.commit_count === 1 ? "" : "s"}</span></div>
+        <p class="state-sum">${esc(s.summary)}${wrong.length ? ` <span class="flag">· licensed γ = ${esc(wrong.map((w) => w.gamma).join(", "))} is contradicted by certified bounds</span>` : ""}</p>
+        ${change && !none ? `<div class="change">Changed at ${commitLink(change.at)}: ${esc(change.at.subject)}${change.lines.map((l) => `<span class="mono">${esc(l)}</span>`).join("")}</div>` : ""}</div></li>`;
+    }).join("");
+  }
+
+  // ===== running ==================================================================
+  const PRESET_INPUTS = { "tilted-simplex": { title: "Tilted simplex", note: "The decisive example: ambient axes predict 2, the feasible chart gives 4/3.", request: { system: SIMPLEX, base: "-((x0+x1-1)**2 + x0**4)", perturbation: "x0" } } };
+  function presetFor(request) {
+    const same = (a, b) => ["system", "base", "perturbation"].every((k) => (a[k] || "").replace(/\s+/g, "") === (b[k] || "").replace(/\s+/g, ""));
+    return Object.entries(store.ledger?.presets || {}).find(([, p]) => same(request, p.request))?.[0] || null;
+  }
+  function openSolve(request) { store.lastSolveLike = request; location.hash = "solve"; if (store.mode === "solve") { fill(request); run(); } }
+  async function run(event) {
+    if (event) event.preventDefault();
+    let request; try { request = readForm(); } catch (error) { $("form-note").textContent = error.message; return; }
+    if (store.mode !== "design" && store.mode !== "sweep") store.lastSolveLike = request;
+    const known = presetFor(request);
+    for (const chip of document.querySelectorAll(".chip")) chip.setAttribute("aria-pressed", String(chip.dataset.id === (store.mode === "design" || store.mode === "sweep" ? String(store.preset[store.mode]) : known)));
+    try {
+      if (store.mode === "solve") { const r = E.solve(request, { git: store.ledger?.head, engineBlob: BUILD.engine_blob }); renderReceipt(r); renderAgreement(r, known ? store.ledger.presets[known].receipt : null); }
+      else if (store.mode === "design") renderDesign(E.design(request), request);
+      else if (store.mode === "sweep") renderSweep(E.sweep(request));
+      else if (store.mode === "attack") renderAttack(E.attack(request));
+      else if (store.mode === "history") {
+        if (known) renderHistory(store.ledger.presets[known].history, request);
+        else if (store.ready) { $("form-note").textContent = "Replaying across every code state…"; renderHistory(await call("history", request), request); $("form-note").textContent = "History replayed live from the bundled git blobs."; }
+        else renderHistory(null, request);
+      }
+    } catch (error) { $("form-note").innerHTML = `${esc(error.message)}. Try the repository's Python:<code class="cmd">${esc(cli(store.mode, request))}</code>`; }
+  }
+
+  // ===== the repository's Python, where the page may load it =====================
+  const WORKER = `
+    let py = null, bundle = null;
+    function write(path, text) { const dir = path.slice(0, path.lastIndexOf("/")); py.FS.mkdirTree(dir); py.FS.writeFile(path, text); }
+    self.onmessage = async (event) => {
+      const msg = event.data;
+      try {
+        if (msg.type === "init") {
+          importScripts(msg.index + "pyodide.js");
+          py = await loadPyodide({ indexURL: msg.index });
+          bundle = msg.bundle;
+          const head = bundle.states.find((s) => s.code_id === bundle.head_state) || bundle.states[bundle.states.length - 1];
+          for (const [p, b] of Object.entries(head.files)) write("/repo/" + p, bundle.blobs[b]);
+          for (const [p, b] of Object.entries(bundle.calculator.files)) write("/repo/" + p, bundle.blobs[b]);
+          for (const [p, b] of Object.entries(bundle.documents)) write("/repo/" + p, bundle.blobs[b]);
+          py.globals.set("BUNDLE_JSON", JSON.stringify(bundle));
+          const info = py.runPython(["import sys, json", "sys.path.insert(0, '/repo')", "from gitcalculator import provenance as P", "BUNDLE = json.loads(BUNDLE_JSON)",
+            "bad = [b for b, t in BUNDLE['blobs'].items() if P.blob_id(t.encode()) != b]", "P.BUNDLED_STATE['git'] = dict(BUNDLE['head'], source='bundle')",
+            "json.dumps({'python': sys.version.split()[0], 'blobs': len(BUNDLE['blobs']), 'bad': bad})"].join("\\n"));
+          self.postMessage({ type: "ready", info: JSON.parse(info) });
+        } else {
+          py.globals.set("REQUEST_JSON", JSON.stringify(msg.request));
+          const code = msg.type === "calc" ? "import json\\nfrom gitcalculator.receipt import calculate\\njson.dumps(calculate(json.loads(REQUEST_JSON)), ensure_ascii=False)"
+            : "import json\\nfrom pathlib import Path\\nfrom gitcalculator.history import BundleSource, replay\\njson.dumps(replay(json.loads(REQUEST_JSON), BundleSource(BUNDLE, Path('/snapshots'))), ensure_ascii=False)";
+          self.postMessage({ type: "result", id: msg.id, result: JSON.parse(py.runPython(code)) });
+        }
+      } catch (error) { self.postMessage({ type: "error", id: msg.id, error: String(error && error.message || error) }); }
+    };`;
+  function startPython() {
+    if (store.starting) return store.starting;
+    store.starting = (async () => {
+      engineStatus("busy", "Starting the repository's Python in this page (about 14 MB)…", false);
+      store.bundle = store.bundle || await fetch("bundle.json").then((r) => { if (!r.ok) throw new Error("bundle.json is missing"); return r.json(); });
+      const index = new URL(store.bundle.pyodide.index, location.href).href;
+      const worker = new Worker(URL.createObjectURL(new Blob([WORKER], { type: "text/javascript" })));
+      store.worker = worker;
+      const info = await new Promise((resolve, reject) => {
+        worker.onmessage = (event) => { const msg = event.data; if (msg.type === "ready") return resolve(msg.info); const job = store.pending.get(msg.id); if (!job) { if (msg.type === "error") reject(new Error(msg.error)); return; } store.pending.delete(msg.id); msg.type === "error" ? job.reject(new Error(msg.error)) : job.resolve(msg.result); };
+        worker.onerror = (event) => reject(new Error(event.message || "the worker could not start"));
+        setTimeout(() => reject(new Error("Python did not start within 90 seconds")), 90000);
+        worker.postMessage({ type: "init", index, bundle: store.bundle });
+      });
+      if (info.bad.length) throw new Error(`${info.bad.length} bundled blobs do not match their git ids`);
+      store.ready = true;
+      engineStatus("", `Exact JS engine and Python ${info.python} (commit ${store.bundle.head.short}, ${info.blobs} blobs verified)`, false);
+    })().catch((error) => { store.starting = null; store.worker?.terminate(); engineStatus("off", `Exact JS engine only: ${error.message}`, false); throw error; });
+    return store.starting;
+  }
+  const FIELDS = { solve: ["perturbation", "observed"], design: ["target"], sweep: ["perturbation", "from", "to"], attack: ["perturbation"], history: ["perturbation"] };
+  function shareLink() {
+    const params = new URLSearchParams();
+    for (const id of ["system", "base", ...FIELDS[store.mode]]) if ($(id).value.trim()) params.set(id, $(id).value.trim());
+    return `${location.origin}${location.pathname}?${params}#${store.mode}`;
+  }
+  function readLink() {
+    const query = new URLSearchParams(location.search);
+    if (!query.get("system") || !query.get("base")) return null;
+    const request = {};
+    for (const id of ["system", "base", "perturbation", "target", "from", "to", "observed"]) if (query.has(id)) request[id] = query.get(id);
+    return request;
+  }
+  const call = (type, request) => new Promise((resolve, reject) => { const id = ++store.seq; store.pending.set(id, { resolve, reject }); store.worker.postMessage({ type, id, request }); });
+
+  async function boot() {
+    try { store.ledger = await fetch("ledger.json").then((r) => (r.ok ? r.json() : null)); } catch { store.ledger = null; }
+    const live = store.ledger?.live_engine !== false && !!store.ledger;
+    engineStatus("", `Exact JS engine ready${store.ledger?.head?.short ? ` · built from commit ${store.ledger.head.short}` : ""}`, live);
+    $("engine-start").addEventListener("click", () => startPython().then(() => run()).catch(() => {}));
+    $("form").addEventListener("submit", run);
+    store.fromLink = readLink();
+    $("share").hidden = store.ledger?.live_engine === false;
+    $("share").addEventListener("click", () => {
+      const link = shareLink();
+      const done = () => toast("Link to this calculation copied");
+      const show = () => { $("form-note").innerHTML = `Copy this link:<code class="cmd">${esc(link)}</code>`; };
+      navigator.clipboard ? navigator.clipboard.writeText(link).then(done, show) : show();
+    });
+    window.addEventListener("hashchange", () => setMode(location.hash.slice(1)));
+    setMode(location.hash.slice(1) || "solve");
+  }
+  boot();
+})();
+</script>

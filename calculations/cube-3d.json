@@ -1,0 +1,69 @@
+{
+  "schema": "gitcalculator.tape.v1",
+  "name": "cube-3d",
+  "input": {
+    "system": "([[-1,0,0],[0,-1,0],[0,0,-1],[1,0,0],[0,1,0],[0,0,1]], [0,0,0,1,1,1])",
+    "base": "-(x0**2+x1**4+x2**6)",
+    "perturbation": "x0*x1 + x2 - x1**2"
+  },
+  "receipt_id": "gc-c682e2d979c020c4",
+  "answer": {
+    "verdict": "proved",
+    "headline": "Δ(s) = Θ(s^6/5)",
+    "gamma": "6/5",
+    "q_star": "1/6"
+  },
+  "signature": {
+    "verdict": "proved",
+    "gamma": "6/5",
+    "q_star": "1/6",
+    "backend": {
+      "status": "licensed",
+      "licensed": true,
+      "gamma": "6/5",
+      "q_star": "1/6",
+      "blockers": [],
+      "refusal": null
+    },
+    "certificate": {
+      "status": "theorem",
+      "links": {
+        "standing": "exact",
+        "vertex": "exact",
+        "transport": "exact",
+        "H2": "exact",
+        "H1": "exact",
+        "H0": "exact",
+        "H3": "exact",
+        "faces": "exact",
+        "H5": "exact",
+        "selection": "exact"
+      }
+    },
+    "curved": null,
+    "ambient_gamma": "6/5",
+    "measurement": {
+      "backend": "consistent"
+    },
+    "counter": {
+      "finite-scale": "caveat",
+      "homogeneity-probe": "averted",
+      "isolation-probe": "averted",
+      "ambient-axes": "clear",
+      "signed-channel": "clear",
+      "signed-sharp": "clear",
+      "interior-zero": "clear",
+      "empty-not-zero": "clear",
+      "active-set": "clear",
+      "critical-layer": "clear",
+      "tied-coefficient": "clear",
+      "inverse-tolerance": "clear",
+      "non-simple": "clear"
+    }
+  },
+  "recorded_with": {
+    "commit": "b6e4350d854e5eb017691f2651f37b46fbf3a864",
+    "code_id": "code-23ad9e729a48",
+    "calculator_id": "calc-d0fa59fc8cee"
+  }
+}

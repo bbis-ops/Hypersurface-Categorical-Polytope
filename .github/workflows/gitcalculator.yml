@@ -1,0 +1,80 @@
+name: gitcalculator
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # history replays need every commit
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pytest
+      - name: Regression tests, including Python against the browser engine
+        run: python -m pytest -q -p no:cacheprovider tests/test_gitcalculator.py
+      - name: Counter-argument witnesses
+        run: python -m gitcalculator counter
+      - name: Recorded calculations have not drifted
+        run: python -m gitcalculator tape verify
+
+  pages-enabled:
+    # Deploys only where GitHub Pages is switched on with the GitHub Actions
+    # source (Settings -> Pages); elsewhere this job reports and stops.
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: read
+    outputs:
+      enabled: ${{ steps.check.outputs.enabled }}
+    steps:
+      - id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          source=$(gh api "repos/${GITHUB_REPOSITORY}/pages" --jq .build_type 2>/dev/null || true)
+          echo "Pages build type: ${source:-not enabled}"
+          echo "enabled=$([ "$source" = workflow ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
+  pages:
+    needs: [verify, pages-enabled]
+    if: needs.pages-enabled.outputs.enabled == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Vendor the WebAssembly Python runtime (npm verifies its integrity)
+        run: |
+          mkdir -p /tmp/pyodide && cd /tmp/pyodide
+          npm pack pyodide@0.26.4 --silent
+          tar -xzf pyodide-0.26.4.tgz
+      - name: Build the web calculator from the full history
+        run: python -m gitcalculator site --out _site --pyodide /tmp/pyodide/package
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deploy
+        uses: actions/deploy-pages@v4

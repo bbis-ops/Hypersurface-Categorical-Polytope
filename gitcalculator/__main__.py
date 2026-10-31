@@ -76,6 +76,10 @@ def main(argv: list[str] | None = None) -> int:
     site.add_argument("--fragment", action="store_true", help="omit the document skeleton (for a Claude artifact)")
     site.add_argument("--recorded-only", action="store_true", help="ship recorded receipts without the live engine")
 
+    serve = sub.add_parser("serve", help="build the web calculator and open it at http://127.0.0.1:PORT")
+    serve.add_argument("--port", type=int, default=8000)
+    serve.add_argument("--pyodide", type=Path, help="a local Pyodide directory to vendor instead of the CDN")
+
     # An expression such as -(x0**4+x1**4) starts like an option; bind it to its flag.
     raw = list(sys.argv[1:] if argv is None else argv)
     valued = {"--system", "--base", "--perturbation", "--target", "--from", "--to", "--observed"}
@@ -219,6 +223,21 @@ def main(argv: list[str] | None = None) -> int:
         from .site import build
         out = build(args.out, pyodide=args.pyodide, fragment=args.fragment, live=not args.recorded_only)
         print(f"web calculator written to {out}")
+        return 0
+
+    if args.command == "serve":
+        import mimetypes
+        from functools import partial
+        from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+        from .site import build
+        out = build(Path("tmp/gitcalculator/serve"), pyodide=args.pyodide)
+        mimetypes.add_type("application/wasm", ".wasm")
+        server = ThreadingHTTPServer(("127.0.0.1", args.port), partial(SimpleHTTPRequestHandler, directory=str(out)))
+        print(f"gitcalculator running at http://127.0.0.1:{args.port}/  (Ctrl+C stops it)", flush=True)
+        try:
+            server.serve_forever()
+        except KeyboardInterrupt:
+            pass
         return 0
     return 1
 

@@ -1,0 +1,12 @@
+{
+  "name": "gitcalculator",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": { "version": "20" }
+  },
+  "postCreateCommand": "python -m pip install -e '.[dev]'",
+  "forwardPorts": [8000],
+  "portsAttributes": {
+    "8000": { "label": "gitcalculator", "onAutoForward": "openBrowser" }
+  }
+}

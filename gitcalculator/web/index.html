@@ -201,7 +201,7 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
         </div>
         <label for="observed" data-for="solve">Observed exponent <small>optional, for the inverse check</small>
           <input id="observed" spellcheck="false" placeholder="4/3"></label>
-        <div class="actions"><button type="submit" class="primary" id="run">Solve</button></div>
+        <div class="actions"><button type="submit" class="primary" id="run">Solve</button><button type="button" id="share" hidden>Copy link</button></div>
         <p class="note" id="form-note"></p>
       </form>
     </div>
@@ -354,7 +354,8 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
   }
   function fill(request) {
     for (const id of ["system", "base", "perturbation", "target", "from", "to"]) if (request[id] != null) $(id).value = request[id];
-    if (request.observed_exponent == null) $("observed").value = "";
+    if (request.observed != null) $("observed").value = request.observed;
+    else if (request.observed_exponent == null) $("observed").value = "";
   }
   const cli = (mode, r) => {
     const q = (v) => "'" + String(v).replace(/'/g, "'\\''") + "'";
@@ -395,9 +396,11 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
     const preset = store.preset[mode];
     const solveLike = store.ledger?.presets?.[preset] || PRESET_INPUTS[preset] || PRESET_INPUTS["tilted-simplex"];
     const chosen = mode === "design" ? DESIGN_PRESETS[preset] : mode === "sweep" ? SWEEP_PRESETS[preset] : solveLike;
-    const keep = mode !== "design" && mode !== "sweep" && store.lastSolveLike;
+    const shared = store.fromLink;
+    store.fromLink = null;
+    const keep = shared || (mode !== "design" && mode !== "sweep" && store.lastSolveLike);
     fill(keep || chosen.request);
-    $("form-note").textContent = keep ? "" : chosen.note;
+    $("form-note").textContent = shared ? "Opened from a shared link." : keep ? "" : chosen.note;
     presetChips();
     run();
   }
@@ -714,6 +717,19 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
     })().catch((error) => { store.starting = null; store.worker?.terminate(); engineStatus("off", `Exact JS engine only: ${error.message}`, false); throw error; });
     return store.starting;
   }
+  const FIELDS = { solve: ["perturbation", "observed"], design: ["target"], sweep: ["perturbation", "from", "to"], attack: ["perturbation"], history: ["perturbation"] };
+  function shareLink() {
+    const params = new URLSearchParams();
+    for (const id of ["system", "base", ...FIELDS[store.mode]]) if ($(id).value.trim()) params.set(id, $(id).value.trim());
+    return `${location.origin}${location.pathname}?${params}#${store.mode}`;
+  }
+  function readLink() {
+    const query = new URLSearchParams(location.search);
+    if (!query.get("system") || !query.get("base")) return null;
+    const request = {};
+    for (const id of ["system", "base", "perturbation", "target", "from", "to", "observed"]) if (query.has(id)) request[id] = query.get(id);
+    return request;
+  }
   const call = (type, request) => new Promise((resolve, reject) => { const id = ++store.seq; store.pending.set(id, { resolve, reject }); store.worker.postMessage({ type, id, request }); });
 
   async function boot() {
@@ -722,6 +738,14 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
     engineStatus("", `Exact JS engine ready${store.ledger?.head?.short ? ` · built from commit ${store.ledger.head.short}` : ""}`, live);
     $("engine-start").addEventListener("click", () => startPython().then(() => run()).catch(() => {}));
     $("form").addEventListener("submit", run);
+    store.fromLink = readLink();
+    $("share").hidden = store.ledger?.live_engine === false;
+    $("share").addEventListener("click", () => {
+      const link = shareLink();
+      const done = () => toast("Link to this calculation copied");
+      const show = () => { $("form-note").innerHTML = `Copy this link:<code class="cmd">${esc(link)}</code>`; };
+      navigator.clipboard ? navigator.clipboard.writeText(link).then(done, show) : show();
+    });
     window.addEventListener("hashchange", () => setMode(location.hash.slice(1)));
     setMode(location.hash.slice(1) || "solve");
   }

@@ -6,7 +6,7 @@
     "base": "-((x0*(1-x0))**2 + x1**2)",
     "perturbation": "x0"
   },
-  "receipt_id": "gc-28e525e24647177e",
+  "receipt_id": "gc-a79c5c008385fb69",
   "answer": {
     "verdict": "unlicensed",
     "headline": "candidate Δ(s) = Θ(s^2), not licensed",
@@ -69,8 +69,8 @@
     }
   },
   "recorded_with": {
-    "commit": "0927d93357cbf3f189513012c6980d2af8300979",
+    "commit": "b6e4350d854e5eb017691f2651f37b46fbf3a864",
     "code_id": "code-23ad9e729a48",
-    "calculator_id": "calc-8056d415d566"
+    "calculator_id": "calc-d0fa59fc8cee"
   }
 }

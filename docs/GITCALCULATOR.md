@@ -411,13 +411,32 @@ the command line, including history replays for new inputs. The browser
 receipt reports the same code identity as a local run. `--recorded-only` builds
 the page without the Python bundle; the exact engine still runs.
 
-Serve the directory with any static server. The
-[`gitcalculator` workflow](../.github/workflows/gitcalculator.yml) runs the tests,
-the counter-argument witnesses and the tape on every push and pull request.
-Publishing to GitHub Pages is opt-in: set the repository's Pages source to
-*GitHub Actions* and add a repository variable `GITCALCULATOR_PAGES` with the
-value `true`. Each push to `main` then builds the site from the full history and
-deploys it.
+### On GitHub
+
+The [`gitcalculator` workflow](../.github/workflows/gitcalculator.yml) runs the
+tests, the counter-argument witnesses and the tape on every push and pull
+request. When GitHub Pages is switched on with the *GitHub Actions* source
+(Settings → Pages), each push to `main` also publishes the calculator at
+`https://<owner>.github.io/<repository>/`. For this repository that is
+https://bbis-ops.github.io/Hypersurface-Categorical-Polytope/. Until Pages is
+switched on, the deployment job reports that and stops.
+
+The deployed site depends on nothing outside GitHub. The workflow builds it
+from the full history and vendors the Pyodide runtime from npm, which verifies
+the package's integrity, instead of loading it from a CDN at runtime. Every
+calculation on the page has a *Copy link* button: the link carries the inputs
+and the mode, so a calculation can be shared or bookmarked.
+
+GitHub renders Markdown without scripts, so the calculator cannot run inside a
+README or a file view on github.com. It runs on the Pages site, in
+[GitHub Codespaces](https://codespaces.new/bbis-ops/Hypersurface-Categorical-Polytope)
+(the [dev container](../.devcontainer/devcontainer.json) installs the package,
+and `python -m gitcalculator serve` opens the page on a forwarded port), and
+locally:
+
+```bash
+python -m gitcalculator serve
+```
 
 ## Scope and limits
 

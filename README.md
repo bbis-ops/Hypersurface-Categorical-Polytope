@@ -337,8 +337,16 @@ $2$. The second replays the audit's sharpened signed counterexample across
 every code state in the repository's history. The exact core licensed
 $\gamma=6$ when the backend was introduced; commit `90105c2` withdrew that
 license, and V.22 gives $\gamma=3$. The [web calculator](docs/GITCALCULATOR.md#the-web-calculator)
-runs the same Python in the browser after checking each file against its git
-blob id.
+runs every mode in the browser, and can also run the repository's own Python
+there after checking each file against its git blob id.
+
+**Use it in a browser.** Once GitHub Pages is switched on for this repository
+(Settings → Pages → Source: *GitHub Actions*), each push to `main` publishes the
+calculator at **https://bbis-ops.github.io/Hypersurface-Categorical-Polytope/**.
+Nothing needs installing, and any calculation can be shared as a link. For the
+command line in a browser tab, open the repository in
+[GitHub Codespaces](https://codespaces.new/bbis-ops/Hypersurface-Categorical-Polytope).
+Locally, `python -m gitcalculator serve` serves the same page.
 
 ## Navigate the repository
 

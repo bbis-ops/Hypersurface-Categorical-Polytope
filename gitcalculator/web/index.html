@@ -99,6 +99,10 @@ sup { font-size: .62em; line-height: 0; }
 .meaning { margin: 0; color: var(--ink-2); max-width: 72ch; }
 .stamp { margin: 0; font: 12px/1.6 var(--mono); color: var(--ink-3); overflow-wrap: anywhere; }
 .stamp b { color: var(--brass-ink); font-weight: 500; }
+.gh { margin-top: 10px; }
+.gh-preview { margin-top: 8px; }
+.gh-preview summary { cursor: pointer; }
+.gh-preview pre { max-height: 320px; overflow: auto; }
 h2 { font: 400 23px/1.2 var(--display); margin: 0 0 4px; text-wrap: balance; }
 h3 { font: 600 14px/1.3 var(--sans); margin: 0 0 8px; }
 .sec-head { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
@@ -219,6 +223,14 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
       <dl class="numbers" id="numbers"></dl>
       <p class="meaning" id="meaning"></p>
       <p class="stamp" id="stamp"></p>
+      <div class="actions gh" id="gh-actions">
+        <button type="button" class="quiet" id="gh-copy" title="The answer, the input and every clause of the certificate in GitHub Markdown, with each clause linked to its theorem at this build's commit">Copy proof sheet</button>
+        <button type="button" class="quiet" id="gh-issue" title="Open a GitHub issue with this proof sheet, to discuss or challenge the answer">Open an issue</button>
+        <button type="button" class="quiet" id="gh-tape" title="Record this calculation with the repository's Python and propose it for calculations/, which CI recomputes on every push">Propose for the tape</button>
+        <button type="button" class="quiet" id="gh-download">Download .md</button>
+      </div>
+      <p class="note" id="gh-note" hidden></p>
+      <details class="gh-preview"><summary class="note">Preview the proof sheet</summary><pre class="cmd" id="gh-preview"></pre></details>
     </section>
     <section data-view="solve" class="panel" id="agree-panel" hidden></section>
     <section data-view="solve" aria-labelledby="h-pictures">
@@ -763,7 +775,7 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
     const known = presetFor(request);
     for (const chip of document.querySelectorAll(".chip")) chip.setAttribute("aria-pressed", String(chip.dataset.id === (store.mode === "design" || store.mode === "sweep" ? String(store.preset[store.mode]) : known)));
     try {
-      if (store.mode === "solve") { const r = E.solve(request, { git: store.ledger?.head, engineBlob: BUILD.engine_blob }); renderReceipt(r); renderAgreement(r, known ? store.ledger.presets[known].receipt : null); }
+      if (store.mode === "solve") { const r = E.solve(request, { git: store.ledger?.head, engineBlob: BUILD.engine_blob }); store.receipt = r; store.known = known; renderReceipt(r); renderAgreement(r, known ? store.ledger.presets[known].receipt : null); $("gh-preview").textContent = proofSheet(r); $("gh-note").hidden = true; }
       else if (store.mode === "design") renderDesign(E.design(request), request);
       else if (store.mode === "sweep") renderSweep(E.sweep(request));
       else if (store.mode === "attack") renderAttack(E.attack(request));
@@ -798,6 +810,7 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
         } else {
           py.globals.set("REQUEST_JSON", JSON.stringify(msg.request));
           const code = msg.type === "calc" ? "import json\\nfrom gitcalculator.receipt import calculate\\njson.dumps(calculate(json.loads(REQUEST_JSON)), ensure_ascii=False)"
+            : msg.type === "tape" ? "import json\\nfrom gitcalculator.receipt import calculate\\nfrom gitcalculator.tape import entry\\nJOB = json.loads(REQUEST_JSON)\\njson.dumps(json.dumps(entry(JOB['name'], calculate(JOB['request'])), indent=2, ensure_ascii=False) + '\\\\n')"
             : "import json\\nfrom pathlib import Path\\nfrom gitcalculator.history import BundleSource, replay\\njson.dumps(replay(json.loads(REQUEST_JSON), BundleSource(BUNDLE, Path('/snapshots'))), ensure_ascii=False)";
           self.postMessage({ type: "result", id: msg.id, result: JSON.parse(py.runPython(code)) });
         }
@@ -822,6 +835,60 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
       engineStatus("", `Exact JS engine and Python ${info.python} (commit ${store.bundle.head.short}, ${info.blobs} blobs verified)`, false);
     })().catch((error) => { store.starting = null; store.worker?.terminate(); engineStatus("off", `Exact JS engine only: ${error.message}`, false); throw error; });
     return store.starting;
+  }
+  // ===== GitHub: proof sheets, issues and the tape ================================
+  const calculatorUrl = () => location.origin + location.pathname;
+  const shellQ = (v) => "'" + String(v).replace(/'/g, "'\\''") + "'";
+  function proofSheet(receipt) {
+    return E.sheet(receipt, { repository: repoUrl(), ref: store.ledger?.head?.link_ref || undefined, calculator: calculatorUrl(), linkable: store.ledger?.linkable });
+  }
+  function ghNote(html) { const n = $("gh-note"); n.innerHTML = html; n.hidden = !html; }
+  function clipboard(text) { return navigator.clipboard ? navigator.clipboard.writeText(text).then(() => true, () => false) : Promise.resolve(false); }
+  function download(name, text, type) {
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name;
+    document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+  const GITHUB_URL_LIMIT = 8000; // GitHub refuses much longer addresses
+  function blankTab() { const tab = window.open("", "_blank"); if (tab) tab.opener = null; return tab; }
+  function sendTab(tab, url, label) {
+    if (tab && !tab.closed) tab.location.href = url;
+    return ` If no tab opened, <a href="${esc(url)}" target="_blank" rel="noopener">${esc(label)}</a>.`;
+  }
+  async function openIssue() {
+    const r = store.receipt, repo = repoUrl();
+    if (!r || !repo) { ghNote("This build does not know its GitHub repository."); return; }
+    const tab = blankTab();
+    const full = proofSheet(r), title = `gitcalculator: ${r.answer.headline} (${r.answer.verdict})`;
+    let url = `${repo}/issues/new?${new URLSearchParams({ title, body: full })}`;
+    if (url.length > GITHUB_URL_LIMIT) {
+      const lines = full.split("\n"), cut = lines.findIndex((l) => l.startsWith("#### ")), footer = lines.findIndex((l) => l.startsWith("<sub>Receipt"));
+      const brief = [...lines.slice(0, cut), "_The full proof sheet is on the clipboard; paste it below._", "", ...lines.slice(footer)].join("\n");
+      const copied = await clipboard(full);
+      url = `${repo}/issues/new?${new URLSearchParams({ title, body: brief })}`;
+      ghNote((copied ? "The full sheet is too long for a link, so the issue opens with a summary and the full sheet is on your clipboard." : "The full sheet is too long for a link; the issue opens with a summary. Use Copy proof sheet for the rest.") + sendTab(tab, url, "open the issue"));
+    } else ghNote("A new issue opens with the proof sheet as its text." + sendTab(tab, url, "open the issue"));
+  }
+  async function proposeTape() {
+    const r = store.receipt, repo = repoUrl();
+    if (!r || !repo) { ghNote("This build does not know its GitHub repository."); return; }
+    if (store.known) { ghNote(`This calculation is already on the tape as ${docLink(`calculations/${store.known}.json`, `calculations/${store.known}.json`)}.`); return; }
+    const name = (prompt("A name for the recorded calculation: lowercase letters, digits and dashes", "calc-" + r.id.replace(/^gc(js)?-/, "").slice(0, 8)) || "").trim();
+    if (!name) return;
+    if (!/^[a-z0-9][a-z0-9-]{0,63}$/.test(name)) { ghNote("Use lowercase letters, digits and dashes, starting with a letter or digit."); return; }
+    if (store.ledger?.presets?.[name]) { ghNote(`The tape already has an entry named ${esc(name)}; choose another name.`); return; }
+    $("gh-tape").disabled = true;
+    const tab = blankTab();
+    try {
+      ghNote(store.ready ? "Recording with the repository's Python…" : "Starting the repository's Python in this page to record the calculation (about 14 MB, once)…");
+      await startPython();
+      ghNote("Recording with the repository's Python…");
+      const file = await call("tape", { name, request: r.input });
+      const copied = await clipboard(file);
+      const branch = /^[\w./-]+$/.test(store.ledger?.head?.branch || "") && store.ledger.head.branch !== "HEAD" ? store.ledger.head.branch : "main";
+      const url = `${repo}/new/${branch}?${new URLSearchParams({ filename: `calculations/${name}.json`, value: file })}`;
+      ghNote(`GitHub opens <span class="mono">calculations/${esc(name)}.json</span> with the entry recorded here by the repository's Python${copied ? " (it is also on your clipboard)" : ""}. Commit it on a new branch and open a pull request: the workflow's tape check recomputes it and fails if the answer does not reproduce exactly.` + sendTab(tab, url, "open the new file on GitHub"));
+    } catch (error) { if (tab) tab.close(); ghNote(`Could not record: ${esc(error.message)}. From a clone: <code class="cmd">${esc(`python -m gitcalculator tape record ${name} --system ${shellQ(r.input.system)} --base ${shellQ(r.input.base)} --perturbation ${shellQ(r.input.perturbation)}`)}</code>`); }
+    finally { $("gh-tape").disabled = false; }
   }
   const FIELDS = { solve: ["perturbation", "observed"], design: ["target"], sweep: ["perturbation", "from", "to"], attack: ["perturbation"], history: ["perturbation"] };
   function shareLink() {
@@ -852,6 +919,16 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
       const show = () => { $("form-note").innerHTML = `Copy this link:<code class="cmd">${esc(link)}</code>`; };
       navigator.clipboard ? navigator.clipboard.writeText(link).then(done, show) : show();
     });
+    $("gh-copy").addEventListener("click", async () => {
+      if (!store.receipt) return;
+      const text = proofSheet(store.receipt);
+      if (await clipboard(text)) { toast("Proof sheet copied: paste it into an issue, a pull request or a discussion"); ghNote(""); }
+      else { $("gh-preview").textContent = text; document.querySelector(".gh-preview").open = true; ghNote("Copy the sheet from the preview below."); }
+    });
+    $("gh-download").addEventListener("click", () => { if (store.receipt) download(`gitcalculator-${store.receipt.id}.md`, proofSheet(store.receipt), "text/markdown"); });
+    $("gh-issue").addEventListener("click", () => { openIssue(); });
+    $("gh-tape").addEventListener("click", () => { proposeTape(); });
+    $("gh-tape").hidden = !live;
     window.addEventListener("hashchange", () => setMode(location.hash.slice(1)));
     setMode(location.hash.slice(1) || "solve");
   }

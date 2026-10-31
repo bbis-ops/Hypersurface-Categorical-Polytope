@@ -98,7 +98,7 @@ python -m gitcalculator calc --system "([[-1,0],[0,-1],[1,1]], [0,0,1])" --base 
 
 | Command | What it does |
 | :--- | :--- |
-| `calc` | One receipt; `--json` for the full record, `--history` to add the replay, `--observed 4/3` for the inverse check |
+| `calc` | One receipt; `--json` for the full record, `--markdown` for a proof sheet, `--history` to add the replay, `--observed 4/3` for the inverse check |
 | `design` | The exponent spectrum of the vertex; `--target 3/2` synthesizes and certifies perturbations for one exponent |
 | `sweep` | The exact phase fan of a family written with the parameter `t`, over `--from` and `--to` |
 | `attack` | Generated counterexamples: every mutation of the input, re-certified |
@@ -107,6 +107,7 @@ python -m gitcalculator calc --system "([[-1,0],[0,-1],[1,1]], [0,0,1])" --base 
 | `history` | Replays one input across every code state in git |
 | `tape record` / `tape verify` | Records calculations in [`calculations/`](../calculations/) and checks them for drift |
 | `site --out DIR` | Builds the static web calculator |
+| `visit URL` | Loads a published calculator the way a browser does and checks every file against git |
 
 After `python -m pip install -e .` the same commands are available as
 `gitcalculator`.
@@ -371,7 +372,46 @@ python -m gitcalculator tape verify
 The command recomputes every entry and prints any field that drifted. A change
 to the backend, the certificate or the counter-arguments that alters a
 recorded answer cannot pass silently. Record new entries deliberately with
-`tape record`.
+`tape record`. A preset is recorded by its name. A new calculation needs a name
+and its input:
+
+```bash
+python -m gitcalculator tape record orthant-check --system "([[-1,0],[0,-1],[1,1]], [0,0,1])" --base "-((x0+x1-1)**2 + x0**4)" --perturbation "x0 + x1**3"
+```
+
+## Take it to GitHub
+
+Every calculation can leave the calculator as GitHub content, in three forms.
+
+**A proof sheet.** `python -m gitcalculator calc --markdown` prints the
+receipt as GitHub Markdown, and so does *Copy proof sheet* under every answer
+on the web page. A sheet contains:
+
+- the answer with its formula;
+- the input;
+- the exact certificate clause by clause, each clause linked to its theorem at
+  the commit the calculator was built from;
+- the alternatives and the measurement;
+- the counter-arguments that bear on the input;
+- a link that reopens the calculation, and the command that reproduces it.
+
+Its mathematics follows the rules of
+[`ghmath.py`](../experiments/ghmath.py), so it renders as written when pasted
+into an issue, a pull request or a discussion.
+[`sheet.py`](../gitcalculator/sheet.py) and the browser engine write the same
+sheet from the same receipt, byte for byte, and the tests check both.
+
+**An issue.** *Open an issue* starts a GitHub issue with the sheet as its
+text, to discuss or challenge an answer. A sheet too long for an address opens
+with a summary, and the full sheet is put on the clipboard.
+
+**A tape entry.** *Propose for the tape* records the calculation with the
+repository's Python, running in the page. It then opens GitHub's new-file form
+at `calculations/NAME.json` with the entry filled in. The entry is byte for
+byte what `tape record` writes from a clone. Commit it on a branch and open a
+pull request. The workflow's tape check then recomputes the entry with the
+current code, and fails unless the recorded answer reproduces exactly. Anyone
+with a browser can propose a calculation, and CI decides whether it stands.
 
 ## Two implementations
 

@@ -42,6 +42,8 @@ def main(argv: list[str] | None = None) -> int:
     calc.add_argument("--budget", choices=("quick", "standard"), default="standard")
     calc.add_argument("--full", action="store_true", help="include the complete backend response")
     calc.add_argument("--history", action="store_true", help="also replay the input across git history")
+    calc.add_argument("--markdown", action="store_true",
+                      help="print a proof sheet in GitHub Markdown, for an issue or a pull request")
 
     design = sub.add_parser("design", help="the exponent spectrum of a vertex, and perturbations that reach a target")
     design.add_argument("--preset", choices=sorted(PRESETS), help="take P and F from a preset")
@@ -68,7 +70,10 @@ def main(argv: list[str] | None = None) -> int:
 
     tape = sub.add_parser("tape", help="record or verify calculations kept in calculations/")
     tape.add_argument("action", choices=("record", "verify"))
-    tape.add_argument("names", nargs="*", help="presets to record (default: all)")
+    tape.add_argument("names", nargs="*", help="presets to record (default: all), or one new name with --system --base --perturbation")
+    tape.add_argument("--system", help="record a new calculation: the polyhedron")
+    tape.add_argument("--base", help="the base objective F")
+    tape.add_argument("--perturbation", help="the perturbation G")
 
     site = sub.add_parser("site", help="build the static web calculator")
     site.add_argument("--out", type=Path, default=Path("tmp/gitcalculator/site"))
@@ -183,6 +188,11 @@ def main(argv: list[str] | None = None) -> int:
             receipt["history"] = replay(receipt["input"])
         if args.json:
             print(json.dumps(receipt, indent=2, ensure_ascii=False))
+        elif args.markdown:
+            from .sheet import sheet
+            from .site import link_target
+            ref, linkable = link_target(receipt["provenance"]["git"])
+            print(sheet(receipt, ref=ref, linkable=linkable or None), end="")
         else:
             print(render_text(receipt))
             if args.history:
@@ -215,6 +225,14 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "tape":
         from . import tape
         if args.action == "record":
+            given = {k: getattr(args, k) for k in ("system", "base", "perturbation") if getattr(args, k)}
+            if given:
+                import re
+                if len(given) < 3 or len(args.names) != 1 or not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,63}", args.names[0]):
+                    raise SystemExit("a new calculation needs one name (lowercase letters, digits and dashes) "
+                                     "and all of --system --base --perturbation")
+                print(f"recorded {tape.record(args.names[0], given).relative_to(tape.ROOT)}")
+                return 0
             for name in args.names or list(PRESETS):
                 print(f"recorded {tape.record(name, preset_request(name)).relative_to(tape.ROOT)}")
             return 0

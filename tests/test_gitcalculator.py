@@ -447,3 +447,72 @@ def test_browser_engine_facets_match_exact_python_geometry():
     assert sorted(len(f) for f in cube["facets"]) == [4] * 6 and cube["simple"] and len(cube["active"]) == 3
     assert sorted(len(f) for f in pyramid["facets"] if len(f) >= 3) == [3, 3, 3, 3, 4]
     assert not pyramid["simple"] and len(pyramid["active"]) == 4
+
+
+# --- proof sheets and the tape from GitHub ------------------------------------------
+
+def _ghmath():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("ghmath", ROOT / "experiments" / "ghmath.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+@pytest.fixture(scope="module")
+def every_receipt():
+    from gitcalculator.presets import PRESETS
+    return {name: calculate(preset_request(name), budget="quick") for name in sorted(PRESETS)}
+
+
+def test_proof_sheets_render_on_github_and_pin_their_links(every_receipt):
+    from gitcalculator.sheet import sheet
+    check = _ghmath().check_text
+    for name, receipt in every_receipt.items():
+        markdown = sheet(receipt, repository="https://github.com/o/r", ref="abc123", calculator="https://o.github.io/r/")
+        assert check(markdown) == [], (name, check(markdown))
+        assert markdown.startswith(f"### {receipt['answer']['headline'].replace('>', chr(92) + '>').replace('~', chr(92) + '~')} · ")
+        statuses = [line.split(" | ")[1] for line in markdown.splitlines() if line.startswith("| [")]
+        assert statuses == [link["status"].replace("_", " ") for link in receipt["certificate"]["links"]], name
+        assert "https://github.com/o/r/blob/abc123/docs/" in markdown and "https://o.github.io/r/?system=" in markdown
+    proved = sheet(every_receipt["cube-3d"])
+    assert "\\frac{1}{1 - \\tfrac{1}{6}} = \\tfrac{6}{5}" in proved
+    assert "\\Delta(s) \\sim \\tfrac{1}{432}\\, s^{3}" in sheet(every_receipt["signed-sharp"])
+    unpinned = sheet(every_receipt["cube-3d"], repository="https://github.com/o/r", ref="abc123", linkable=[])
+    assert "/blob/" not in unpinned and "/commit/" not in unpinned  # nothing links where the files are not known to exist
+
+
+@pytest.mark.skipif(NODE is None, reason="node is not installed")
+def test_the_browser_writes_the_same_proof_sheet(every_receipt):
+    from gitcalculator.sheet import sheet
+    from gitcalculator.presets import PRESETS
+    options = [{}, {"repository": "https://github.com/o/r", "ref": "abc123", "calculator": "https://o.github.io/r/",
+                    "linkable": ["docs/FORMAL_FACE_SELECTION.md"]}]
+    jobs = [{"mode": "sheet", "receipt": r, "options": o} for r in every_receipt.values() for o in options]
+    jobs += [{"mode": "solve-sheet", "request": preset_request(n), "options": options[1]} for n in sorted(PRESETS)]
+    results = _browser(jobs)
+    expected = [sheet(r, **o) for r in every_receipt.values() for o in options]
+    assert [r["markdown"] for r in results[:len(expected)]] == expected
+    check = _ghmath().check_text
+    assert {n: check(r["markdown"]) for n, r in zip(sorted(PRESETS), results[len(expected):]) if check(r["markdown"])} == {}
+
+
+def test_command_line_prints_a_proof_sheet():
+    out = io.StringIO()
+    with redirect_stdout(out):
+        assert main(["calc", "--preset", "cube-3d", "--budget", "quick", "--markdown"]) == 0
+    text = out.getvalue()
+    assert text.startswith("### Δ(s) = Θ(s^6/5) · proved\n\n```math\n") and "python -m gitcalculator calc --system" in text
+
+
+def test_a_new_calculation_can_be_recorded_on_the_tape(tmp_path):
+    from gitcalculator import tape
+    request = {"system": SIMPLEX, "base": "-((x0+x1-1)**2 + x0**4)", "perturbation": "x0 + x1**3"}
+    path = tape.record("orthant-check", request, tmp_path)
+    stored = json.loads(path.read_text(encoding="utf-8"))
+    assert stored["input"] == request and stored["name"] == "orthant-check"
+    assert [row["unchanged"] for row in tape.verify(tmp_path)] == [True]
+    with pytest.raises(SystemExit):
+        main(["tape", "record", "Not A Name", "--system", SIMPLEX, "--base", "-x0", "--perturbation", "x0"])
+    with pytest.raises(SystemExit):
+        main(["tape", "record", "two-inputs-missing", "--system", SIMPLEX])

@@ -450,5 +450,107 @@
       kinds_changed: [...new Set(fragile.map((r) => r.kind))], kinds_stable: [...new Set(stable.map((r) => r.kind))].filter((k) => !fragile.some((r) => r.kind === k)) } };
   }
 
-  Object.assign(G, { ENGINE_VERSION, normalize, assess, REGISTRY, solve, outcome, design, sweep, attack, spectrumOf, affineText, slackMonomial, decimalText });
+  // ===== proof sheets: a receipt as GitHub Markdown, as gitcalculator/sheet.py writes it =====
+  const SHEET_VERDICTS = { proved: "proved", "proved-v22": "proved by V.22", licensed: "licensed", unlicensed: "not licensed", refused: "refused", contradicted: "contradicted" };
+  const GITHUB_RE = /^(?:https:\/\/github\.com\/|git@github\.com:)([^/\s]+)\/([^/\s]+?)(?:\.git)?\/?$/;
+  const filled = (o) => Boolean(o) && Object.keys(o).length > 0;
+  const mdText = (v) => String(v).split(/\s+/).filter(Boolean).join(" ").replace(/([\\`*_<>|$~])/g, "\\$1");
+  function mdCode(v) {
+    const body = String(v).replace(/\|/g, "\\|"), runs = body.match(/`+/g) || [];
+    const fence = "`".repeat(Math.max(0, ...runs.map((r) => r.length)) + 1), pad = body.startsWith("`") || body.endsWith("`") ? " " : "";
+    return fence + pad + body + pad + fence;
+  }
+  function tex(v) {
+    let body = String(v).trim(), sign = "";
+    if (body.startsWith("-")) { sign = "-"; body = body.slice(1); }
+    const i = body.indexOf("/");
+    return i < 0 ? sign + body : `${sign}\\tfrac{${body.slice(0, i)}}{${body.slice(i + 1)}}`;
+  }
+  const shellQuote = (v) => "'" + String(v).replace(/'/g, "'\\''") + "'";
+  function githubRepository(remote) { const m = GITHUB_RE.exec(remote || ""); return m ? `https://github.com/${m[1]}/${m[2]}` : null; }
+  function pagesUrl(repository) { const m = GITHUB_RE.exec(repository || ""); return m ? `https://${m[1].toLowerCase()}.github.io/${m[2]}/` : null; }
+  function formula(answer) {
+    const gamma = answer.gamma, q = answer.q_star, coefficient = (answer.coefficient || {}).exact;
+    if (answer.certificate_status === "zero_response") return "\\Delta(s) = 0 \\quad \\text{for all sufficiently small } s \\gt 0";
+    if (answer.verdict === "proved-v22" && gamma) return `\\Delta(s) \\sim ${coefficient ? tex(coefficient) : "C"}\\, s^{${gamma}}`;
+    if (gamma && q) return `\\Delta(s) = \\Theta\\big(s^{\\gamma}\\big), \\quad \\gamma = \\frac{1}{1 - q^\\ast} = \\frac{1}{1 - ${tex(q)}} = ${tex(gamma)}`;
+    return null;
+  }
+  function calculationPairs(request) {
+    const pairs = ["system", "base", "perturbation"].filter((k) => request[k]).map((k) => [k, String(request[k])]);
+    if (request.observed_exponent != null) pairs.push(["observed", String(request.observed_exponent)]);
+    return pairs;
+  }
+  const SHEET_FLAGS = { system: "--system", base: "--base", perturbation: "--perturbation", observed: "--observed" };
+  const sheetCommand = (request) => "python -m gitcalculator calc " + calculationPairs(request).map(([k, v]) => `${SHEET_FLAGS[k]} ${shellQuote(v)}`).join(" ");
+  const sheetLink = (request, calculator) => `${calculator}?${new URLSearchParams(calculationPairs(request))}#solve`;
+  function sheet(receipt, options = {}) {
+    const answer = receipt.answer, request = receipt.input, git = (receipt.provenance || {}).git || {};
+    const repository = options.repository || githubRepository(git.remote), ref = options.ref || git.commit;
+    const calculator = options.calculator || pagesUrl(repository), files = options.linkable == null ? null : new Set(options.linkable);
+    const doc = (label, path) => {
+      const i = path.indexOf("#"), file = i < 0 ? path : path.slice(0, i), anchor = i < 0 ? "" : path.slice(i + 1);
+      if (!repository || !ref || (files && !files.has(file))) return mdText(label);
+      return `[${mdText(label).replace(/\[/g, "(").replace(/\]/g, ")")}](${repository}/blob/${ref}/${file}${anchor ? "#" + anchor : ""})`;
+    };
+    const out = [`### ${mdText(answer.headline)} · ${SHEET_VERDICTS[answer.verdict] || mdText(answer.verdict)}`, ""];
+    const math = formula(answer);
+    if (math != null) out.push("```math", math, "```", "");
+    out.push(mdText(answer.meaning), "");
+
+    out.push("| Input | |", "| :--- | :--- |", `| Polyhedron $Ax \\le b$ | ${mdCode(request.system)} |`,
+      `| Base objective $F$ | ${mdCode(request.base)} |`, `| Perturbation $G$ | ${mdCode(request.perturbation)} |`);
+    if (request.observed_exponent != null) out.push(`| Observed exponent | ${mdCode(String(request.observed_exponent))} |`);
+    out.push("");
+
+    const certificate = receipt.certificate || {};
+    out.push(`#### Exact certificate: ${mdText(String(certificate.status ?? "—").replace(/_/g, " "))}`, "", "| Clause | Status | What was checked |", "| :--- | :--- | :--- |");
+    for (const l of certificate.links || []) out.push(`| ${doc(l.clause, l.doc)} | ${mdText(l.status.replace(/_/g, " "))} | ${mdText(l.detail || "")} |`);
+    out.push("");
+
+    const alternatives = receipt.alternatives || {}, curved = alternatives.curved_reduction, ambient = alternatives.ambient_axes, rows = [];
+    if (filled(curved)) {
+      const found = curved.status === "licensed"
+        ? `licensed: $\\gamma = ${tex(curved.gamma)}$` + (curved.coefficient ? `, $C = ${tex(curved.coefficient)}$` : "")
+        : mdText(String(curved.status ?? "").replace(/_/g, " ")) + ((curved.blockers || []).length ? `: ${mdText(curved.blockers[0])}` : "");
+      rows.push(`| V.22 curved reduction | ${found} |`);
+    }
+    if (filled(ambient)) rows.push(`| Ambient axes, ignoring the edge chart | ${ambient.gamma ? `$\\gamma = ${tex(ambient.gamma)}$` : "no exponent"} |`);
+    if (rows.length) out.push("#### Alternatives", "", "| Reading | Result |", "| :--- | :--- |", ...rows, "");
+
+    const measurement = receipt.measurement || {}, verdicts = measurement.verdicts || [];
+    if (measurement.status === "complete" && (verdicts.length || measurement.measured_exponent != null)) {
+      const exponent = measurement.measured_exponent, scales = measurement.series_length ?? (measurement.rows || []).length;
+      out.push("#### Measurement", "", `Certified lower bounds $\\Delta(s) \\ge L(s)$ at ${scales} scales, each witnessed by a point of $P$ checked in exact arithmetic`
+        + (exponent != null ? `; measured exponent ${mdText(String(exponent))}.` : "."), "");
+      if (verdicts.length) {
+        out.push("| Prediction | $\\gamma$ | Verdict |", "| :--- | :--- | :--- |");
+        for (const v of verdicts) out.push(`| ${mdText(v.label)} | ${v.gamma ? `$${tex(v.gamma)}$` : "—"} | ${mdText(v.verdict)} |`);
+        out.push("");
+      }
+    }
+
+    const counters = receipt.counterarguments || [], bearing = counters.filter((c) => c.effect !== "clear");
+    if (counters.length) {
+      out.push("#### Counter-arguments", "");
+      if (bearing.length) {
+        out.push("| Counter-argument | Effect | Here |", "| :--- | :--- | :--- |");
+        for (const c of bearing) out.push(`| ${mdText(c.title)} | ${mdText(c.effect)} | ${mdText(c.detail || "")} |`);
+        out.push("");
+      }
+      const clear = counters.length - bearing.length;
+      if (clear) out.push(`${clear} other counter-argument${clear !== 1 ? "s" : ""} do${clear === 1 ? "es" : ""} not apply to this input.`, "");
+    }
+
+    const provenance = receipt.provenance || {};
+    const engine = receipt.engine ? `exact JS engine ${mdCode(receipt.engine)}` : `Python ${mdCode(provenance.code_id || "—")} · ${mdCode(provenance.calculator_id || "—")}`;
+    const commit = git.commit, short = git.short || (commit ? commit.slice(0, 7) : "—");
+    const pinned = repository && commit && ref === commit ? `[${mdCode(short)}](${repository}/commit/${commit})` : mdCode(short);
+    out.push(`<sub>Receipt ${mdCode(receipt.id || "—")} · ${engine} · commit ${pinned}</sub>`, "");
+    out.push(calculator ? `[Open this calculation in the gitcalculator](${sheetLink(request, calculator)}). Reproduce it:` : "Reproduce it:", "");
+    out.push("```bash", sheetCommand(request), "```", "");
+    return out.join("\n");
+  }
+
+  Object.assign(G, { ENGINE_VERSION, normalize, assess, REGISTRY, solve, outcome, design, sweep, attack, spectrumOf, affineText, slackMonomial, decimalText, sheet, sheetLink, sheetCommand, githubRepository, pagesUrl });
 })(typeof globalThis !== "undefined" ? globalThis : this);

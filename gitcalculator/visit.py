@@ -251,9 +251,10 @@ def _size(count: int) -> str:
 def render(report: dict[str, Any]) -> str:
     attempts = report.get("attempts", 1)
     lines = [f"visited {report['url']}" + (f" ({attempts} attempts)" if attempts > 1 else "")]
+    width = max([16] + [len(row["type"]) for row in report["files"]])
     for row in report["files"]:
         status = "---" if row["status"] is None else str(row["status"])
-        lines.append(f"  {status:>3}  {row['path']:<26} {row['type']:<18} {_size(row['bytes']):>9}  "
+        lines.append(f"  {status:>3}  {row['path']:<26} {row['type']:<{width}} {_size(row['bytes']):>9}  "
                      f"{'; '.join(row['notes'])}".rstrip())
     lines += [f"  PROBLEM  {problem}" for problem in report["problems"]]
     if report["ok"]:

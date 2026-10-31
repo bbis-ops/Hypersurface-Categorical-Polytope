@@ -1,0 +1,535 @@
+<title>Face-Selection gitcalculator</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: an instrument. Keypad (problem + presets) beside a display whose
+   printed tape runs theorem -> backend -> certificate -> counter-arguments,
+   then measurement, git history, provenance. Dark-first, in the repository's
+   ink-teal and brass. */
+:root {
+  --bg: #091924; --panel: #0f2532; --panel-2: #143040; --rule: #23414f;
+  --ink: #f4efe5; --ink-2: #b9cbd0; --ink-3: #86a0a8;
+  --brass: #d9b77b; --brass-ink: #f5d298; --sea: #87b8bd;
+  --ok: #6cc4a1; --warn: #e5a04f; --bad: #ef7d7d; --muted: #8fa3aa;
+  --s1: #3d86e0; --s2: #cf7a30; --s3: #2f9e78; --s4: #9a7bdc;
+  --display: Georgia, "Times New Roman", serif;
+  --sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) {
+  --bg: #f4efe5; --panel: #fbf8f1; --panel-2: #efe8d9; --rule: #d8ccb7;
+  --ink: #102734; --ink-2: #3c5460; --ink-3: #5f747c;
+  --brass: #86621f; --brass-ink: #6c4c12; --sea: #2c666d;
+  --ok: #1f7a5a; --warn: #a1570f; --bad: #b03636; --muted: #5f7177;
+  --s1: #2a78d6; --s2: #c8752a; --s3: #2f8f6f; --s4: #8a5bc4;
+  color-scheme: light;
+} }
+:root[data-theme="light"] {
+  --bg: #f4efe5; --panel: #fbf8f1; --panel-2: #efe8d9; --rule: #d8ccb7;
+  --ink: #102734; --ink-2: #3c5460; --ink-3: #5f747c;
+  --brass: #86621f; --brass-ink: #6c4c12; --sea: #2c666d;
+  --ok: #1f7a5a; --warn: #a1570f; --bad: #b03636; --muted: #5f7177;
+  --s1: #2a78d6; --s2: #c8752a; --s3: #2f8f6f; --s4: #8a5bc4;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 var(--sans); }
+[hidden] { display: none !important; }
+a { color: var(--sea); text-underline-offset: 2px; }
+a:hover { color: var(--brass-ink); }
+:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; border-radius: 3px; }
+.wrap { max-width: 1320px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.masthead { border-bottom: 1px solid var(--rule); }
+.masthead .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; justify-content: space-between; padding-block: 18px; }
+.brand { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; min-width: 0; }
+.wordmark { font: 400 30px/1 var(--display); letter-spacing: -0.01em; }
+.wordmark b { font-weight: 400; color: var(--brass); }
+.eyebrow { font: 500 11px/1.4 var(--sans); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+.tagline { font: 14px/1.4 var(--sans); color: var(--ink-3); }
+.engine { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font: 13px/1.4 var(--sans); color: var(--ink-2); }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--muted); flex: none; }
+.dot.live { background: var(--ok); } .dot.busy { background: var(--brass); animation: pulse 1.2s ease-in-out infinite; } .dot.off { background: var(--warn); }
+@keyframes pulse { 50% { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) { .dot.busy { animation: none; } }
+button { font: 500 14px/1 var(--sans); border-radius: 6px; padding: 10px 14px; cursor: pointer; border: 1px solid var(--rule); background: var(--panel-2); color: var(--ink); }
+button.primary { background: var(--brass); border-color: var(--brass); color: var(--bg); }
+button.quiet { padding: 6px 10px; font-size: 13px; }
+button:disabled { opacity: .55; cursor: progress; }
+.layout { display: grid; gap: 28px; padding-block: 26px 64px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 980px) { .layout { grid-template-columns: minmax(290px, 360px) minmax(0, 1fr); align-items: start; } .keypad { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); } }
+.keypad, .display { display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0; }
+.keypad { gap: 18px; }
+.keypad > *, .display > * { min-width: 0; }
+.panel { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 18px; min-width: 0; }
+form { display: grid; gap: 12px; }
+label { display: grid; gap: 5px; font: 500 13px/1.3 var(--sans); color: var(--ink-2); }
+textarea, input { width: 100%; font: 13.5px/1.45 var(--mono); color: var(--ink); background: var(--bg); border: 1px solid var(--rule); border-radius: 6px; padding: 9px 10px; }
+textarea { min-height: 76px; resize: vertical; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.note { margin: 0; font-size: 13px; color: var(--ink-2); }
+.note code, .cmd { font: 12.5px/1.5 var(--mono); }
+.cmd { display: block; white-space: pre-wrap; word-break: break-all; background: var(--bg); border: 1px solid var(--rule); border-radius: 6px; padding: 8px 10px; margin-top: 8px; color: var(--ink); }
+.presets { display: grid; gap: 14px; }
+.preset-group { display: grid; gap: 7px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font: 13px/1.2 var(--sans); padding: 7px 10px; border-radius: 999px; background: transparent; border: 1px solid var(--rule); color: var(--ink-2); }
+.chip[aria-pressed="true"] { border-color: var(--brass); color: var(--ink); background: var(--panel-2); }
+.display { gap: 26px; }
+.readout { background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; padding: 22px 24px; display: grid; gap: 12px; }
+.verdict { justify-self: start; font: 600 12px/1 var(--sans); letter-spacing: .16em; text-transform: uppercase; padding: 7px 10px 6px; border-radius: 4px; border: 1px solid currentColor; }
+.v-proved, .v-proved-v22 { color: var(--ok); } .v-licensed { color: var(--brass); } .v-unlicensed { color: var(--warn); }
+.v-refused { color: var(--muted); } .v-contradicted { color: var(--bad); }
+.headline { font: 400 clamp(28px, 4.6vw, 46px)/1.15 var(--display); letter-spacing: -0.01em; text-wrap: balance; overflow-wrap: anywhere; }
+.headline sup { font-size: .55em; vertical-align: .9em; line-height: 0; }
+.numbers { display: flex; flex-wrap: wrap; gap: 10px 28px; margin: 0; }
+.numbers div { display: grid; gap: 2px; }
+.numbers dt { font: 500 12px/1 var(--sans); letter-spacing: .04em; color: var(--ink-3); }
+.numbers dd { margin: 0; font: 500 19px/1.2 var(--mono); font-variant-numeric: tabular-nums; }
+.meaning { margin: 0; color: var(--ink-2); max-width: 70ch; }
+.stamp { margin: 0; font: 12px/1.6 var(--mono); color: var(--ink-3); overflow-wrap: anywhere; }
+.stamp b { color: var(--brass-ink); font-weight: 500; }
+h2 { font: 400 23px/1.2 var(--display); margin: 0 0 4px; text-wrap: balance; }
+.sec-head { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+.sec-head p { margin: 0; color: var(--ink-2); font-size: 14px; max-width: 68ch; }
+.scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th, td { text-align: left; vertical-align: top; padding: 11px 12px; border-bottom: 1px solid var(--rule); }
+tr:last-child td { border-bottom: 0; }
+th { font: 500 11px/1.3 var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); background: var(--panel-2); white-space: nowrap; }
+.ledger td:nth-child(1) { min-width: 190px; } .ledger td:nth-child(2) { min-width: 210px; } .ledger td:nth-child(3) { min-width: 250px; } .ledger td:nth-child(4) { min-width: 170px; }
+.clause { font-weight: 600; } .statement { color: var(--ink-2); font-size: 13px; margin-top: 3px; }
+.mono { font-family: var(--mono); font-size: 12.5px; overflow-wrap: anywhere; }
+.status { display: inline-flex; align-items: center; gap: 6px; font: 600 11px/1 var(--sans); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 5px; }
+.status::before { content: ""; width: 8px; height: 8px; border-radius: 2px; background: currentColor; }
+.s-exact { color: var(--ok); } .s-probed { color: var(--brass); } .s-unresolved { color: var(--warn); } .s-failed { color: var(--bad); }
+.s-not_reached, .s-not_applicable { color: var(--muted); }
+.tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.tag { font: 12px/1.2 var(--mono); padding: 4px 7px; border-radius: 4px; border: 1px solid var(--rule); color: var(--ink-2); background: transparent; }
+.e-blocks { color: var(--bad); border-color: currentColor; } .e-caveat { color: var(--warn); border-color: currentColor; }
+.e-averted { color: var(--ok); border-color: currentColor; } .e-clear { color: var(--muted); }
+.counters { display: grid; gap: 8px; }
+.counter { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 12px 14px; }
+.counter summary { cursor: pointer; display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 4px 12px; align-items: baseline; list-style: none; }
+.counter summary::-webkit-details-marker { display: none; }
+.effect { font: 600 11px/1.2 var(--sans); letter-spacing: .12em; text-transform: uppercase; }
+.counter .title { font-weight: 600; }
+.counter .detail { grid-column: 2; color: var(--ink-2); font-size: 14px; }
+.counter .more { margin: 10px 0 2px 104px; display: grid; gap: 6px; font-size: 14px; color: var(--ink-2); overflow-wrap: anywhere; }
+.counter .more b { color: var(--ink); font-weight: 600; }
+@media (max-width: 560px) { .counter summary { grid-template-columns: minmax(0, 1fr); } .counter .detail { grid-column: 1; } .counter .more { margin-left: 0; } }
+.chart-wrap { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 14px 14px 8px; position: relative; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--ink-2); margin: 0 0 6px; padding: 0; list-style: none; }
+.legend li { display: inline-flex; align-items: center; gap: 7px; }
+.swatch { width: 18px; height: 2px; border-radius: 1px; display: inline-block; }
+.swatch.pt { width: 9px; height: 9px; border-radius: 50%; background: var(--ink); }
+svg text { font: 11.5px var(--sans); fill: var(--ink-3); }
+svg .lbl { font: 12px var(--sans); fill: var(--ink-2); }
+.tip { position: absolute; pointer-events: none; background: var(--panel-2); border: 1px solid var(--rule); border-radius: 6px; padding: 8px 10px; font: 12px/1.5 var(--mono); color: var(--ink); max-width: 320px; box-shadow: 0 6px 18px rgb(0 0 0 / .25); }
+.verdicts { display: grid; gap: 6px; margin-top: 10px; }
+.verdicts div { font-size: 14px; color: var(--ink-2); }
+.verdicts b { font-weight: 600; }
+.timeline { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.state { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 0 12px; }
+.rail { position: relative; } .rail::before { content: ""; position: absolute; left: 9px; top: 0; bottom: 0; width: 2px; background: var(--rule); }
+.rail::after { content: ""; position: absolute; left: 4px; top: 16px; width: 12px; height: 12px; border-radius: 50%; background: var(--panel); border: 2px solid var(--sea); }
+.state.wrong .rail::after { border-color: var(--bad); background: var(--bad); }
+.state.none .rail::after { border-color: var(--muted); }
+.state-body { padding: 10px 0 14px; min-width: 0; }
+.state-head { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; font: 12.5px/1.4 var(--mono); color: var(--ink-3); }
+.state-sum { margin: 4px 0 0; font-size: 14px; overflow-wrap: anywhere; }
+.flag { color: var(--bad); font-weight: 600; }
+.change { margin: 8px 0 0; padding: 8px 10px; border-left: 2px solid var(--brass); background: var(--panel); border-radius: 0 6px 6px 0; font-size: 13px; }
+.change .mono { display: block; color: var(--ink-2); }
+.prov { display: grid; gap: 14px; }
+.kv { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 16px; margin: 0; font-size: 14px; }
+.kv dt { color: var(--ink-3); } .kv dd { margin: 0; overflow-wrap: anywhere; }
+.empty { color: var(--ink-2); font-size: 14px; margin: 0; }
+.toast { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--panel-2); border: 1px solid var(--rule); color: var(--ink); padding: 9px 14px; border-radius: 8px; font-size: 14px; }
+</style>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="brand">
+      <span class="wordmark"><b>git</b>calculator</span>
+      <span class="tagline">Newton–tropical face selection · γ = 1/(1 − q*)</span>
+    </div>
+    <div class="engine" id="engine" aria-live="polite">
+      <span class="dot" id="engine-dot"></span><span id="engine-text">Loading recorded receipts…</span>
+      <button type="button" class="quiet" id="engine-start" hidden>Run Python here</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap layout">
+  <aside class="keypad" aria-label="Problem">
+    <div class="panel">
+      <form id="form" autocomplete="off">
+        <label for="system">Polyhedron (A, b) with A·x ≤ b
+          <textarea id="system" spellcheck="false"></textarea></label>
+        <label for="base">Base objective F
+          <input id="base" spellcheck="false"></label>
+        <label for="perturbation">Perturbation G
+          <input id="perturbation" spellcheck="false"></label>
+        <label for="observed">Observed exponent, optional
+          <input id="observed" placeholder="for example 4/3" spellcheck="false"></label>
+        <div class="actions">
+          <button type="submit" class="primary" id="calc">Calculate</button>
+          <button type="button" id="replay">Replay across history</button>
+        </div>
+        <p class="note" id="form-note"></p>
+      </form>
+    </div>
+    <div class="presets" id="presets"></div>
+  </aside>
+
+  <div class="display">
+    <section class="readout" aria-live="polite" aria-label="Answer">
+      <span class="verdict" id="verdict">—</span>
+      <div class="headline" id="headline">—</div>
+      <dl class="numbers" id="numbers"></dl>
+      <p class="meaning" id="meaning"></p>
+      <p class="stamp" id="stamp"></p>
+    </section>
+
+    <section aria-labelledby="h-ledger">
+      <div class="sec-head"><h2 id="h-ledger">Theorem ledger</h2>
+        <p>Each clause of the polyhedral theorem, what the backend computed for it, the calculator's exact check, and the counter-arguments aimed at that step.</p></div>
+      <div class="scroll"><table class="ledger"><thead><tr><th>Theorem clause</th><th>Backend computed</th><th>Exact certificate</th><th>Challenged by</th></tr></thead><tbody id="ledger"></tbody></table></div>
+    </section>
+
+    <section aria-labelledby="h-counter">
+      <div class="sec-head"><h2 id="h-counter">Counter-arguments</h2>
+        <p>The repository's refuted claims, each applied to this input. Open one for the refuting example and its sources.</p></div>
+      <div class="counters" id="counters"></div>
+    </section>
+
+    <section aria-labelledby="h-measure">
+      <div class="sec-head"><h2 id="h-measure">Measurement</h2>
+        <p>Certified lower bounds: every point is a witness verified to lie in P, with Δ(s) ≥ L(s) evaluated in exact rational arithmetic. Lines show each prediction's slope.</p></div>
+      <div class="chart-wrap" id="chart-wrap"><ul class="legend" id="legend"></ul><div id="chart"></div><div class="tip" id="tip" hidden></div></div>
+      <div class="verdicts" id="verdicts"></div>
+      <details style="margin-top:12px"><summary class="note" style="cursor:pointer">Show the witness table</summary>
+        <div class="scroll" style="margin-top:8px"><table><thead><tr><th>s</th><th>L(s) ≥</th><th>Witness c</th><th>Support</th><th>In P</th></tr></thead><tbody id="rows"></tbody></table></div>
+      </details>
+    </section>
+
+    <section aria-labelledby="h-history">
+      <div class="sec-head"><h2 id="h-history">History</h2>
+        <p id="history-lede">The same input answered by every code state in the repository's git history.</p></div>
+      <ol class="timeline" id="timeline"></ol>
+    </section>
+
+    <section aria-labelledby="h-prov">
+      <div class="sec-head"><h2 id="h-prov">Provenance</h2>
+        <p>Every file that produced this answer, by git blob id. Anyone can check one with <code class="mono">git cat-file -p &lt;blob&gt;</code>.</p></div>
+      <div class="prov panel" id="provenance"></div>
+    </section>
+  </div>
+</main>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(() => {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const sup = (text) => esc(text).replace(/s\^([0-9/.]+)/g, "s<sup>$1</sup>").replace(/\^([0-9/]+)/g, "<sup>$1</sup>");
+  const GROUPS = [
+    ["Worked examples", ["tilted-simplex", "sheared-simplex", "cube-3d", "tied-faces", "active-set"]],
+    ["Counterexamples", ["signed-channel", "signed-sharp", "interior-zero", "cross-term", "tied-maximizers"]],
+    ["Boundaries", ["curved-cancellation", "critical-layer", "pyramid-apex"]],
+  ];
+  const SERIES = { backend: "--s1", "exact-faces": "--s2", curved: "--s3", "ambient-axes": "--s4" };
+  const store = { ledger: null, bundle: null, worker: null, ready: false, starting: null, pending: new Map(), seq: 0, preset: null, receipt: null };
+
+  function toast(message) { const t = $("toast"); t.textContent = message; t.hidden = false; clearTimeout(toast.timer); toast.timer = setTimeout(() => { t.hidden = true; }, 2600); }
+  function engine(kind, text, canStart) { $("engine-dot").className = "dot " + kind; $("engine-text").textContent = text; $("engine-start").hidden = !canStart; }
+
+  // --- links into the repository at the pinned commit ---------------------
+  function repoUrl() { const r = (store.ledger?.head?.remote || "").replace(/\.git$/, ""); return r.startsWith("https://github.com/") ? r : null; }
+  function linkRef() { return store.ledger?.head?.link_ref || store.ledger?.head?.commit; }
+  function docLink(path, label) {
+    const url = repoUrl(); const ref = linkRef(); const [file, anchor] = String(path).split("#");
+    const linkable = store.ledger?.linkable;
+    if (!url || !ref || (linkable && !linkable.includes(file))) return `<span class="mono">${esc(label || path)}</span>`;
+    return `<a href="${esc(url)}/blob/${esc(ref)}/${esc(file)}${anchor ? "#" + esc(anchor) : ""}" target="_blank" rel="noopener">${esc(label || path)}</a>`;
+  }
+
+  // --- presets -------------------------------------------------------------
+  function renderPresets() {
+    const host = $("presets"); host.innerHTML = "";
+    for (const [title, names] of GROUPS) {
+      const group = document.createElement("div"); group.className = "preset-group";
+      group.innerHTML = `<span class="eyebrow">${esc(title)}</span><div class="chips"></div>`;
+      for (const name of names) {
+        const preset = store.ledger.presets[name]; if (!preset) continue;
+        const chip = document.createElement("button"); chip.type = "button"; chip.className = "chip"; chip.dataset.name = name;
+        chip.textContent = preset.title; chip.title = preset.note; chip.setAttribute("aria-pressed", "false");
+        chip.addEventListener("click", () => { location.hash = name; });
+        group.querySelector(".chips").appendChild(chip);
+      }
+      host.appendChild(group);
+    }
+  }
+  function markPreset(name) { for (const chip of document.querySelectorAll(".chip")) chip.setAttribute("aria-pressed", String(chip.dataset.name === name)); }
+  function fill(request) { $("system").value = request.system || ""; $("base").value = request.base || ""; $("perturbation").value = request.perturbation || ""; $("observed").value = request.observed_exponent ? String(request.observed_exponent) : ""; }
+  function readForm() {
+    const request = { system: $("system").value.trim(), base: $("base").value.trim(), perturbation: $("perturbation").value.trim() };
+    const observed = $("observed").value.trim();
+    if (observed) { const [p, q] = observed.split("/"); const value = q ? Number(p) / Number(q) : Number(p); if (!Number.isFinite(value)) throw new Error("The observed exponent must be a number such as 4/3."); request.observed_exponent = value; }
+    if (!request.system || !request.base || !request.perturbation) throw new Error("Enter the polyhedron, the base objective, and the perturbation.");
+    return request;
+  }
+  const sameInput = (a, b) => ["system", "base", "perturbation"].every((k) => (a[k] || "").replace(/\s+/g, "") === (b[k] || "").replace(/\s+/g, "")) && !a.observed_exponent;
+  function presetFor(request) { return Object.entries(store.ledger.presets).find(([, p]) => sameInput(request, p.request))?.[0] || null; }
+  function cliCommand(request) {
+    const q = (v) => "'" + String(v).replace(/'/g, "'\\''") + "'";
+    let cmd = `python -m gitcalculator calc --system ${q(request.system)} --base ${q(request.base)} --perturbation ${q(request.perturbation)}`;
+    if (request.observed_exponent) cmd += ` --observed ${q($("observed").value.trim())}`;
+    return cmd;
+  }
+
+  // --- the readout and the tape ------------------------------------------
+  function renderReceipt(receipt) {
+    store.receipt = receipt;
+    const a = receipt.answer;
+    const verdict = $("verdict"); verdict.className = "verdict v-" + a.verdict; verdict.textContent = a.verdict === "proved-v22" ? "Proved · V.22" : a.verdict;
+    $("headline").innerHTML = sup(a.headline);
+    const coefficient = a.coefficient ? (a.coefficient.exact || Number(a.coefficient.value).toPrecision(6)) : "—";
+    $("numbers").innerHTML = [["γ", a.gamma ?? "—"], ["q*", a.q_star ?? "—"], ["C", coefficient], ["Backend", a.backend_status], ["Certificate", a.certificate_status]]
+      .map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
+    $("meaning").textContent = a.meaning + (a.coefficient ? ` The coefficient is ${a.coefficient.source}.` : "");
+    const p = receipt.provenance, g = p.git || {};
+    $("stamp").innerHTML = `receipt <b>${esc(receipt.id)}</b> · commit ${esc(g.short || "—")}${g.dirty ? " (working tree)" : ""} · ${esc(p.code_id)} · ${esc(p.calculator_id)} · ${esc(p.runtime.engine)} ${esc(p.runtime.python)}`;
+    const effect = Object.fromEntries(receipt.counterarguments.map((c) => [c.id, c]));
+    $("ledger").innerHTML = receipt.steps.map((s) => `<tr>
+      <td><div class="clause">${docLink(s.doc, s.clause)}</div><div class="statement">${esc(s.statement)}</div></td>
+      <td class="mono">${esc(s.backend)}</td>
+      <td><div class="status s-${esc(s.certificate.status)}">${esc(s.certificate.status.replace("_", " "))}</div><div>${esc(s.certificate.detail)}</div><div class="statement">${esc(s.certificate.method)}</div></td>
+      <td><div class="tags">${s.challenges.map((c) => `<span class="tag e-${esc(c.effect)}" title="${esc(effect[c.id]?.detail)}">${esc(c.id)} · ${esc(c.effect)}</span>`).join("") || '<span class="statement">—</span>'}</div></td></tr>`).join("");
+    $("counters").innerHTML = receipt.counterarguments.map((c) => `<details class="counter">
+      <summary><span class="effect e-${esc(c.effect)}">${esc(c.effect)}</span><span class="title">${esc(c.title)}</span><span class="detail">${esc(c.detail)}</span></summary>
+      <div class="more"><div><b>Refuted claim.</b> ${esc(c.claim)}</div><div><b>Counterexample.</b> ${esc(c.refutation)}</div>
+      <div><b>Sources.</b> ${c.sources.map((s) => docLink(s)).join(" · ")}</div></div></details>`).join("");
+    renderMeasurement(receipt.measurement);
+    renderProvenance(receipt);
+  }
+
+  function renderMeasurement(m) {
+    const rows = (m.rows || []).filter((r) => r.lower_bound !== "0");
+    $("rows").innerHTML = (m.rows || []).map((r) => `<tr><td class="mono">${esc(r.s)}</td><td class="mono">${esc(r.lower_bound)}</td><td class="mono">(${esc(r.witness_c.join(", "))})</td><td class="mono">{${esc(r.support.join(", "))}}</td><td>${r.feasible ? "yes" : "no"}</td></tr>`).join("")
+      || `<tr><td colspan="5" class="empty">${esc(m.reason || m.summary || "No measurement for this input.")}</td></tr>`;
+    const verdicts = m.verdicts || [];
+    $("verdicts").innerHTML = verdicts.map((v) => `<div><b style="color:var(${SERIES[v.id] || "--ink"})">${esc(v.label || v.id)}</b> · γ = ${esc(v.gamma)} · <span class="effect ${v.verdict === "contradicted" ? "e-blocks" : v.verdict === "consistent" ? "e-averted" : "e-caveat"}">${esc(v.verdict)}</span>${v.detail ? " — " + esc(v.detail) : ""}</div>`).join("")
+      || `<div>${esc(m.status === "complete" ? (m.positive_gain_found ? "No prediction to compare." : "No positive gain was found at any tested s.") : (m.reason || ""))}</div>`;
+    const host = $("chart"), legend = $("legend");
+    if (rows.length < 2) { host.innerHTML = `<p class="empty" style="padding:12px 4px">${esc(m.reason || (m.positive_gain_found ? "Too few points to plot." : "No positive certified gain: L(s) = 0 at every tested s."))}</p>`; legend.innerHTML = ""; return; }
+    const css = getComputedStyle(document.documentElement);
+    const color = (v) => css.getPropertyValue(v).trim();
+    const W = 760, H = 330, L = 64, R = 170, T = 14, B = 42;
+    const pts = rows.map((r) => ({ x: Math.log10(Number(r.s_value)), y: lg(r.lower_bound), r }));
+    function lg(dec) { const [mant, exp] = dec.split("e"); return Math.log10(Number(mant)) + Number(exp); }
+    const xs = pts.map((p) => p.x), xmin = Math.min(...xs), xmax = Math.max(...xs);
+    const last = pts.reduce((a, b) => (b.x < a.x ? b : a));
+    const lines = verdicts.filter((v) => v.gamma && SERIES[v.id]).map((v) => {
+      const g = v.gamma.includes("/") ? v.gamma.split("/").reduce((p, q) => Number(p) / Number(q)) : Number(v.gamma);
+      return { v, g, y0: last.y, y1: last.y + g * (xmax - last.x) };
+    });
+    const ys = pts.map((p) => p.y).concat(lines.flatMap((l) => [l.y0, l.y1]));
+    let ymin = Math.floor(Math.min(...ys)), ymax = Math.ceil(Math.max(...ys)); if (ymax === ymin) ymax += 1;
+    const X = (x) => L + (x - xmin) / ((xmax - xmin) || 1) * (W - L - R), Y = (y) => T + (ymax - y) / (ymax - ymin) * (H - T - B);
+    const span = ymax - ymin, step = span > 24 ? 6 : span > 12 ? 4 : span > 6 ? 2 : 1;
+    let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Certified lower bounds of the response on log-log axes">`;
+    for (let y = Math.ceil(ymin / step) * step; y <= ymax; y += step) svg += `<line x1="${L}" x2="${W - R}" y1="${Y(y)}" y2="${Y(y)}" stroke="${color("--rule")}" stroke-width="1"/><text x="${L - 8}" y="${Y(y) + 4}" text-anchor="end">1e${y}</text>`;
+    for (let x = Math.ceil(xmin); x <= Math.floor(xmax); x += 1) svg += `<line x1="${X(x)}" x2="${X(x)}" y1="${H - B}" y2="${H - B + 5}" stroke="${color("--ink-3")}"/><text x="${X(x)}" y="${H - B + 19}" text-anchor="middle">1e${x}</text>`;
+    svg += `<line x1="${L}" x2="${W - R}" y1="${H - B}" y2="${H - B}" stroke="${color("--ink-3")}" stroke-width="1"/>`;
+    svg += `<text x="${(L + W - R) / 2}" y="${H - 6}" text-anchor="middle">perturbation size s</text><text x="14" y="${(T + H - B) / 2}" text-anchor="middle" transform="rotate(-90 14 ${(T + H - B) / 2})">certified L(s)</text>`;
+    const labels = lines.map((l) => ({ ...l, ly: Y(l.y1) })).sort((a, b) => a.ly - b.ly);
+    for (let i = 1; i < labels.length; i++) if (labels[i].ly - labels[i - 1].ly < 15) labels[i].ly = labels[i - 1].ly + 15;
+    for (const l of labels) {
+      const c = color(SERIES[l.v.id]);
+      svg += `<line x1="${X(last.x)}" y1="${Y(l.y0)}" x2="${X(xmax)}" y2="${Y(l.y1)}" stroke="${c}" stroke-width="2" stroke-linecap="round"${l.v.verdict === "contradicted" ? ' stroke-dasharray="6 5"' : ""}/>`;
+      svg += `<text class="lbl" x="${X(xmax) + 8}" y="${l.ly + 4}">s^${esc(l.v.gamma)} · ${esc(l.v.verdict)}</text>`;
+    }
+    pts.forEach((p, i) => { svg += `<circle data-i="${i}" cx="${X(p.x)}" cy="${Y(p.y)}" r="4.5" fill="${color("--ink")}" stroke="${color("--panel")}" stroke-width="2"/><circle data-i="${i}" cx="${X(p.x)}" cy="${Y(p.y)}" r="13" fill="transparent"/>`; });
+    host.innerHTML = svg + "</svg>";
+    legend.innerHTML = `<li><span class="swatch pt"></span>certified lower bound</li>` + lines.map((l) => `<li><span class="swatch" style="background:var(${SERIES[l.v.id]})"></span>${esc(l.v.label || l.v.id)}, slope ${esc(l.v.gamma)}</li>`).join("");
+    const tip = $("tip"), wrap = $("chart-wrap");
+    host.querySelectorAll("circle[data-i]").forEach((dot) => {
+      const show = () => { const p = pts[Number(dot.dataset.i)]; tip.innerHTML = `s = ${esc(p.r.s)}<br>L(s) ≥ ${esc(p.r.lower_bound)}<br>c = (${esc(p.r.witness_c.join(", "))})<br>support {${esc(p.r.support.join(", "))}}`; tip.hidden = false;
+        const box = dot.getBoundingClientRect(), outer = wrap.getBoundingClientRect(); const left = Math.min(box.left - outer.left + 14, outer.width - 250); tip.style.left = Math.max(8, left) + "px"; tip.style.top = (box.top - outer.top + 14) + "px"; };
+      dot.addEventListener("mouseenter", show); dot.addEventListener("mouseleave", () => { tip.hidden = true; });
+    });
+  }
+
+  function renderHistory(history) {
+    const host = $("timeline");
+    if (!history) { host.innerHTML = `<li class="empty">Replay this input to see how each code state answers it.</li>`; $("history-lede").textContent = "The same input answered by every code state in the repository's git history."; return; }
+    $("history-lede").textContent = `${history.commit_count} commits collapse to ${history.state_count} code states; ${history.answered_state_count} of them have the face-selection backend.`;
+    const changes = Object.fromEntries((history.changes || []).map((c) => [c.code_id, c]));
+    const url = repoUrl();
+    const commitLink = (c) => (url && c.commit !== "working-tree") ? `<a href="${esc(url)}/commit/${esc(c.commit)}" target="_blank" rel="noopener">${esc(c.short)}</a>` : esc(c.short);
+    host.innerHTML = history.states.map((s) => {
+      const wrong = (s.audit || []).filter((a) => a.verdict === "contradicted");
+      const none = s.answer?.backend?.status === "unavailable";
+      const change = changes[s.code_id];
+      const span = s.commit_count === 1 ? commitLink(s.first_commit) : `${commitLink(s.first_commit)}…${commitLink(s.last_commit)}`;
+      return `<li class="state${wrong.length ? " wrong" : ""}${none ? " none" : ""}"><div class="rail"></div><div class="state-body">
+        <div class="state-head"><span>${esc(s.code_id)}</span><span>${span}</span><span>${esc((s.first_commit.date || "").slice(0, 10))}</span><span>${s.commit_count} commit${s.commit_count === 1 ? "" : "s"}</span></div>
+        <p class="state-sum">${esc(s.summary)}${wrong.length ? ` <span class="flag">· licensed γ = ${esc(wrong.map((w) => w.gamma).join(", "))} is contradicted by certified bounds</span>` : ""}</p>
+        ${change && !none ? `<div class="change">Changed at ${commitLink(change.at)}: ${esc(change.at.subject)}${change.lines.map((l) => `<span class="mono">${esc(l)}</span>`).join("")}</div>` : ""}
+      </div></li>`;
+    }).join("");
+  }
+
+  function renderProvenance(receipt) {
+    const p = receipt.provenance, g = p.git || {}, url = repoUrl();
+    const rowsFor = (entries) => Object.entries(entries).map(([path, blob]) => `<tr><td>${docLink(path)}</td><td class="mono">${esc(blob || "missing")}</td></tr>`).join("");
+    $("provenance").innerHTML = `<dl class="kv">
+      <dt>Commit</dt><dd class="mono">${url && g.commit ? `<a href="${esc(url)}/commit/${esc(g.commit)}" target="_blank" rel="noopener">${esc(g.commit)}</a>` : esc(g.commit || "—")}${g.branch ? " on " + esc(g.branch) : ""}${g.dirty ? " · working tree differs" : ""}</dd>
+      <dt>Code state</dt><dd class="mono">${esc(p.code_id)} (blob ids of categorical_polytope/**/*.py)</dd>
+      <dt>Calculator</dt><dd class="mono">${esc(p.calculator_id)}</dd>
+      <dt>Runtime</dt><dd class="mono">${esc(p.runtime.engine)} · Python ${esc(p.runtime.python)}</dd>
+      <dt>Timings</dt><dd class="mono">${esc(Object.entries(receipt.timings || {}).map(([k, v]) => `${k} ${v}s`).join(" · "))}</dd></dl>
+      <details><summary class="note" style="cursor:pointer">Source files that ran (${Object.keys(p.sources).length})</summary><div class="scroll" style="margin-top:8px"><table><thead><tr><th>Path</th><th>Git blob</th></tr></thead><tbody>${rowsFor(p.sources)}</tbody></table></div></details>
+      <details><summary class="note" style="cursor:pointer">Documents cited (${Object.keys(p.documents).length})</summary><div class="scroll" style="margin-top:8px"><table><thead><tr><th>Path</th><th>Git blob</th></tr></thead><tbody>${rowsFor(p.documents)}</tbody></table></div></details>
+      <div><span class="note">Reproduce this receipt</span><code class="cmd" id="cli">${esc(cliCommand(receipt.input))}</code><button type="button" class="quiet" id="copy-cli" style="margin-top:6px">Copy command</button></div>`;
+    $("copy-cli").addEventListener("click", () => copy(cliCommand(receipt.input)));
+  }
+
+  function copy(text) {
+    navigator.clipboard?.writeText(text).then(() => toast("Command copied"), () => { selectText("cli"); toast("Press Ctrl+C or ⌘C to copy"); }) ?? (selectText("cli"), toast("Press Ctrl+C or ⌘C to copy"));
+  }
+  function selectText(id) { const range = document.createRange(); range.selectNodeContents($(id)); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range); }
+
+  // --- the live engine: the repository's own Python, in a worker ------------
+  const WORKER = `
+    let py = null, bundle = null;
+    function write(path, text) { const dir = path.slice(0, path.lastIndexOf("/")); py.FS.mkdirTree(dir); py.FS.writeFile(path, text); }
+    self.onmessage = async (event) => {
+      const msg = event.data;
+      try {
+        if (msg.type === "init") {
+          importScripts(msg.index + "pyodide.js");
+          py = await loadPyodide({ indexURL: msg.index });
+          bundle = msg.bundle;
+          const head = bundle.states.find((s) => s.code_id === bundle.head_state) || bundle.states[bundle.states.length - 1];
+          for (const [p, b] of Object.entries(head.files)) write("/repo/" + p, bundle.blobs[b]);
+          for (const [p, b] of Object.entries(bundle.calculator.files)) write("/repo/" + p, bundle.blobs[b]);
+          for (const [p, b] of Object.entries(bundle.documents)) write("/repo/" + p, bundle.blobs[b]);
+          py.globals.set("BUNDLE_JSON", JSON.stringify(bundle));
+          const info = py.runPython([
+            "import sys, json",
+            "sys.path.insert(0, '/repo')",
+            "from gitcalculator import provenance as P",
+            "BUNDLE = json.loads(BUNDLE_JSON)",
+            "bad = [b for b, t in BUNDLE['blobs'].items() if P.blob_id(t.encode()) != b]",
+            "P.BUNDLED_STATE['git'] = dict(BUNDLE['head'], source='bundle')",
+            "json.dumps({'python': sys.version.split()[0], 'blobs': len(BUNDLE['blobs']), 'bad': bad})",
+          ].join("\\n"));
+          self.postMessage({ type: "ready", info: JSON.parse(info) });
+        } else {
+          py.globals.set("REQUEST_JSON", JSON.stringify(msg.request));
+          const code = msg.type === "calc"
+            ? "import json\\nfrom gitcalculator.receipt import calculate\\njson.dumps(calculate(json.loads(REQUEST_JSON)), ensure_ascii=False)"
+            : "import json\\nfrom pathlib import Path\\nfrom gitcalculator.history import BundleSource, replay\\njson.dumps(replay(json.loads(REQUEST_JSON), BundleSource(BUNDLE, Path('/snapshots'))), ensure_ascii=False)";
+          self.postMessage({ type: "result", id: msg.id, result: JSON.parse(py.runPython(code)) });
+        }
+      } catch (error) { self.postMessage({ type: "error", id: msg.id, error: String(error && error.message || error) }); }
+    };`;
+
+  function startEngine() {
+    if (store.starting) return store.starting;
+    store.starting = (async () => {
+      engine("busy", "Starting Python in this page (about 14 MB)…", false);
+      if (!store.bundle) store.bundle = await fetch("bundle.json").then((r) => { if (!r.ok) throw new Error("bundle.json is missing"); return r.json(); });
+      const index = new URL(store.bundle.pyodide.index, location.href).href;
+      const worker = new Worker(URL.createObjectURL(new Blob([WORKER], { type: "text/javascript" })));
+      store.worker = worker;
+      const ready = new Promise((resolve, reject) => {
+        worker.onmessage = (event) => {
+          const msg = event.data;
+          if (msg.type === "ready") { resolve(msg.info); return; }
+          const job = store.pending.get(msg.id); if (!job) { if (msg.type === "error") reject(new Error(msg.error)); return; }
+          store.pending.delete(msg.id); msg.type === "error" ? job.reject(new Error(msg.error)) : job.resolve(msg.result);
+        };
+        worker.onerror = (event) => reject(new Error(event.message || "the worker could not start"));
+        setTimeout(() => reject(new Error("Python did not start within 90 seconds")), 90000);
+      });
+      worker.postMessage({ type: "init", index, bundle: store.bundle });
+      const info = await ready;
+      if (info.bad.length) throw new Error(`${info.bad.length} bundled blobs do not match their git ids`);
+      store.ready = true;
+      const head = store.bundle.head || {};
+      engine("live", `Live · Python ${info.python} running commit ${head.short || "—"} · ${info.blobs} blobs verified`, false);
+    })().catch((error) => {
+      store.starting = null; store.worker?.terminate(); store.worker = null;
+      engine("off", "Recorded receipts only: this viewer blocks WebAssembly or the runtime download.", false);
+      throw error;
+    });
+    return store.starting;
+  }
+  function run(type, request) {
+    const id = ++store.seq;
+    return new Promise((resolve, reject) => { store.pending.set(id, { resolve, reject }); store.worker.postMessage({ type, id, request }); });
+  }
+
+  // --- actions ---------------------------------------------------------------
+  function showPreset(name) {
+    const preset = store.ledger.presets[name]; if (!preset) return false;
+    store.preset = name; markPreset(name); fill(preset.request);
+    renderReceipt(preset.receipt); renderHistory(preset.history);
+    $("form-note").textContent = preset.note;
+    return true;
+  }
+  async function calculate(event) {
+    event.preventDefault();
+    let request; try { request = readForm(); } catch (error) { $("form-note").textContent = error.message; return; }
+    const known = presetFor(request);
+    if (known && !store.ready) { location.hash === "#" + known ? showPreset(known) : (location.hash = known); return; }
+    markPreset(known);
+    const button = $("calc"); button.disabled = true; $("form-note").textContent = "Calculating with the repository's code…";
+    try {
+      await startEngine();
+      const receipt = await run("calc", request);
+      renderReceipt(receipt); renderHistory(null);
+      $("form-note").textContent = `Computed live. Receipt ${receipt.id}.`;
+    } catch (error) {
+      $("form-note").innerHTML = `${esc(error.message)}. Recorded receipts cover the presets; run any input on your machine with:<code class="cmd">${esc(cliCommand(request))}</code>`;
+    } finally { button.disabled = false; }
+  }
+  async function replayHistory() {
+    let request; try { request = readForm(); } catch (error) { $("form-note").textContent = error.message; return; }
+    const known = presetFor(request);
+    if (known && !store.ready) { renderHistory(store.ledger.presets[known].history); $("h-history").scrollIntoView({ behavior: "smooth" }); return; }
+    const button = $("replay"); button.disabled = true; $("form-note").textContent = "Replaying across every code state…";
+    try {
+      await startEngine();
+      renderHistory(await run("history", request));
+      $("form-note").textContent = "History replayed live from the bundled git blobs.";
+      $("h-history").scrollIntoView({ behavior: "smooth" });
+    } catch (error) {
+      $("form-note").innerHTML = `${esc(error.message)}. Replay any input on your machine with:<code class="cmd">${esc(cliCommand(request).replace(" calc ", " history "))}</code>`;
+    } finally { button.disabled = false; }
+  }
+
+  async function boot() {
+    try { store.ledger = await fetch("ledger.json").then((r) => { if (!r.ok) throw new Error(); return r.json(); }); }
+    catch { engine("off", "ledger.json is missing: build the site with python -m gitcalculator site", false); return; }
+    renderPresets();
+    const head = store.ledger.head || {};
+    engine("", `Recorded receipts · commit ${head.short || "—"}`, true);
+    const name = location.hash.slice(1);
+    if (!showPreset(name)) showPreset("tilted-simplex");
+    window.addEventListener("hashchange", () => { showPreset(location.hash.slice(1)); });
+    $("form").addEventListener("submit", calculate);
+    $("replay").addEventListener("click", replayHistory);
+    $("engine-start").addEventListener("click", () => startEngine().catch(() => {}));
+  }
+  boot();
+})();
+</script>

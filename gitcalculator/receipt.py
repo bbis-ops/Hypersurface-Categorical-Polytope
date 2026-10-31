@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import textwrap
 import time
 from fractions import Fraction
 from typing import Any, Mapping
@@ -235,7 +236,8 @@ def calculate(request: Mapping[str, Any], *, budget: str = "standard", include_b
         coefficient = {"value": response["scaling"]["leading_coefficient"]["value"], "source": "backend, measured"}
 
     steps = []
-    for link in certificate.get("links", []):
+    order = list(STEP_CHALLENGES)
+    for link in sorted(certificate.get("links", []), key=lambda l: order.index(l["id"])):
         steps.append({
             "id": link["id"], "clause": link["clause"], "statement": link["statement"], "doc": link["doc"],
             "backend": _backend_column(link["id"], response),
@@ -283,6 +285,11 @@ MARK = {"exact": "■", "probed": "◐", "failed": "✗", "unresolved": "?", "no
 EFFECT_MARK = {"blocks": "✗ blocks ", "caveat": "! caveat ", "averted": "✓ averted", "clear": "· clear  "}
 
 
+def _wrap(label: str, text: str, width: int, indent: int = 15) -> list[str]:
+    lines = textwrap.wrap(text, width - indent) or [""]
+    return [f"{label:<{indent}}{lines[0]}"] + [" " * indent + line for line in lines[1:]]
+
+
 def render_text(receipt: Mapping[str, Any], *, width: int = 92) -> str:
     """The printed tape."""
     rule = "─" * width
@@ -300,13 +307,13 @@ def render_text(receipt: Mapping[str, Any], *, width: int = 92) -> str:
     for step in receipt["steps"]:
         cert = step["certificate"]
         out.append(f" {MARK.get(cert['status'], '?')} {step['clause']:<40} {cert['status']}")
-        out.append(f"     backend   {step['backend'][:width - 15]}")
-        out.append(f"     exact     {cert['detail'][:width - 15]}")
+        out += _wrap("     backend", step["backend"], width)
+        out += _wrap("     exact", cert["detail"], width)
         if step["challenges"]:
-            out.append("     attacked  " + ", ".join(f"{c['id']} ({c['effect']})" for c in step["challenges"]))
+            out += _wrap("     attacked", ", ".join(f"{c['id']} ({c['effect']})" for c in step["challenges"]), width)
     out += [rule, "COUNTER-ARGUMENTS"]
     for c in receipt["counterarguments"]:
-        out.append(f" {EFFECT_MARK[c['effect']]}  {c['id']:<18} {c['detail'][:width - 32]}")
+        out += _wrap(f" {EFFECT_MARK[c['effect']]}  {c['id']}", c["detail"], width, indent=32)
     m = receipt["measurement"]
     out += [rule, "MEASUREMENT   certified lower bounds Δ(s) ≥ L(s) at points verified in P"]
     if m.get("status") == "complete" and m.get("rows"):
@@ -314,7 +321,7 @@ def render_text(receipt: Mapping[str, Any], *, width: int = 92) -> str:
             out.append(f"   s = {row['s']:<12} L(s) ≥ {row['lower_bound']:<20} support {{{', '.join(row['support'])}}}")
         out.append(f"   measured exponent {m.get('measured_exponent')}")
         for v in m.get("verdicts", []):
-            out.append(f"   {v['id']:<14} γ = {v['gamma']:<6} {v.get('verdict')}: {v.get('detail', '')}"[:width + 3])
+            out += _wrap(f"   {v['id']:<14} γ = {v['gamma']:<6}", f"{v.get('verdict')}: {v.get('detail', '')}", width, indent=29)
     else:
         out.append(f"   {m.get('reason') or m.get('summary') or 'no data'}")
     out += [rule, "PROVENANCE",

@@ -176,11 +176,15 @@ def _grid_points(dimension: int, degree: int, seed: str) -> tuple[list[tuple[Fra
 
 
 def _transport(model: LocalModel, expression: str, tree: ast.Expression, degree: int):
-    """Pull back through the repository's compiler, then prove the identity here."""
+    """Pull back through the repository's compiler, then prove the identity here.
+
+    The compiler returns the centered pullback H(Φ(c)) − H(v) (V.20), so the
+    value at the vertex is evaluated here, exactly and independently.
+    """
     transported = transport_ambient_polynomial(expression, model.vertex, model.generators)
     zero = (0,) * model.dimension
-    polynomial = {s: c for s, c in transported.polynomial.items() if c != 0}
-    constant = polynomial.pop(zero, Fraction(0))
+    polynomial = {s: c for s, c in transported.polynomial.items() if c != 0 and s != zero}
+    constant = X.evaluate_exact(tree, model.vertex)
     points, kind = _grid_points(model.dimension, degree, expression)
     for c in points:
         if X.evaluate_exact(tree, model.point(c)) != constant + X.poly_evaluate(polynomial, c):

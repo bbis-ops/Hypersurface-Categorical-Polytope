@@ -6,7 +6,7 @@
     "base": "-(x0**4+x1**4)",
     "perturbation": "-(x0-x1)**2+x0**3"
   },
-  "receipt_id": "gc-27082dde312ea495",
+  "receipt_id": "gc-26161cb035d6c9af",
   "answer": {
     "verdict": "unlicensed",
     "headline": "candidate Δ(s) = Θ(s^4), not licensed",
@@ -69,8 +69,8 @@
     }
   },
   "recorded_with": {
-    "commit": "6c6010032331d8fa4f5a1628ce07dbde6f25b5e4",
+    "commit": "5a456c8e9c05e13edef0a3cb546b40aa028e49f0",
     "code_id": "code-23ad9e729a48",
-    "calculator_id": "calc-3463f3690e6b"
+    "calculator_id": "calc-0eaba755e5e6"
   }
 }

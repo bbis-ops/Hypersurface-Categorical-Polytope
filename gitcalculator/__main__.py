@@ -58,6 +58,7 @@ def main(argv: list[str] | None = None) -> int:
     site.add_argument("--out", type=Path, default=Path("tmp/gitcalculator/site"))
     site.add_argument("--pyodide", type=Path, help="a local Pyodide directory to vendor instead of the CDN")
     site.add_argument("--fragment", action="store_true", help="omit the document skeleton (for a Claude artifact)")
+    site.add_argument("--recorded-only", action="store_true", help="ship recorded receipts without the live engine")
 
     args = parser.parse_args(argv)
 
@@ -119,7 +120,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "site":
         from .site import build
-        out = build(args.out, pyodide=args.pyodide, fragment=args.fragment)
+        out = build(args.out, pyodide=args.pyodide, fragment=args.fragment, live=not args.recorded_only)
         print(f"web calculator written to {out}")
         return 0
     return 1

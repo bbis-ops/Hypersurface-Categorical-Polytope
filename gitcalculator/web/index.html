@@ -443,7 +443,9 @@ svg .lbl { font: 12px var(--sans); fill: var(--ink-2); }
       } catch (error) { self.postMessage({ type: "error", id: msg.id, error: String(error && error.message || error) }); }
     };`;
 
+  const liveEngine = () => store.ledger?.live_engine !== false;
   function startEngine() {
+    if (!liveEngine()) return Promise.reject(new Error("This copy of the calculator carries recorded receipts only"));
     if (store.starting) return store.starting;
     store.starting = (async () => {
       engine("busy", "Starting Python in this page (about 14 MB)…", false);
@@ -523,7 +525,7 @@ svg .lbl { font: 12px var(--sans); fill: var(--ink-2); }
     catch { engine("off", "ledger.json is missing: build the site with python -m gitcalculator site", false); return; }
     renderPresets();
     const head = store.ledger.head || {};
-    engine("", `Recorded receipts · commit ${head.short || "—"}`, true);
+    engine("", `Recorded receipts · commit ${head.short || "—"}`, liveEngine());
     const name = location.hash.slice(1);
     if (!showPreset(name)) showPreset("tilted-simplex");
     window.addEventListener("hashchange", () => { showPreset(location.hash.slice(1)); });

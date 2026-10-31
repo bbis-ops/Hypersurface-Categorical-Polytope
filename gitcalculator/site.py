@@ -69,11 +69,12 @@ def cited_documents() -> list[str]:
     return sorted(p for p in paths if (ROOT / p).is_file())
 
 
-def build(out: Path, *, pyodide: Path | None = None, fragment: bool = False) -> Path:
+def build(out: Path, *, pyodide: Path | None = None, fragment: bool = False, live: bool = True) -> Path:
     """Write the site to ``out``.
 
     ``pyodide`` vendors a local runtime instead of the CDN; ``fragment`` writes
-    the page without its document skeleton, as a Claude artifact expects.
+    the page without its document skeleton, as a Claude artifact expects;
+    ``live=False`` ships recorded receipts only, without the blob bundle.
     """
     out = out.resolve()
     out.mkdir(parents=True, exist_ok=True)
@@ -90,11 +91,12 @@ def build(out: Path, *, pyodide: Path | None = None, fragment: bool = False) -> 
                          "index": "./pyodide/" if pyodide else f"https://cdn.jsdelivr.net/npm/pyodide@{PYODIDE_VERSION}/"}
     ref, linkable = link_target(bundle["head"])
     bundle["head"]["link_ref"] = ref
-    (out / "bundle.json").write_text(json.dumps(bundle, ensure_ascii=False), encoding="utf-8")
+    if live:
+        (out / "bundle.json").write_text(json.dumps(bundle, ensure_ascii=False), encoding="utf-8")
 
     remote_commits = (_git("rev-list", "--remotes") or "").split()
     ledger = {"schema": "gitcalculator.ledger.v1", "head": bundle["head"], "linkable": linkable,
-              "remote_commits": remote_commits, "presets": {},
+              "remote_commits": remote_commits, "live_engine": live, "presets": {},
               "counterarguments": counter_catalogue(), "witnesses": check_witnesses(backend().handle)}
     for name, preset in PRESETS.items():
         receipt = calculate(preset_request(name))
@@ -104,7 +106,7 @@ def build(out: Path, *, pyodide: Path | None = None, fragment: bool = False) -> 
 
     page = (WEB / "index.html").read_text(encoding="utf-8")
     (out / "index.html").write_text(page if fragment else PAGE.format(fragment=page), encoding="utf-8")
-    if pyodide:
+    if pyodide and live:
         target = out / "pyodide"
         target.mkdir(exist_ok=True)
         for name in PYODIDE_FILES:

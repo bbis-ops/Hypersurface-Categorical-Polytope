@@ -6,7 +6,7 @@
     "base": "-(x0**2+x1**4+x2**6)",
     "perturbation": "x0*x1 + x2 - x1**2"
   },
-  "receipt_id": "gc-e85b5688c704b218",
+  "receipt_id": "gc-8d98005c571a1e67",
   "answer": {
     "verdict": "proved",
     "headline": "Δ(s) = Θ(s^6/5)",
@@ -62,8 +62,8 @@
     }
   },
   "recorded_with": {
-    "commit": "6c6010032331d8fa4f5a1628ce07dbde6f25b5e4",
+    "commit": "5a456c8e9c05e13edef0a3cb546b40aa028e49f0",
     "code_id": "code-23ad9e729a48",
-    "calculator_id": "calc-3463f3690e6b"
+    "calculator_id": "calc-0eaba755e5e6"
   }
 }

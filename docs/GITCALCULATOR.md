@@ -3,7 +3,7 @@
 **The face-selection law as a calculator** · computed by the backend, certified
 against the theorem, attacked by the counter-arguments, pinned to git.
 
-[**Quick start →**](#quick-start) · [Reading a receipt](#reading-a-receipt) · [The exact certificate](#the-exact-certificate) · [Certified measurement](#certified-measurement) · [Counter-arguments](#counter-arguments) · [History](#history-answers-have-commits) · [The tape](#the-tape) · [Web calculator](#the-web-calculator) · [Scope](#scope-and-limits)
+[**Quick start →**](#quick-start) · [Five modes](#five-questions-one-law) · [Reading a receipt](#reading-a-receipt) · [The exact certificate](#the-exact-certificate) · [Certified measurement](#certified-measurement) · [Counter-arguments](#counter-arguments) · [Design, Sweep, Attack](#design-sweep-and-attack) · [History](#history-answers-have-commits) · [The tape](#the-tape) · [Web calculator](#the-web-calculator) · [Scope](#scope-and-limits)
 
 | 01 · Theorem | 02 · Backend | 03 · Counter-arguments | 04 · Git |
 | :--- | :--- | :--- | :--- |
@@ -32,6 +32,23 @@ together with the evidence for each step:
 4. **Pin.** Every source file and cited document is identified by its git blob
    id. The same input can be replayed against every code state in the
    repository's history.
+
+## Five questions, one law
+
+Because the law maps geometry to an exponent exactly, the calculator runs it in
+five directions.
+
+| Mode | The question it answers | Command |
+| :--- | :--- | :--- |
+| **Solve** | What is $\gamma$ for this $P$, $F$, $G$, and is it a theorem? | `calc` |
+| **Design** | Which exponents can this vertex produce at all, and which $G$ reaches a target $\gamma$? | `design` |
+| **Sweep** | Where does $\gamma$ change along a family $G_t$, exactly? | `sweep` |
+| **Attack** | Which nearby inputs break this answer? | `attack` |
+| **History** | What did every version of the code answer, and was it right? | `history` |
+
+Every mode runs in two independent implementations: the Python package, and an
+exact JavaScript engine that runs in the browser. A regression test checks that
+they agree.
 
 ```mermaid
 flowchart LR
@@ -82,6 +99,9 @@ python -m gitcalculator calc --system "([[-1,0],[0,-1],[1,1]], [0,0,1])" --base 
 | Command | What it does |
 | :--- | :--- |
 | `calc` | One receipt; `--json` for the full record, `--history` to add the replay, `--observed 4/3` for the inverse check |
+| `design` | The exponent spectrum of the vertex; `--target 3/2` synthesizes and certifies perturbations for one exponent |
+| `sweep` | The exact phase fan of a family written with the parameter `t`, over `--from` and `--to` |
+| `attack` | Generated counterexamples: every mutation of the input, re-certified |
 | `presets` | The thirteen canonical calculations |
 | `counter` | Every counter-argument with its claim, refutation and executable witness; exits nonzero if a witness fails |
 | `history` | Replays one input across every code state in git |
@@ -224,6 +244,90 @@ Two calculations show what the combination adds.
   exactly. The exponent agrees with the measurement, but the theorem as stated
   does not deliver it. The receipt reports `licensed`, not `proved`.
 
+## Design, Sweep and Attack
+
+[`modes.py`](../gitcalculator/modes.py) and its browser twin
+[`modes.js`](../gitcalculator/web/modes.js) run the certificate in three new
+directions.
+
+### Design: the exponent spectrum of a vertex
+
+At a simple vertex the edge coordinates are the slacks of the active
+constraints, because $A_Su_i=-e_i$ gives
+
+$$
+c=b_S-A_Sx.
+$$
+
+A monomial $c^\alpha$ is therefore the perturbation
+$\prod_i(b_{S_i}-a_{S_i}\cdot x)^{\alpha_i}$, with weighted degree
+$q=\sum_i\alpha_i/\beta_i$. Every exponent the qualified-face law or a V.22
+channel can produce at the vertex lies in the discrete set
+
+$$
+\Gamma_v=\lbrace\frac{1}{1-q}:q=\sum_i\frac{\alpha_i}{\beta_i},\
+\alpha\in\mathbb N^n\setminus\lbrace0\rbrace,\ 0\lt q\lt1\rbrace .
+$$
+
+The calculator enumerates $\Gamma_v$, writes one perturbation for each exponent
+in ambient coordinates, and certifies it. At the tilted simplex the edge orders
+are $(4,2)$, so
+
+$$
+\Gamma_v=\lbrace\tfrac43,\ 2,\ 4\rbrace,
+$$
+
+reached by $G=x_0$, $G=1-x_0-x_1$ and $G=x_0(1-x_0-x_1)$. A target outside
+$\Gamma_v$ is reported as unreachable, with its nearest neighbours: no
+polynomial perturbation produces $\gamma=3/2$ at that vertex under the
+theorem's hypotheses. On the unit square with orders $(4,6)$ the spectrum has
+ten exponents, from $6/5$ to $12$.
+
+```bash
+python -m gitcalculator design --preset tilted-simplex --target 3/2
+```
+
+### Sweep: the phase fan, compiled
+
+For a family $G_t$ the transported coefficients are polynomials in $t$. The
+sweep interpolates them exactly, takes their real roots as coefficient walls
+(exact when rational), and certifies sample points in every chamber. When two
+samples in one chamber disagree, it bisects on the certified outcome and
+reports a bracket whose two ends are both certified. That finds walls no
+coefficient predicts. For $D_0=x^4+y^4$ and
+$G_t=-x^2+t\,xy-y^2$, every coefficient is constant for $t\gt0$, yet the
+outcome changes at $t=2$, where $-x^2+t\,xy-y^2$ first becomes positive inside
+the cone. The [V.18 qualification example](FORMAL_QUALIFIED_SELECTION_STRATIFICATION.md)
+appears as an exact wall at $t=1/3$.
+
+```bash
+python -m gitcalculator sweep --system "([[-1,0],[0,-1],[1,0],[0,1]], [0,0,1,1])" --base "-(x0**4+x1**4)" --perturbation "-x0**2 + t*x0*x1 - x1**2" --from 0 --to 4
+```
+
+### Attack: counterexamples generated for your input
+
+The counter-argument registry lists refutations the repository already knows.
+Attack generates new ones for the input at hand and re-certifies each:
+
+- **intrusion** adds a slack monomial below the winning degree;
+- **suppression** adds the same monomial with a negative sign;
+- **sign flip** reverses a winning initial term;
+- **base cross term** adds a mixed monomial at or below the principal weight,
+  which breaks Hypothesis 2;
+- **facet tilt** rotates an active constraint about the vertex, which moves
+  the edges;
+- **control** doubles $G$, which must change nothing.
+
+On the tilted simplex with $G=x_0^2$, a 1% tilt of the facet $x_0+x_1\le1$
+breaks the alignment with the quartic valley. The base order along the new
+edge drops to two and the certificate is lost. This is the README's
+"feasibility comes before degree", found by the calculator rather than written
+in by hand.
+
+```bash
+python -m gitcalculator attack --preset tilted-simplex
+```
+
 ## History: answers have commits
 
 An answer is a function of the input and of the code, and git records every
@@ -269,6 +373,20 @@ to the backend, the certificate or the counter-arguments that alters a
 recorded answer cannot pass silently. Record new entries deliberately with
 `tape record`.
 
+## Two implementations
+
+[`web/engine.js`](../gitcalculator/web/engine.js) is an independent, exact
+implementation of the certificate, the V.22 reduction, the certified
+measurement and the counter-arguments, using BigInt rationals. It computes its
+own pullbacks by symbolic substitution instead of calling the repository's
+compiler. [`tests/test_gitcalculator.py`](../tests/test_gitcalculator.py) runs
+it under Node and requires the same certificate status, $q_\ast$, $\gamma$ and
+status on all ten links for every preset, the same spectra, walls and chambers,
+and the same attack outcomes as the Python package. The browser engine does not
+run the backend's numerical predictor, so it never reports `licensed`; where
+the Python receipt rests on a numerical probe, the browser receipt says the
+link is unresolved.
+
 ## The web calculator
 
 ```bash
@@ -283,13 +401,15 @@ The build writes three files:
 - `bundle.json` is a deduplicated store of git blobs: every code state that had
   the backend, the gitcalculator, and the cited documents.
 
-Where the browser allows WebAssembly, *Run Python here* loads
+The page computes every mode live with the exact JavaScript engine, in any
+browser and inside a Claude artifact. For each preset it also shows the
+repository's recorded Python receipt and whether the two implementations agree.
+Where the browser allows WebAssembly, *Also run the repository's Python* loads
 [Pyodide](https://pyodide.org) 0.26.4, writes the bundled blobs into its file
 system, checks every file against its git blob id, and runs the same Python as
-the command line. Custom inputs and history replays then run in the page. The
-browser receipt reports the same code identity as a local run. Where
-WebAssembly is unavailable, the page keeps the recorded receipts and prints the
-equivalent command line for any input.
+the command line, including history replays for new inputs. The browser
+receipt reports the same code identity as a local run. `--recorded-only` builds
+the page without the Python bundle; the exact engine still runs.
 
 Serve the directory with any static server. The
 [`gitcalculator` workflow](../.github/workflows/gitcalculator.yml) runs the tests,
@@ -307,6 +427,12 @@ deploys it.
   An `unresolved` link asks for more analysis; it does not assert failure.
 - Hypothesis 0 is certified only by the two exact routes. Otherwise it remains
   the backend's finite probe.
+- The exponent spectrum covers channels the qualified-face law and V.22 can
+  see. An unreachable target is a statement about those channels under the
+  theorem's hypotheses, not about every conceivable mechanism.
+- A sweep's coefficient walls are exact; outcome walls are brackets whose ends
+  are certified, located by bisection on sampled chambers, so a chamber change
+  narrower than the sampling can be missed.
 - Certified bounds are lower bounds at finitely many scales, in dimension at
   most four. They support or contradict a prediction at those scales; they are
   not an asymptotic proof.

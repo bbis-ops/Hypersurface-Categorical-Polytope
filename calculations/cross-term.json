@@ -6,7 +6,7 @@
     "base": "-(x0**2+x0*x1+x1**2)",
     "perturbation": "x0"
   },
-  "receipt_id": "gc-7944dde3d3aedffd",
+  "receipt_id": "gc-1045b69a73d920bb",
   "answer": {
     "verdict": "licensed",
     "headline": "Δ(s) = Θ(s^2)",
@@ -67,8 +67,8 @@
     }
   },
   "recorded_with": {
-    "commit": "8a3fb6f5284478dcde0694427d41f9131c4e01e3",
+    "commit": "0927d93357cbf3f189513012c6980d2af8300979",
     "code_id": "code-23ad9e729a48",
-    "calculator_id": "calc-0165fb52752a"
+    "calculator_id": "calc-8056d415d566"
   }
 }

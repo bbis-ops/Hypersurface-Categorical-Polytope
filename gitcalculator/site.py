@@ -105,6 +105,12 @@ def build(out: Path, *, pyodide: Path | None = None, fragment: bool = False, liv
     (out / "ledger.json").write_text(json.dumps(ledger, ensure_ascii=False), encoding="utf-8")
 
     page = (WEB / "index.html").read_text(encoding="utf-8")
+    engine, modes = ((WEB / name).read_text(encoding="utf-8") for name in ("engine.js", "modes.js"))
+    stamp = {"engine_blob": blob_id(engine.encode()), "modes_blob": blob_id(modes.encode()),
+             "commit": bundle["head"].get("commit"), "short": bundle["head"].get("short")}
+    page = page.replace('<script src="engine.js"></script>',
+                        f"<script>window.GITCALC_BUILD = {json.dumps(stamp)};</script>\n<script>\n{engine}</script>")
+    page = page.replace('<script src="modes.js"></script>', f"<script>\n{modes}</script>")
     (out / "index.html").write_text(page if fragment else PAGE.format(fragment=page), encoding="utf-8")
     if pyodide and live:
         target = out / "pyodide"

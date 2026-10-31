@@ -30,7 +30,7 @@ where = ["."]
 include = ["categorical_polytope*", "gitcalculator*"]
 
 [tool.setuptools.package-data]
-gitcalculator = ["web/index.html"]
+gitcalculator = ["web/index.html", "web/engine.js", "web/modes.js"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

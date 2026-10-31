@@ -5,6 +5,7 @@ from __future__ import annotations
 import io
 import json
 import re
+import shutil
 import subprocess
 from contextlib import redirect_stdout
 from fractions import Fraction
@@ -228,3 +229,95 @@ def test_command_line_applies_an_observed_exponent_to_a_preset():
     assert receipt["input"]["observed_exponent"] == 2.0
     inverse = next(c for c in receipt["counterarguments"] if c["id"] == "inverse-tolerance")
     assert inverse["effect"] == "caveat" and "no_face_match" in inverse["detail"]
+
+
+# --- the browser engine against the Python implementation ---------------------------
+
+NODE = shutil.which("node")
+SQUARE = "([[-1,0],[0,-1],[1,0],[0,1]], [0,0,1,1])"
+DESIGNS = [(SIMPLEX, "-((x0+x1-1)**2 + x0**4)", "3/2"), (SQUARE, "-(x0**4+x1**6)", "3/2")]
+SWEEPS = [(SQUARE, "-(x0**4 + x1**2)", "(t - 1/3)*x0 + x1", "-1", "1"),
+          (SQUARE, "-(x0**4+x1**4)", "-x0**2 + t*x0*x1 - x1**2", "0", "4")]
+ATTACKS = [(SIMPLEX, "-((x0+x1-1)**2 + x0**4)", "x0**2"), (SQUARE, "-(x0**4+x1**4)", "x0+x1**2")]
+
+
+def _browser(jobs):
+    completed = subprocess.run([NODE, str(ROOT / "tests" / "engine_conformance.js")], input=json.dumps(jobs),
+                               capture_output=True, text=True, timeout=300, check=True)
+    results = json.loads(completed.stdout)
+    assert not [r for r in results if "error" in r], results
+    return results
+
+
+@pytest.mark.skipif(NODE is None, reason="node is not installed")
+def test_browser_engine_matches_the_python_certificate_on_every_preset():
+    from gitcalculator.certify import certify
+    from gitcalculator.modes import outcome
+    from gitcalculator.presets import PRESETS
+    names = sorted(PRESETS)
+    results = _browser([{"mode": "solve", "request": preset_request(n)} for n in names])
+    for name, js in zip(names, results):
+        request = preset_request(name)
+        python, _ = certify(request, {})
+        assert js["status"] == python["status"], name
+        assert (js["q_star"], js["gamma"]) == (python.get("q_star"), python.get("gamma")), name
+        assert js["links"] == {link["id"]: link["status"] for link in python["links"]}, name
+        python_outcome = outcome(request)
+        if python_outcome["verdict"] == "proved-v22":
+            assert js["curved"] == python_outcome["gamma"], name
+
+
+@pytest.mark.skipif(NODE is None, reason="node is not installed")
+def test_browser_engine_matches_python_on_design_sweep_and_attack():
+    from gitcalculator.modes import attack, design, sweep
+    jobs = ([{"mode": "design", "request": {"system": s, "base": b, "target": t}} for s, b, t in DESIGNS]
+            + [{"mode": "sweep", "request": {"system": s, "base": b, "perturbation": p, "from": lo, "to": hi}}
+               for s, b, p, lo, hi in SWEEPS]
+            + [{"mode": "attack", "request": {"system": s, "base": b, "perturbation": p}} for s, b, p in ATTACKS])
+    results = iter(_browser(jobs))
+    for system, base, target in DESIGNS:
+        js, py = next(results), design(system, base, target)
+        assert js["spectrum"] == [[e["q"], e["gamma"]] for e in py["spectrum"]]
+        assert js["target"] == [py["target"]["achievable"], py["target"]["nearest_below"], py["target"]["nearest_above"]]
+    for system, base, perturbation, lo, hi in SWEEPS:
+        js, py = next(results), sweep(system, base, perturbation, lo, hi)
+        assert [w[:2] for w in js["walls"]] == [[w["kind"], w["at"]] for w in py["walls"]]
+        assert all(abs(a[2] - b["value"]) < 1e-9 for a, b in zip(js["walls"], py["walls"]))
+        assert js["chambers"] == [[c["outcome"]["verdict"], c["outcome"]["gamma"]] for c in py["chambers"]]
+    for system, base, perturbation in ATTACKS:
+        js, py = next(results), attack(system, base, perturbation)
+        assert js["base"] == [py["base"]["verdict"], py["base"]["gamma"]]
+        assert js["mutations"] == [[m["kind"], m["outcome"]["verdict"], m["outcome"]["gamma"], m["changed"]] for m in py["mutations"]]
+
+
+def test_design_finds_the_quantized_spectrum_and_impossible_targets():
+    from gitcalculator.modes import design
+    result = design(SIMPLEX, "-((x0+x1-1)**2 + x0**4)", "3/2")
+    assert [e["gamma"] for e in result["spectrum"]] == ["4/3", "2", "4"]
+    assert result["slacks"][1]["expression"] == "1 - x0 - x1"
+    assert result["target"]["achievable"] is False
+    assert (result["target"]["nearest_below"], result["target"]["nearest_above"]) == ("4/3", "2")
+    reachable = design(SIMPLEX, "-((x0+x1-1)**2 + x0**4)", "4/3")["target"]
+    assert [(c["perturbation"], c["check"]["verdict"], c["check"]["gamma"]) for c in reachable["candidates"]] == [("x0", "proved", "4/3")]
+
+
+def test_sweep_finds_exact_and_positivity_walls():
+    from gitcalculator.modes import sweep
+    exact = sweep(SQUARE, "-(x0**4 + x1**2)", "(t - 1/3)*x0 + x1", "-1", "1")
+    assert [(w["kind"], w["at"]) for w in exact["walls"]] == [("coefficient", "1/3")]
+    assert [c["outcome"]["gamma"] for c in exact["chambers"]] == ["2", "4/3"]
+    positivity = sweep(SQUARE, "-(x0**4+x1**4)", "-x0**2 + t*x0*x1 - x1**2", "0", "4")
+    wall = next(w for w in positivity["walls"] if w["kind"] == "outcome")
+    assert Fraction(wall["lo"]) <= 2 <= Fraction(wall["hi"]) and Fraction(wall["hi"]) - Fraction(wall["lo"]) < Fraction(1, 10**12)
+    assert [c["outcome"]["verdict"] for c in positivity["chambers"]] == ["refused", "proved"]
+
+
+def test_attack_generates_counterexamples_and_keeps_the_control():
+    from gitcalculator.modes import attack
+    result = attack(SIMPLEX, "-((x0+x1-1)**2 + x0**4)", "x0**2")
+    by_kind = {}
+    for m in result["mutations"]:
+        by_kind.setdefault(m["kind"], []).append(m)
+    assert by_kind["control"][0]["changed"] is False
+    assert by_kind["intrusion"][0]["outcome"]["gamma"] == "4/3"
+    assert any(m["changed"] for m in by_kind["facet tilt"]) and not all(m["changed"] for m in by_kind["facet tilt"])

@@ -324,6 +324,13 @@ python -m gitcalculator calc --preset tilted-simplex
 python -m gitcalculator history --preset signed-sharp
 ```
 
+It answers five kinds of question about the law: **Solve** (the exponent and its
+proof), **Design** (which exponents a vertex can produce at all, and a
+perturbation for each), **Sweep** (the exact phase walls of a family $G_t$),
+**Attack** (counterexamples generated for the input), and **History** (what every
+commit of the backend answered). Each mode runs in Python and in an independent
+exact JavaScript engine, and a regression test requires them to agree.
+
 The first command proves $\Delta(s)=\Theta(s^{4/3})$ for the tilted simplex in
 exact arithmetic, and its certified bounds contradict the ambient-axis exponent
 $2$. The second replays the audit's sharpened signed counterexample across

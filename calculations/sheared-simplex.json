@@ -6,7 +6,7 @@
     "base": "-((x0+2*x1-2)**2 + x0**4)",
     "perturbation": "x0"
   },
-  "receipt_id": "gc-54007e3531a4b9f3",
+  "receipt_id": "gc-55e72d30ad98176a",
   "answer": {
     "verdict": "proved",
     "headline": "Δ(s) = Θ(s^4/3)",
@@ -68,8 +68,8 @@
     }
   },
   "recorded_with": {
-    "commit": "8a3fb6f5284478dcde0694427d41f9131c4e01e3",
+    "commit": "0927d93357cbf3f189513012c6980d2af8300979",
     "code_id": "code-23ad9e729a48",
-    "calculator_id": "calc-0165fb52752a"
+    "calculator_id": "calc-8056d415d566"
   }
 }

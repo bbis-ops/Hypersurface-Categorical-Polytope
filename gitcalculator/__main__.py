@@ -43,6 +43,21 @@ def main(argv: list[str] | None = None) -> int:
     calc.add_argument("--full", action="store_true", help="include the complete backend response")
     calc.add_argument("--history", action="store_true", help="also replay the input across git history")
 
+    design = sub.add_parser("design", help="the exponent spectrum of a vertex, and perturbations that reach a target")
+    design.add_argument("--preset", choices=sorted(PRESETS), help="take P and F from a preset")
+    design.add_argument("--system")
+    design.add_argument("--base")
+    design.add_argument("--target", help="a response exponent to synthesize, such as 3/2")
+    design.add_argument("--json", action="store_true")
+
+    sweep = sub.add_parser("sweep", help="the exact phase fan of a family G(t)")
+    _inputs(sweep)
+    sweep.add_argument("--from", dest="low", default="-1")
+    sweep.add_argument("--to", dest="high", default="1")
+
+    attack = sub.add_parser("attack", help="generate counterexamples to one answer")
+    _inputs(attack)
+
     sub.add_parser("presets", help="list the canonical calculations")
 
     counter = sub.add_parser("counter", help="list the counter-arguments and run their witnesses")
@@ -61,7 +76,88 @@ def main(argv: list[str] | None = None) -> int:
     site.add_argument("--fragment", action="store_true", help="omit the document skeleton (for a Claude artifact)")
     site.add_argument("--recorded-only", action="store_true", help="ship recorded receipts without the live engine")
 
-    args = parser.parse_args(argv)
+    # An expression such as -(x0**4+x1**4) starts like an option; bind it to its flag.
+    raw = list(sys.argv[1:] if argv is None else argv)
+    valued = {"--system", "--base", "--perturbation", "--target", "--from", "--to", "--observed"}
+    bound: list[str] = []
+    while raw:
+        token = raw.pop(0)
+        bound.append(f"{token}={raw.pop(0)}" if token in valued and raw else token)
+    args = parser.parse_args(bound)
+
+    if args.command == "design":
+        from .modes import design as run_design
+        system, base = args.system, args.base
+        if args.preset:
+            preset = preset_request(args.preset)
+            system, base = system or preset["system"], base or preset["base"]
+        if not (system and base):
+            raise SystemExit("give --preset, or both --system and --base")
+        result = run_design(system, base, args.target)
+        if args.json:
+            print(json.dumps(result, indent=2, ensure_ascii=False))
+            return 0
+        if result["status"] != "complete":
+            print(f"not applicable: {result['reason']}")
+            return 1
+        print(f"vertex ({', '.join(result['vertex'])}) · edge weights {', '.join(result['weights'])} · "
+              f"base {'proved' if result['base_proved'] else 'not proved'} (H0–H2)")
+        print("edge coordinates are the active constraints' slacks: "
+              + ", ".join(f"{s['axis']} = {s['expression']}" for s in result["slacks"]))
+        print("\nexponent spectrum (γ = 1/(1 − q))")
+        for entry in result["spectrum"]:
+            examples = ", ".join(m["perturbation"] for m in entry["mechanisms"][:3])
+            print(f"  γ = {entry['gamma']:<6} q = {entry['q']:<6} {entry['mechanism_count']} mechanism(s), e.g. G = {examples}")
+        target = result.get("target")
+        if target:
+            if "error" in target:
+                print(f"\ntarget: {target['error']}")
+            elif target["achievable"]:
+                print(f"\ntarget γ = {target['gamma']} is reachable:")
+                for c in target["candidates"]:
+                    print(f"  G = {c['perturbation']:<28} → {c['check']['verdict']} γ = {c['check']['gamma']}")
+            else:
+                print(f"\ntarget γ = {target['gamma']} is not reachable by any qualified face or V.22 channel here; "
+                      f"nearest: {target['nearest_below']} below, {target['nearest_above']} above")
+        return 0
+
+    if args.command == "sweep":
+        from .modes import sweep as run_sweep
+        request = _request(args)
+        result = run_sweep(request["system"], request["base"], request["perturbation"], args.low, args.high)
+        if args.json:
+            print(json.dumps(result, indent=2, ensure_ascii=False))
+            return 0
+        if result["status"] != "complete":
+            print(f"not applicable: {result['reason']}")
+            return 1
+        print("transported coefficient laws: " + "; ".join(f"{law['monomial']}: {law['law']}" for law in result["coefficient_laws"]))
+        for wall in result["walls"]:
+            where = wall["at"] or f"[{wall['lo']}, {wall['hi']}]"
+            print(f"  wall t = {where}  ({wall['kind']}{', ' + wall['monomial'] if wall['monomial'] else ''})")
+        for chamber in result["chambers"]:
+            o = chamber["outcome"]
+            print(f"  t in ({chamber['from']}, {chamber['to']}): {o['verdict']} γ = {o['gamma']} {o['winners']}")
+        return 0
+
+    if args.command == "attack":
+        from .modes import attack as run_attack
+        request = _request(args)
+        result = run_attack(request["system"], request["base"], request["perturbation"])
+        if args.json:
+            print(json.dumps(result, indent=2, ensure_ascii=False))
+            return 0
+        if result["status"] != "complete":
+            print(f"not applicable: {result['reason']}")
+            return 1
+        b = result["base"]
+        print(f"answer under attack: {b['verdict']} γ = {b['gamma']} {b['winners']}")
+        for m in result["mutations"]:
+            o = m["outcome"]
+            print(f"  {'BREAKS' if m['changed'] else 'holds '}  {m['kind']:<16} {m['description']}  → {o['verdict']} γ = {o['gamma']}")
+        s = result["summary"]
+        print(f"{s['changed']} of {s['total']} mutations change the answer")
+        return 0
 
     if args.command == "presets":
         for name, preset in PRESETS.items():

@@ -12,8 +12,11 @@ checks each against its git id, and runs the same Python as the command line.
 from __future__ import annotations
 
 import json
+import mimetypes
 import shutil
 import subprocess
+from functools import partial
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from .certify import LINKS
@@ -26,6 +29,7 @@ from .receipt import backend, calculate, counter_catalogue
 WEB = Path(__file__).resolve().parent / "web"
 PYODIDE_VERSION = "0.26.4"
 PYODIDE_FILES = ("pyodide.js", "pyodide.asm.js", "pyodide.asm.wasm", "python_stdlib.zip", "pyodide-lock.json")
+LEDGER_SCHEMA = "gitcalculator.ledger.v1"
 
 
 PAGE = """<!doctype html>
@@ -69,6 +73,30 @@ def cited_documents() -> list[str]:
     return sorted(p for p in paths if (ROOT / p).is_file())
 
 
+def render_page(head: dict, *, fragment: bool = False) -> str:
+    """``index.html`` with the browser engine inlined, stamped with its blob ids and the build."""
+    page = (WEB / "index.html").read_text(encoding="utf-8")
+    engine, modes = ((WEB / name).read_text(encoding="utf-8") for name in ("engine.js", "modes.js"))
+    stamp = {"engine_blob": blob_id(engine.encode()), "modes_blob": blob_id(modes.encode()),
+             "commit": head.get("commit"), "short": head.get("short")}
+    page = page.replace('<script src="engine.js"></script>',
+                        f"<script>window.GITCALC_BUILD = {json.dumps(stamp)};</script>\n<script>\n{engine}</script>")
+    page = page.replace('<script src="modes.js"></script>', f"<script>\n{modes}</script>")
+    return page if fragment else PAGE.format(fragment=page)
+
+
+class _Quiet(SimpleHTTPRequestHandler):
+    def log_message(self, format: str, *args: object) -> None:
+        pass
+
+
+def server(directory: Path, port: int = 8000, *, quiet: bool = False) -> ThreadingHTTPServer:
+    """A local web server for a built site that serves WebAssembly as ``application/wasm``."""
+    mimetypes.add_type("application/wasm", ".wasm")
+    handler = _Quiet if quiet else SimpleHTTPRequestHandler
+    return ThreadingHTTPServer(("127.0.0.1", port), partial(handler, directory=str(directory)))
+
+
 def build(out: Path, *, pyodide: Path | None = None, fragment: bool = False, live: bool = True) -> Path:
     """Write the site to ``out``.
 
@@ -95,7 +123,7 @@ def build(out: Path, *, pyodide: Path | None = None, fragment: bool = False, liv
         (out / "bundle.json").write_text(json.dumps(bundle, ensure_ascii=False), encoding="utf-8")
 
     remote_commits = (_git("rev-list", "--remotes") or "").split()
-    ledger = {"schema": "gitcalculator.ledger.v1", "head": bundle["head"], "linkable": linkable,
+    ledger = {"schema": LEDGER_SCHEMA, "head": bundle["head"], "linkable": linkable,
               "remote_commits": remote_commits, "live_engine": live, "presets": {},
               "counterarguments": counter_catalogue(), "witnesses": check_witnesses(backend().handle)}
     for name, preset in PRESETS.items():
@@ -104,14 +132,7 @@ def build(out: Path, *, pyodide: Path | None = None, fragment: bool = False, liv
                                    "receipt": receipt, "history": replay(receipt["input"])}
     (out / "ledger.json").write_text(json.dumps(ledger, ensure_ascii=False), encoding="utf-8")
 
-    page = (WEB / "index.html").read_text(encoding="utf-8")
-    engine, modes = ((WEB / name).read_text(encoding="utf-8") for name in ("engine.js", "modes.js"))
-    stamp = {"engine_blob": blob_id(engine.encode()), "modes_blob": blob_id(modes.encode()),
-             "commit": bundle["head"].get("commit"), "short": bundle["head"].get("short")}
-    page = page.replace('<script src="engine.js"></script>',
-                        f"<script>window.GITCALC_BUILD = {json.dumps(stamp)};</script>\n<script>\n{engine}</script>")
-    page = page.replace('<script src="modes.js"></script>', f"<script>\n{modes}</script>")
-    (out / "index.html").write_text(page if fragment else PAGE.format(fragment=page), encoding="utf-8")
+    (out / "index.html").write_text(render_page(bundle["head"], fragment=fragment), encoding="utf-8")
     if pyodide and live:
         target = out / "pyodide"
         target.mkdir(exist_ok=True)

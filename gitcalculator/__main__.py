@@ -76,6 +76,13 @@ def main(argv: list[str] | None = None) -> int:
     site.add_argument("--fragment", action="store_true", help="omit the document skeleton (for a Claude artifact)")
     site.add_argument("--recorded-only", action="store_true", help="ship recorded receipts without the live engine")
 
+    visit = sub.add_parser("visit", help="load a published web calculator as a browser does and check every file")
+    visit.add_argument("url", help="where the calculator is published, such as https://OWNER.github.io/REPOSITORY/")
+    visit.add_argument("--commit", help="require this build, and check it against this clone's git objects")
+    visit.add_argument("--wait", type=float, default=0.0, metavar="SECONDS",
+                       help="retry for up to this long, for a deployment that is still reaching every server")
+    visit.add_argument("--json", action="store_true", help="print JSON instead of the report")
+
     serve = sub.add_parser("serve", help="build the web calculator and open it at http://127.0.0.1:PORT")
     serve.add_argument("--port", type=int, default=8000)
     serve.add_argument("--pyodide", type=Path, help="a local Pyodide directory to vendor instead of the CDN")
@@ -225,17 +232,22 @@ def main(argv: list[str] | None = None) -> int:
         print(f"web calculator written to {out}")
         return 0
 
+    if args.command == "visit":
+        from .visit import render, visit_until
+
+        def progress(attempt: int, report: dict) -> None:
+            print(f"attempt {attempt}: {report['problems'][0]}; retrying", file=sys.stderr, flush=True)
+
+        report = visit_until(args.url, commit=args.commit, wait=args.wait, progress=progress)
+        print(json.dumps(report, indent=2) if args.json else render(report))
+        return 0 if report["ok"] else 1
+
     if args.command == "serve":
-        import mimetypes
-        from functools import partial
-        from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
-        from .site import build
-        out = build(Path("tmp/gitcalculator/serve"), pyodide=args.pyodide)
-        mimetypes.add_type("application/wasm", ".wasm")
-        server = ThreadingHTTPServer(("127.0.0.1", args.port), partial(SimpleHTTPRequestHandler, directory=str(out)))
+        from .site import build, server
+        httpd = server(build(Path("tmp/gitcalculator/serve"), pyodide=args.pyodide), args.port)
         print(f"gitcalculator running at http://127.0.0.1:{args.port}/  (Ctrl+C stops it)", flush=True)
         try:
-            server.serve_forever()
+            httpd.serve_forever()
         except KeyboardInterrupt:
             pass
         return 0

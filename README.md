@@ -343,8 +343,11 @@ there after checking each file against its git blob id.
 **Use it in a browser.** Once GitHub Pages is switched on for this repository
 (Settings → Pages → Source: *GitHub Actions*), each push to `main` publishes the
 calculator at **https://bbis-ops.github.io/Hypersurface-Categorical-Polytope/**.
-Nothing needs installing, and any calculation can be shared as a link. For the
-command line in a browser tab, open the repository in
+Nothing needs installing, and any calculation can be shared as a link. After
+each deployment the workflow loads the published page from the public internet,
+the way a browser does. It checks every file down to its git object
+(`python -m gitcalculator visit <url>`). For the command line in a browser tab,
+open the repository in
 [GitHub Codespaces](https://codespaces.new/bbis-ops/Hypersurface-Categorical-Polytope).
 Locally, `python -m gitcalculator serve` serves the same page.
 

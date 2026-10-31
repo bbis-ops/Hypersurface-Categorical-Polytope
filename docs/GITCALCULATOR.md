@@ -427,7 +427,29 @@ request. When GitHub Pages is switched on with the *GitHub Actions* source
 (Settings → Pages), each push to `main` also publishes the calculator at
 `https://<owner>.github.io/<repository>/`. For this repository that is
 https://bbis-ops.github.io/Hypersurface-Categorical-Polytope/. Until Pages is
-switched on, the deployment job reports that and stops.
+switched on, the workflow reports that and skips publishing.
+
+Each deployment is then checked from the public internet. The `live` job
+loads the published calculator the way a browser does and checks every file
+it loads:
+
+```bash
+python -m gitcalculator visit https://bbis-ops.github.io/Hypersurface-Categorical-Polytope/
+```
+
+The page must carry a build stamp, and the engine inlined in it must hash to
+the blob ids in that stamp. The ledger and the bundle must come from the same
+build. Every bundled blob must hash to its git id. The vendored Pyodide must
+arrive whole, with the WebAssembly module served as `application/wasm`. When
+the clone running the check has the build's commit, the served engine is also
+compared with that commit's files, and every bundled blob is looked up among
+the clone's git objects. A clean build therefore matches the repository byte
+for byte. After a deployment, the job passes `--commit` with the commit just
+built and `--wait 600`, because a new deployment can take a few minutes to
+reach every server and the old build is served until then. On other branches
+the job reports on the calculator that `main` last published. A first visit
+made before the first deployment finishes gets GitHub's 404 page. Reload once
+the run's `pages` job is green.
 
 The deployed site depends on nothing outside GitHub. The workflow builds it
 from the full history and vendors the Pyodide runtime from npm, which verifies

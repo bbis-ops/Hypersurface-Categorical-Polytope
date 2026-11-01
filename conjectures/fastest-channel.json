@@ -1,0 +1,218 @@
+{
+  "schema": "gitcalculator.conjecture.v1",
+  "name": "fastest-channel",
+  "title": "The fastest channel wins",
+  "statement": "Each mechanism the calculator knows opens a channel, and the response follows the fastest: $\\gamma = \\min(\\gamma_{\\mathrm{face}}, \\gamma_{\\mathrm{V.22}})$.",
+  "rule": "min(face_gamma, curved_gamma)",
+  "corpus": {
+    "kind": "presets"
+  },
+  "budget": "standard",
+  "status": "contradicted",
+  "counts": {
+    "refuted": 0,
+    "contradicted": 1,
+    "agrees": 8,
+    "consistent": 1,
+    "inconclusive": 0,
+    "untestable": 0,
+    "no claim": 3
+  },
+  "instances": [
+    {
+      "label": "tilted-simplex",
+      "params": {},
+      "features": {
+        "face_gamma": "4/3"
+      },
+      "prediction": "4/3",
+      "established": {
+        "gamma": "4/3",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "sheared-simplex",
+      "params": {},
+      "features": {
+        "face_gamma": "4/3"
+      },
+      "prediction": "4/3",
+      "established": {
+        "gamma": "4/3",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "signed-channel",
+      "params": {},
+      "features": {
+        "curved_gamma": "3"
+      },
+      "prediction": "3",
+      "established": {
+        "gamma": "3",
+        "by": "V.22"
+      },
+      "verdict": "agrees",
+      "detail": "proved by V.22"
+    },
+    {
+      "label": "signed-sharp",
+      "params": {},
+      "features": {
+        "curved_gamma": "3",
+        "face_gamma": "6"
+      },
+      "prediction": "3",
+      "established": {
+        "gamma": "3",
+        "by": "V.22"
+      },
+      "verdict": "agrees",
+      "detail": "proved by V.22"
+    },
+    {
+      "label": "curved-cancellation",
+      "params": {},
+      "features": {
+        "curved_gamma": "6"
+      },
+      "prediction": "6",
+      "established": {
+        "gamma": "6",
+        "by": "V.22"
+      },
+      "verdict": "agrees",
+      "detail": "proved by V.22"
+    },
+    {
+      "label": "interior-zero",
+      "params": {},
+      "features": {},
+      "prediction": null,
+      "established": null,
+      "verdict": "no claim",
+      "detail": "the rule makes no prediction here"
+    },
+    {
+      "label": "active-set",
+      "params": {},
+      "features": {
+        "face_gamma": "4/3"
+      },
+      "prediction": "4/3",
+      "established": {
+        "gamma": "4/3",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "tied-faces",
+      "params": {},
+      "features": {
+        "face_gamma": "4/3"
+      },
+      "prediction": "4/3",
+      "established": {
+        "gamma": "4/3",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "cross-term",
+      "params": {},
+      "features": {
+        "face_gamma": "2"
+      },
+      "prediction": "2",
+      "established": null,
+      "measured": "2.0",
+      "verdict": "consistent",
+      "detail": "local slopes approach 2.000 (prediction 2.000)"
+    },
+    {
+      "label": "tied-maximizers",
+      "params": {},
+      "features": {
+        "face_gamma": "2"
+      },
+      "prediction": "2",
+      "established": null,
+      "measured": "1.0",
+      "verdict": "contradicted",
+      "detail": "certified lower bounds grow like s^1, faster than s^2: L(s)/s^γ rises by a factor of 10^1.5 as s decreases",
+      "input": {
+        "system": "([[-1,0],[0,-1],[1,0],[0,1]], [0,0,1,1])",
+        "base": "-((x0*(1-x0))**2 + x1**2)",
+        "perturbation": "x0",
+        "request_id": "tied-maximizers"
+      },
+      "witness": {
+        "s": "1.00000e-3",
+        "lower_bound": "1.00000000000e-3",
+        "c": [
+          "1.00000000000e+0",
+          "0"
+        ],
+        "x": [
+          "1",
+          "0"
+        ],
+        "axes": [
+          "c0",
+          "c1"
+        ]
+      }
+    },
+    {
+      "label": "critical-layer",
+      "params": {},
+      "features": {},
+      "prediction": null,
+      "established": {
+        "gamma": "none",
+        "by": "Lemma 2"
+      },
+      "verdict": "no claim",
+      "detail": "the rule makes no prediction here"
+    },
+    {
+      "label": "pyramid-apex",
+      "params": {},
+      "features": {},
+      "prediction": null,
+      "established": null,
+      "verdict": "no claim",
+      "detail": "the rule makes no prediction here"
+    },
+    {
+      "label": "cube-3d",
+      "params": {},
+      "features": {
+        "face_gamma": "6/5"
+      },
+      "prediction": "6/5",
+      "established": {
+        "gamma": "6/5",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    }
+  ],
+  "recorded_with": {
+    "commit": "1a822fc6e8b645c98fee9a0f27315bc62ea01af5",
+    "short": "1a822fc",
+    "code_id": "code-23ad9e729a48",
+    "calculator_id": "calc-e464d311b8f7"
+  }
+}

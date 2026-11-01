@@ -4,11 +4,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
-/* Layout: an instrument with six modes. A keypad (problem, presets) beside a
+/* Layout: an instrument with seven modes. A keypad (problem, presets) beside a
    display that changes with the mode: Solve prints the tape, Design draws the
    exponent spectrum, Sweep the phase strip, Map the phase diagram in t and u,
-   Attack the counterexample table, History the git timeline. Dark-first, in
-   the repository's ink-teal and brass. */
+   Attack the counterexample table, History the git timeline, and Conjecture the
+   evidence for and against a candidate law. Dark-first, in the repository's
+   ink-teal and brass. */
 :root {
   --bg: #091924; --panel: #0f2532; --panel-2: #143040; --rule: #23414f;
   --ink: #f4efe5; --ink-2: #b9cbd0; --ink-3: #86a0a8;
@@ -76,7 +77,7 @@ button:disabled { opacity: .55; cursor: progress; }
 form { display: grid; gap: 12px; }
 label { display: grid; gap: 5px; font: 500 13px/1.3 var(--sans); color: var(--ink-2); }
 label small { font-weight: 400; color: var(--ink-3); }
-textarea, input { width: 100%; font: 13.5px/1.45 var(--mono); color: var(--ink); background: var(--bg); border: 1px solid var(--rule); border-radius: 6px; padding: 9px 10px; }
+textarea, input, select { width: 100%; font: 13.5px/1.45 var(--mono); color: var(--ink); background: var(--bg); border: 1px solid var(--rule); border-radius: 6px; padding: 9px 10px; }
 textarea { min-height: 72px; resize: vertical; }
 .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .actions { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -101,6 +102,11 @@ sup { font-size: .62em; line-height: 0; }
 .stamp { margin: 0; font: 12px/1.6 var(--mono); color: var(--ink-3); overflow-wrap: anywhere; }
 .stamp b { color: var(--brass-ink); font-weight: 500; }
 .gh { margin-top: 10px; }
+.cv-agrees, .cv-consistent { color: var(--ok); border-color: currentColor; } .cv-refuted { color: var(--bad); border-color: currentColor; }
+.cv-contradicted { color: var(--warn); border-color: currentColor; } .cv-inconclusive, .cv-untestable, .cv-no-claim { color: var(--muted); }
+.against { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.against li { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; overflow-wrap: anywhere; }
+.statement-text { white-space: pre-wrap; }
 .gh-preview { margin-top: 8px; }
 .gh-preview summary { cursor: pointer; }
 .gh-preview pre { max-height: 320px; overflow: auto; }
@@ -193,6 +199,7 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
       <a href="#map" data-mode="map"><b>Map</b><span>phase diagram in t and u</span></a>
       <a href="#attack" data-mode="attack"><b>Attack</b><span>break this answer</span></a>
       <a href="#history" data-mode="history"><b>History</b><span>every commit's answer</span></a>
+      <a href="#conjecture" data-mode="conjecture"><b>Conjecture</b><span>test a candidate law</span></a>
     </nav>
   </div>
 </header>
@@ -201,22 +208,32 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
   <aside class="keypad" aria-label="Problem">
     <div class="panel">
       <form id="form" autocomplete="off">
-        <label for="system">Polyhedron (A, b) with A·x ≤ b
+        <label for="ctitle" data-for="conjecture conjecture-family">Title <small>a short name for the law</small>
+          <input id="ctitle" spellcheck="false" placeholder="The fastest channel wins"></label>
+        <label for="crule" data-for="conjecture conjecture-family">Rule <small>the predicted γ; the language is below the results</small>
+          <input id="crule" spellcheck="false" placeholder="min(face_gamma, curved_gamma)"></label>
+        <label for="cstatement" data-for="conjecture conjecture-family">Statement <small>in words; Markdown with $math$</small>
+          <textarea id="cstatement" spellcheck="true"></textarea></label>
+        <label for="ccorpus" data-for="conjecture conjecture-family">Test it on
+          <select id="ccorpus"><option value="presets">the 13 canonical presets</option><option value="family">a family G(t) or G(t, u)</option></select></label>
+        <label for="system" data-for="solve design sweep map attack history conjecture-family">Polyhedron (A, b) with A·x ≤ b
           <textarea id="system" spellcheck="false"></textarea></label>
-        <label for="base">Base objective F <small>in x0, x1, …</small>
+        <label for="base" data-for="solve design sweep map attack history conjecture-family">Base objective F <small>in x0, x1, …</small>
           <input id="base" spellcheck="false"></label>
-        <label for="perturbation" data-for="solve attack history sweep map"><span id="pert-label">Perturbation G</span>
+        <label for="perturbation" data-for="solve attack history sweep map conjecture-family"><span id="pert-label">Perturbation G</span>
           <input id="perturbation" spellcheck="false"></label>
         <label for="target" data-for="design">Target exponent γ <small>optional, such as 3/2</small>
           <input id="target" spellcheck="false" placeholder="3/2"></label>
-        <div class="pair" data-for="sweep map">
+        <div class="pair" data-for="sweep map conjecture-family">
           <label for="from">t from <input id="from" spellcheck="false" value="-1"></label>
           <label for="to">t to <input id="to" spellcheck="false" value="1"></label>
         </div>
-        <div class="pair" data-for="map">
+        <div class="pair" data-for="map conjecture-family">
           <label for="ufrom">u from <input id="ufrom" spellcheck="false" value="-1"></label>
           <label for="uto">u to <input id="uto" spellcheck="false" value="1"></label>
         </div>
+        <label for="cpoints" data-for="conjecture-family">Points per parameter <small>at most 15</small>
+          <input id="cpoints" spellcheck="false" value="5"></label>
         <label for="observed" data-for="solve">Observed exponent <small>optional, for the inverse check</small>
           <input id="observed" spellcheck="false" placeholder="4/3"></label>
         <div class="actions"><button type="submit" class="primary" id="run">Solve</button><button type="button" id="share" hidden>Copy link</button></div>
@@ -300,6 +317,35 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
       <div class="scroll"><table><thead><tr><th>Monomial</th><th class="m">Weighted degree</th><th>a(t, u)</th></tr></thead><tbody id="m-laws"></tbody></table></div>
     </section>
 
+    <!-- CONJECTURE -->
+    <section data-view="conjecture" class="readout" aria-live="polite">
+      <span class="verdict" id="c-verdict">—</span>
+      <div class="headline" id="c-headline">—</div>
+      <p class="meaning statement-text" id="c-statement"></p>
+      <p class="meaning" id="c-meaning"></p>
+      <p class="stamp" id="c-stamp"></p>
+      <div class="actions gh">
+        <button type="button" class="quiet" id="c-copy">Copy conjecture sheet</button>
+        <button type="button" class="quiet" id="c-issue">Open an issue</button>
+        <button type="button" class="quiet" id="c-propose" title="Record this conjecture in conjectures/, where CI recomputes every verdict on every push">Propose for conjectures/</button>
+        <button type="button" class="quiet" id="c-download">Download .md</button>
+      </div>
+      <p class="note" id="c-note" hidden></p>
+    </section>
+    <section data-view="conjecture" aria-labelledby="h-against">
+      <div class="sec-head"><h2 id="h-against">Against the conjecture</h2><p>A theorem that decides an input refutes the conjecture outright. Elsewhere, certified lower bounds can contradict it at finite scales; each contradiction comes with a point of P that anyone can check in exact arithmetic.</p></div>
+      <ul class="against" id="c-against"></ul>
+    </section>
+    <section data-view="conjecture" aria-labelledby="h-every">
+      <div class="sec-head"><h2 id="h-every">Every input</h2><p>The rule's prediction, the answer an established theorem gives where one decides it, and the verdict.</p></div>
+      <div class="scroll"><table><thead><tr><th>Input</th><th>Prediction</th><th>Established</th><th>Verdict</th><th>Why</th><th></th></tr></thead><tbody id="c-table"></tbody></table></div>
+    </section>
+    <section data-view="conjecture" aria-labelledby="h-rules">
+      <div class="sec-head"><h2 id="h-rules">The rule language</h2><p>A rule is an expression over certified features of an input. It is parsed, never executed as code. A feature the calculator cannot compute is unknown, and min and max skip unknown values.</p></div>
+      <div class="scroll"><table><thead><tr><th>Feature</th><th>Meaning</th></tr></thead><tbody id="c-features"></tbody></table></div>
+      <p class="note" style="margin-top:8px">Functions: <span class="mono">min max abs if(condition, then, else) known(x)</span>. Constants: <span class="mono">none</span> (zero response, an infinite exponent), <span class="mono">unknown</span> (no claim), <span class="mono">true false</span>. Operators: <span class="mono">+ - * / ^</span> (integer powers), comparisons, <span class="mono">and or not</span>.</p>
+    </section>
+
     <!-- SWEEP -->
     <section data-view="sweep" class="readout" aria-live="polite">
       <span class="verdict" id="w-verdict">—</span>
@@ -347,7 +393,7 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
   const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
   const fmtQ = (text) => { if (text == null) return "—"; const q = E.Q.parse(text); return q.d <= 1000000n ? String(q) : "≈" + q.toNumber().toPrecision(15).replace(/\.?0+$/, ""); };
   const qCell = (text) => `<span title="${esc(text)}">${esc(fmtQ(text))}</span>`;
-  const MODES = { solve: "Solve", design: "Find the spectrum", sweep: "Sweep", map: "Map", attack: "Attack", history: "Replay history" };
+  const MODES = { solve: "Solve", design: "Find the spectrum", sweep: "Sweep", map: "Map", attack: "Attack", history: "Replay history", conjecture: "Test the conjecture" };
   const SERIES = { backend: "--s1", "exact-faces": "--s1", curved: "--s3", "ambient-axes": "--s4" };
   const SQUARE = "([[-1,0],[0,-1],[1,0],[0,1]], [0,0,1,1])", SIMPLEX = "([[-1,0],[0,-1],[1,1]], [0,0,1])";
   const CUBE = "([[-1,0,0],[0,-1,0],[0,0,-1],[1,0,0],[0,1,0],[0,0,1]], [0,0,0,1,1,1])";
@@ -375,7 +421,7 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
     { title: "A tie and an absorbed cross term", note: "Both edges tie at q* = 1/2; where both coefficients are negative, they absorb the positive cross term.", request: { system: SQUARE, base: "-(x0**2 + x1**4)", perturbation: "t*x0 + u*x1**2 + x0*x1", from: "-1", to: "1", ufrom: "-1", uto: "1" } },
     { title: "A quadratic form on the orthant", note: "The face {c0,c1} qualifies only where the form is positive inside the orthant: a parabolic wall no single coefficient sees.", request: { system: SQUARE, base: "-(x0**4+x1**4)", perturbation: "t*x0**2 + u*x0*x1 - x1**2", from: "-1", to: "1", ufrom: "-1", uto: "1" } },
   ];
-  const store = { ledger: null, bundle: null, mode: "solve", preset: { solve: "tilted-simplex", design: 0, sweep: 0, map: 0, attack: "tilted-simplex", history: "signed-sharp" }, worker: null, ready: false, starting: null, pending: new Map(), seq: 0 };
+  const store = { ledger: null, bundle: null, mode: "solve", preset: { solve: "tilted-simplex", design: 0, sweep: 0, map: 0, attack: "tilted-simplex", history: "signed-sharp", conjecture: null }, worker: null, ready: false, starting: null, pending: new Map(), seq: 0 };
 
   function toast(message) { const t = $("toast"); t.textContent = message; t.hidden = false; clearTimeout(toast.timer); toast.timer = setTimeout(() => { t.hidden = true; }, 2600); }
   function engineStatus(kind, text, canStart) { $("engine-dot").className = "dot " + kind; $("engine-text").textContent = text; $("engine-start").hidden = !canStart; }
@@ -427,7 +473,11 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
       for (const [id, label, note, request] of items) {
         const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = label; b.title = note; b.dataset.id = String(id);
         b.setAttribute("aria-pressed", String(String(store.preset[store.mode]) === String(id)));
-        b.addEventListener("click", () => { store.preset[store.mode] = id; fill(request); $("form-note").textContent = note; presetChips(); run(); });
+        b.addEventListener("click", () => {
+          store.preset[store.mode] = id;
+          if (store.mode === "conjecture") { presetChips(); showRecordedConjecture(); return; }
+          fill(request); $("form-note").textContent = note; presetChips(); run();
+        });
         g.querySelector(".chips").appendChild(b);
       }
       host.appendChild(g);
@@ -435,19 +485,36 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
     if (store.mode === "design") group("Geometries", DESIGN_PRESETS.map((p, i) => [i, p.title, p.note, p.request]));
     else if (store.mode === "sweep") group("Families", SWEEP_PRESETS.map((p, i) => [i, p.title, p.note, p.request]));
     else if (store.mode === "map") group("Families", MAP_PRESETS.map((p, i) => [i, p.title, p.note, p.request]));
+    else if (store.mode === "conjecture") group("Recorded in conjectures/", (store.ledger?.conjectures || []).map((c) => [c.name, c.title, `${CONJ_STATUS[c.status]} · ${c.rule}`, c]));
     else for (const [title, names] of SOLVE_GROUPS) group(title, names.filter((n) => store.ledger?.presets?.[n] || PRESET_INPUTS[n]).map((n) => {
       const p = store.ledger?.presets?.[n] || PRESET_INPUTS[n];
       return [n, p.title, p.note, p.request];
     }));
+  }
+  function showFields(mode) {
+    const tokens = mode === "conjecture" ? ($("ccorpus").value === "family" ? ["conjecture", "conjecture-family"] : ["conjecture"]) : [mode];
+    for (const el of document.querySelectorAll("[data-for]")) el.hidden = !el.dataset.for.split(" ").some((t) => tokens.includes(t));
   }
   function setMode(mode) {
     if (!MODES[mode]) mode = "solve";
     store.mode = mode;
     for (const a of document.querySelectorAll(".modes a")) { if (a.dataset.mode === mode) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); }
     for (const el of document.querySelectorAll("[data-view]")) el.hidden = el.dataset.view !== mode;
-    for (const el of document.querySelectorAll("[data-for]")) el.hidden = !el.dataset.for.split(" ").includes(mode);
-    $("pert-label").textContent = mode === "sweep" ? "Family G(t), using t" : mode === "map" ? "Family G(t, u), using t and u" : "Perturbation G";
+    showFields(mode);
+    $("pert-label").textContent = mode === "sweep" ? "Family G(t), using t" : mode === "map" ? "Family G(t, u), using t and u" : mode === "conjecture" ? "Family G, using t, or t and u" : "Perturbation G";
     $("run").textContent = MODES[mode];
+    if (mode === "conjecture") {
+      const shared = store.fromLink; store.fromLink = null; $("form-note").textContent = "";
+      if (shared && shared.crule) {
+        // A link only fills the form; nothing runs until the reader presses Test the conjecture.
+        store.preset.conjecture = null; presetChips(); fill(shared);
+        for (const id of ["ctitle", "crule", "cstatement", "cpoints"]) if (shared[id] != null) $(id).value = shared[id];
+        $("ccorpus").value = shared.ccorpus === "family" ? "family" : "presets"; showFields("conjecture");
+        $("form-note").textContent = "Opened from a shared link. Press Test the conjecture to run it with the repository's Python.";
+        return;
+      }
+      presetChips(); showRecordedConjecture(); return;
+    }
     const preset = store.preset[mode];
     const solveLike = store.ledger?.presets?.[preset] || PRESET_INPUTS[preset] || PRESET_INPUTS["tilted-simplex"];
     const chosen = mode === "design" ? DESIGN_PRESETS[preset] : mode === "sweep" ? SWEEP_PRESETS[preset] : mode === "map" ? MAP_PRESETS[preset] : solveLike;
@@ -932,6 +999,7 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
   function openSolve(request) { store.lastSolveLike = request; location.hash = "solve"; if (store.mode === "solve") { fill(request); run(); } }
   async function run(event) {
     if (event) event.preventDefault();
+    if (store.mode === "conjecture") { if (event) await runConjecture(); return; }
     let request; try { request = readForm(); } catch (error) { $("form-note").textContent = error.message; return; }
     if (store.mode !== "design" && store.mode !== "sweep" && store.mode !== "map") store.lastSolveLike = request;
     const known = presetFor(request);
@@ -949,6 +1017,7 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
         renderMap(m, request, performance.now() - started);
       }
       else if (store.mode === "attack") renderAttack(E.attack(request));
+      else if (store.mode === "conjecture") await runConjecture();
       else if (store.mode === "history") {
         if (known) renderHistory(store.ledger.presets[known].history, request);
         else if (store.ready) { $("form-note").textContent = "Replaying across every code state…"; renderHistory(await call("history", request), request); $("form-note").textContent = "History replayed live from the bundled git blobs."; }
@@ -979,7 +1048,7 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
           self.postMessage({ type: "ready", info: JSON.parse(info) });
         } else {
           py.globals.set("REQUEST_JSON", JSON.stringify(msg.request));
-          const code = msg.type === "calc" ? "import json\\nfrom gitcalculator.receipt import calculate\\njson.dumps(calculate(json.loads(REQUEST_JSON)), ensure_ascii=False)"
+          const code = msg.type === "py" ? msg.code : msg.type === "calc" ? "import json\\nfrom gitcalculator.receipt import calculate\\njson.dumps(calculate(json.loads(REQUEST_JSON)), ensure_ascii=False)"
             : msg.type === "tape" ? "import json\\nfrom gitcalculator.receipt import calculate\\nfrom gitcalculator.tape import entry\\nJOB = json.loads(REQUEST_JSON)\\njson.dumps(json.dumps(entry(JOB['name'], calculate(JOB['request'])), indent=2, ensure_ascii=False) + '\\\\n')"
             : "import json\\nfrom pathlib import Path\\nfrom gitcalculator.history import BundleSource, replay\\njson.dumps(replay(json.loads(REQUEST_JSON), BundleSource(BUNDLE, Path('/snapshots'))), ensure_ascii=False)";
           self.postMessage({ type: "result", id: msg.id, result: JSON.parse(py.runPython(code)) });
@@ -1006,6 +1075,110 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
     })().catch((error) => { store.starting = null; store.worker?.terminate(); engineStatus("off", `Exact JS engine only: ${error.message}`, false); throw error; });
     return store.starting;
   }
+  // ===== Conjecture: a candidate law, tested with the repository's Python ==========
+  const CONJ_STATUS = { refuted: "refuted by a theorem", contradicted: "contradicted by certified bounds", survives: "survives every test", untested: "untested" };
+  const CONJ_CLASS = { refuted: "v-contradicted", contradicted: "v-unlicensed", survives: "v-proved", untested: "v-refused" };
+  const CONJ_ORDER = ["refuted", "contradicted", "agrees", "consistent", "inconclusive", "untestable", "no claim"];
+  const PY_PLAN = "import json\nfrom gitcalculator import conjecture as C\nJOB = json.loads(REQUEST_JSON)\nC.parse_rule(JOB['meta']['rule'])\njson.dumps(C.plan(JOB['corpus']), ensure_ascii=False)";
+  const PY_TRIAL = "import json\nfrom gitcalculator import conjecture as C\nJOB = json.loads(REQUEST_JSON)\njson.dumps(C.trial(JOB['rule'], JOB['item'], JOB['budget']), ensure_ascii=False)";
+  const PY_FINISH = "import json\nfrom gitcalculator import conjecture as C\nJOB = json.loads(REQUEST_JSON)\nRECORD = C.assemble(JOB['meta'], JOB['corpus'], JOB['budget'], JOB['instances'])\njson.dumps({'record': RECORD, 'sheet': C.sheet(RECORD, calculator=JOB['calculator']), 'file': json.dumps(RECORD, indent=2, ensure_ascii=False) + '\\n'}, ensure_ascii=False)";
+  const gammaText = (v) => (v == null ? "—" : v === "none" ? "zero response" : `γ = ${v}`);
+  function conjNote(html) { const n = $("c-note"); n.innerHTML = html; n.hidden = !html; }
+  function fillConjecture(c) {
+    $("ctitle").value = c.title || ""; $("crule").value = c.rule || ""; $("cstatement").value = c.statement || "";
+    const family = (c.corpus || {}).kind === "family";
+    $("ccorpus").value = family ? "family" : "presets";
+    if (family) { const k = c.corpus; fill({ system: k.system, base: k.base, perturbation: k.perturbation, from: k.t[0], to: k.t[1], ufrom: k.u[0], uto: k.u[1] }); $("cpoints").value = String(k.points || 5); }
+    showFields("conjecture");
+  }
+  function readConjecture() {
+    const value = (id) => $(id).value.trim();
+    const meta = { name: null, title: value("ctitle") || "Untitled conjecture", statement: value("cstatement"), rule: value("crule") };
+    if (!meta.rule) throw new Error("Write the rule, for example min(face_gamma, curved_gamma).");
+    if ($("ccorpus").value !== "family") return { meta, corpus: { kind: "presets" } };
+    const corpus = { kind: "family", system: value("system"), base: value("base"), perturbation: value("perturbation"),
+      t: [value("from") || "-1", value("to") || "1"], u: [value("ufrom") || "-1", value("uto") || "1"], points: Math.max(1, Math.min(15, Number(value("cpoints")) || 5)) };
+    if (!corpus.system || !corpus.base || !corpus.perturbation) throw new Error("A family needs the polyhedron, the base objective and G.");
+    if (!/\bt\b|\bu\b/.test(corpus.perturbation)) throw new Error("A family needs the parameter t, or t and u, in G.");
+    return { meta, corpus };
+  }
+  function showRecordedConjecture() {
+    const list = store.ledger?.conjectures || [];
+    const chosen = list.find((c) => c.name === store.preset.conjecture) || list[0];
+    if (!chosen) { $("c-verdict").textContent = "—"; $("c-headline").textContent = "No recorded conjectures"; return; }
+    store.preset.conjecture = chosen.name;
+    fillConjecture(chosen);
+    store.conjecture = { record: chosen, sheet: chosen.sheet, file: null, recorded: true };
+    renderConjecture(chosen, `Recorded in ${docLink(`conjectures/${chosen.name}.json`, `conjectures/${chosen.name}.json`)}; CI recomputes every verdict on every push.`);
+    conjNote("");
+  }
+  function renderConjecture(record, origin) {
+    const v = $("c-verdict"); v.className = "verdict " + (CONJ_CLASS[record.status] || ""); v.textContent = CONJ_STATUS[record.status] || record.status;
+    $("c-headline").textContent = record.title;
+    $("c-statement").textContent = record.statement || "";
+    const counts = record.counts || {};
+    $("c-meaning").textContent = `Rule ${record.rule}, on ${record.instances.length} input${record.instances.length === 1 ? "" : "s"}: ` +
+      CONJ_ORDER.filter((k) => counts[k]).map((k) => `${counts[k]} ${k}`).join(", ") + ".";
+    const w = record.recorded_with || {};
+    $("c-stamp").innerHTML = `${origin} · commit ${esc(w.short || "—")} · Python ${esc(w.code_id || "—")}`;
+    const against = record.instances.filter((i) => i.verdict === "refuted" || i.verdict === "contradicted");
+    $("c-against").innerHTML = against.length ? against.map((item, k) => {
+      const wit = item.witness;
+      return `<li><b>${esc(item.label)}</b>: predicted ${esc(gammaText(item.prediction))}; ${esc(item.detail)}.` +
+        (wit ? `<div class="statement" style="margin-top:4px">Witness: at s = <span class="mono">${esc(wit.s)}</span> the point x = <span class="mono">(${esc(wit.x.join(", "))})</span> of P gives Δ(s) ≥ <span class="mono">${esc(wit.lower_bound)}</span>, with c = <span class="mono">(${esc(wit.c.join(", "))})</span>.</div>` : "") +
+        (item.input ? ` <button type="button" class="link" data-c-solve="${k}">Solve it</button>` : "") + `</li>`;
+    }).join("") : `<li class="statement">Nothing yet: no theorem disagrees, and no certified bound contradicts it.</li>`;
+    for (const b of document.querySelectorAll("[data-c-solve]")) b.addEventListener("click", () => openSolve(against[Number(b.dataset.cSolve)].input));
+    $("c-table").innerHTML = record.instances.map((item) => `<tr><td class="mono">${esc(item.label)}</td><td>${esc(gammaText(item.prediction))}</td>
+      <td>${item.established ? `${esc(gammaText(item.established.gamma))}<div class="statement">${esc(item.established.by)}</div>` : "—"}</td>
+      <td><span class="tag cv-${esc(item.verdict.replace(" ", "-"))}">${esc(item.verdict)}</span></td><td class="statement">${esc(item.detail)}</td><td></td></tr>`).join("");
+  }
+  async function runConjecture() {
+    let job; try { job = readConjecture(); } catch (error) { $("form-note").textContent = error.message; return; }
+    $("form-note").textContent = "";
+    $("run").disabled = true;
+    try {
+      conjNote(store.ready ? "Testing with the repository's Python…" : "Starting the repository's Python in this page to test the conjecture (about 14 MB, once)…");
+      await startPython();
+      const items = await callPy(PY_PLAN, job);
+      const instances = [];
+      for (let k = 0; k < items.length; k++) {
+        conjNote(`Testing input ${k + 1} of ${items.length}: ${esc(items[k].label)}`);
+        instances.push(await callPy(PY_TRIAL, { rule: job.meta.rule, item: items[k], budget: "standard" }));
+      }
+      const done = await callPy(PY_FINISH, { meta: job.meta, corpus: job.corpus, budget: "standard", instances, calculator: calculatorUrl() });
+      store.conjecture = { record: done.record, sheet: done.sheet, file: done.file, recorded: false, job, instances };
+      store.preset.conjecture = null; presetChips();
+      renderConjecture(done.record, "Tested in this page with the repository's Python");
+      conjNote("");
+    } catch (error) { conjNote(`Could not test the conjecture: ${esc(error.message)}`); }
+    finally { $("run").disabled = false; }
+  }
+  async function proposeConjecture() {
+    const c = store.conjecture, repo = repoUrl();
+    if (!c || !repo) { conjNote("This build does not know its GitHub repository."); return; }
+    if (c.recorded) { conjNote(`This conjecture is already recorded as ${docLink(`conjectures/${c.record.name}.json`, `conjectures/${c.record.name}.json`)}.`); return; }
+    const suggested = (c.record.title || "conjecture").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 48) || "conjecture";
+    const name = (prompt("A name for conjectures/NAME.json: lowercase letters, digits and dashes", suggested) || "").trim();
+    if (!name) return;
+    if (!/^[a-z0-9][a-z0-9-]{0,63}$/.test(name)) { conjNote("Use lowercase letters, digits and dashes, starting with a letter or digit."); return; }
+    if ((store.ledger?.conjectures || []).some((r) => r.name === name)) { conjNote(`conjectures/${esc(name)}.json already exists; choose another name.`); return; }
+    const tab = blankTab();
+    try {
+      const done = await callPy(PY_FINISH, { meta: Object.assign({}, c.job.meta, { name }), corpus: c.job.corpus, budget: "standard", instances: c.instances, calculator: calculatorUrl() });
+      const branch = /^[\w./-]+$/.test(store.ledger?.head?.branch || "") && store.ledger.head.branch !== "HEAD" ? store.ledger.head.branch : "main";
+      const copied = await clipboard(done.file);
+      let url = `${repo}/new/${branch}?${new URLSearchParams({ filename: `conjectures/${name}.json`, value: done.file })}`;
+      let lead = `GitHub opens <span class="mono">conjectures/${esc(name)}.json</span> with the recorded trial${copied ? " (it is also on your clipboard)" : ""}.`;
+      if (url.length > GITHUB_URL_LIMIT) {
+        url = `${repo}/new/${branch}?${new URLSearchParams({ filename: `conjectures/${name}.json` })}`;
+        lead = copied ? `The record is too long for a link: GitHub opens an empty <span class="mono">conjectures/${esc(name)}.json</span>; paste the record from your clipboard.`
+          : `The record is too long for a link, and the clipboard is unavailable: use Download .md for the sheet and record it from a clone with <code class="cmd">${esc(`python -m gitcalculator conjecture record ${name} --rule ${shellQ(c.job.meta.rule)}`)}</code>`;
+      }
+      conjNote(lead + " Commit it on a new branch and open a pull request: the workflow recomputes every verdict and fails if any changes." + sendTab(tab, url, "open the new file on GitHub"));
+    } catch (error) { if (tab) tab.close(); conjNote(`Could not prepare the record: ${esc(error.message)}`); }
+  }
+
   // ===== GitHub: proof sheets, issues and the tape ================================
   const calculatorUrl = () => location.origin + location.pathname;
   const shellQ = (v) => "'" + String(v).replace(/'/g, "'\\''") + "'";
@@ -1060,7 +1233,7 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
     } catch (error) { if (tab) tab.close(); ghNote(`Could not record: ${esc(error.message)}. From a clone: <code class="cmd">${esc(`python -m gitcalculator tape record ${name} --system ${shellQ(r.input.system)} --base ${shellQ(r.input.base)} --perturbation ${shellQ(r.input.perturbation)}`)}</code>`); }
     finally { $("gh-tape").disabled = false; }
   }
-  const FIELDS = { solve: ["perturbation", "observed"], design: ["target"], sweep: ["perturbation", "from", "to"], map: ["perturbation", "from", "to", "ufrom", "uto"], attack: ["perturbation"], history: ["perturbation"] };
+  const FIELDS = { solve: ["perturbation", "observed"], design: ["target"], sweep: ["perturbation", "from", "to"], map: ["perturbation", "from", "to", "ufrom", "uto"], conjecture: ["ctitle", "crule", "cstatement", "ccorpus", "cpoints", "perturbation", "from", "to", "ufrom", "uto"], attack: ["perturbation"], history: ["perturbation"] };
   function shareLink() {
     const params = new URLSearchParams();
     for (const id of ["system", "base", ...FIELDS[store.mode]]) if ($(id).value.trim()) params.set(id, $(id).value.trim());
@@ -1068,12 +1241,13 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
   }
   function readLink() {
     const query = new URLSearchParams(location.search);
-    if (!query.get("system") || !query.get("base")) return null;
+    if (!query.get("crule") && (!query.get("system") || !query.get("base"))) return null;
     const request = {};
-    for (const id of ["system", "base", "perturbation", "target", "from", "to", "ufrom", "uto", "observed"]) if (query.has(id)) request[id] = query.get(id);
+    for (const id of ["system", "base", "perturbation", "target", "from", "to", "ufrom", "uto", "observed", "ctitle", "crule", "cstatement", "ccorpus", "cpoints"]) if (query.has(id)) request[id] = query.get(id);
     return request;
   }
   const call = (type, request) => new Promise((resolve, reject) => { const id = ++store.seq; store.pending.set(id, { resolve, reject }); store.worker.postMessage({ type, id, request }); });
+  const callPy = (code, request) => new Promise((resolve, reject) => { const id = ++store.seq; store.pending.set(id, { resolve, reject }); store.worker.postMessage({ type: "py", id, request, code }); });
 
   async function boot() {
     try { store.ledger = await fetch("ledger.json").then((r) => (r.ok ? r.json() : null)); } catch { store.ledger = null; }
@@ -1099,6 +1273,25 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
     $("gh-issue").addEventListener("click", () => { openIssue(); });
     $("gh-tape").addEventListener("click", () => { proposeTape(); });
     $("gh-tape").hidden = !live;
+    $("ccorpus").addEventListener("change", () => showFields(store.mode));
+    $("c-features").innerHTML = Object.entries(store.ledger?.conjecture_features || {}).map(([k, m]) => `<tr><td class="mono">${esc(k)}</td><td>${esc(m)}</td></tr>`).join("");
+    $("c-copy").addEventListener("click", async () => { const c = store.conjecture; if (!c) return; if (await clipboard(c.sheet)) toast("Conjecture sheet copied"); else conjNote("The clipboard is unavailable here; use Download .md."); });
+    $("c-download").addEventListener("click", () => { const c = store.conjecture; if (c) download(`conjecture-${(c.record.name || "trial")}.md`, c.sheet, "text/markdown"); });
+    $("c-issue").addEventListener("click", async () => {
+      const c = store.conjecture, repo = repoUrl(); if (!c || !repo) return;
+      const tab = blankTab(), title = `Conjecture: ${c.record.title} (${CONJ_STATUS[c.record.status]})`;
+      let url = `${repo}/issues/new?${new URLSearchParams({ title, body: c.sheet })}`, lead = "A new issue opens with the conjecture sheet as its text.";
+      if (url.length > GITHUB_URL_LIMIT) {
+        const lines = c.sheet.split("\n"), cut = lines.findIndex((l) => l.startsWith("#### Every input"));
+        const brief = [...lines.slice(0, cut), "_The full table is on the clipboard; paste it below._", ""].join("\n");
+        const copied = await clipboard(c.sheet);
+        url = `${repo}/issues/new?${new URLSearchParams({ title, body: brief })}`;
+        lead = copied ? "The full sheet is too long for a link: the issue opens without the table of inputs, and the full sheet is on your clipboard." : "The full sheet is too long for a link: the issue opens without the table of inputs.";
+      }
+      conjNote(lead + sendTab(tab, url, "open the issue"));
+    });
+    $("c-propose").addEventListener("click", () => { proposeConjecture(); });
+    $("c-propose").hidden = !live;
     window.addEventListener("hashchange", () => setMode(location.hash.slice(1)));
     setMode(location.hash.slice(1) || "solve");
   }

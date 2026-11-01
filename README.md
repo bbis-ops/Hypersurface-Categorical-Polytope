@@ -324,12 +324,14 @@ python -m gitcalculator calc --preset tilted-simplex
 python -m gitcalculator history --preset signed-sharp
 ```
 
-It answers six kinds of question about the law: **Solve** (the exponent and its
-proof), **Design** (which exponents a vertex can produce at all, and a
+It answers seven kinds of question about the law: **Solve** (the exponent and
+its proof), **Design** (which exponents a vertex can produce at all, and a
 perturbation for each), **Sweep** (the exact phase walls of a family $G_t$),
 **Map** (the phase diagram of a family $G_{t,u}$, one exact certificate per
-cell), **Attack** (counterexamples generated for the input), and **History** (what
-every commit of the backend answered). Each mode runs in Python and in an independent
+cell), **Attack** (counterexamples generated for the input), **History** (what
+every commit of the backend answered), and **Conjecture** (whether a candidate
+law survives every theorem and certified bound the calculator knows; recorded
+conjectures in [`conjectures/`](conjectures/) are rechecked by CI). Each mode runs in Python and in an independent
 exact JavaScript engine, and a regression test requires them to agree.
 
 The first command proves $\Delta(s)=\Theta(s^{4/3})$ for the tilted simplex in

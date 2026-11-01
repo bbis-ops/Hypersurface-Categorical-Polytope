@@ -1,0 +1,663 @@
+{
+  "schema": "gitcalculator.conjecture.v1",
+  "name": "quadratic-form-law",
+  "title": "Positivity on the orthant decides the quadratic form",
+  "statement": "On the square with $F = -(x_0^4 + x_1^4)$ and $G = t x_0^2 + u x_0 x_1 - x_1^2$, the response is $\\Theta(s^2)$ exactly when the form $t c_0^2 + u c_0 c_1 - c_1^2$ is positive somewhere on the open orthant, that is when $t \\gt 0$, or $u \\gt 0$ and $u^2 \\gt -4t$. Otherwise the response is zero. The certificate's sufficient tests decide only part of this window; certified bounds test the rest.",
+  "rule": "if(t > 0 or (u > 0 and u*u > -4*t), 2, none)",
+  "corpus": {
+    "kind": "family",
+    "system": "([[-1,0],[0,-1],[1,0],[0,1]], [0,0,1,1])",
+    "base": "-(x0**4+x1**4)",
+    "perturbation": "t*x0**2 + u*x0*x1 - x1**2",
+    "t": [
+      "-1",
+      "1"
+    ],
+    "u": [
+      "-1",
+      "1"
+    ],
+    "points": 6
+  },
+  "budget": "standard",
+  "status": "survives",
+  "counts": {
+    "refuted": 0,
+    "contradicted": 0,
+    "agrees": 27,
+    "consistent": 9,
+    "inconclusive": 0,
+    "untestable": 0,
+    "no claim": 0
+  },
+  "instances": [
+    {
+      "label": "t = -5/6, u = -5/6",
+      "params": {
+        "t": "-5/6",
+        "u": "-5/6"
+      },
+      "features": {
+        "t": "-5/6",
+        "u": "-5/6"
+      },
+      "prediction": "none",
+      "established": {
+        "gamma": "none",
+        "by": "Lemma 2"
+      },
+      "verdict": "agrees",
+      "detail": "proved by Lemma 2"
+    },
+    {
+      "label": "t = -1/2, u = -5/6",
+      "params": {
+        "t": "-1/2",
+        "u": "-5/6"
+      },
+      "features": {
+        "t": "-1/2",
+        "u": "-5/6"
+      },
+      "prediction": "none",
+      "established": {
+        "gamma": "none",
+        "by": "Lemma 2"
+      },
+      "verdict": "agrees",
+      "detail": "proved by Lemma 2"
+    },
+    {
+      "label": "t = -1/6, u = -5/6",
+      "params": {
+        "t": "-1/6",
+        "u": "-5/6"
+      },
+      "features": {
+        "t": "-1/6",
+        "u": "-5/6"
+      },
+      "prediction": "none",
+      "established": {
+        "gamma": "none",
+        "by": "Lemma 2"
+      },
+      "verdict": "agrees",
+      "detail": "proved by Lemma 2"
+    },
+    {
+      "label": "t = 1/6, u = -5/6",
+      "params": {
+        "t": "1/6",
+        "u": "-5/6"
+      },
+      "features": {
+        "t": "1/6",
+        "u": "-5/6"
+      },
+      "prediction": "2",
+      "established": {
+        "gamma": "2",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "t = 1/2, u = -5/6",
+      "params": {
+        "t": "1/2",
+        "u": "-5/6"
+      },
+      "features": {
+        "t": "1/2",
+        "u": "-5/6"
+      },
+      "prediction": "2",
+      "established": {
+        "gamma": "2",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "t = 5/6, u = -5/6",
+      "params": {
+        "t": "5/6",
+        "u": "-5/6"
+      },
+      "features": {
+        "t": "5/6",
+        "u": "-5/6"
+      },
+      "prediction": "2",
+      "established": {
+        "gamma": "2",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "t = -5/6, u = -1/2",
+      "params": {
+        "t": "-5/6",
+        "u": "-1/2"
+      },
+      "features": {
+        "t": "-5/6",
+        "u": "-1/2"
+      },
+      "prediction": "none",
+      "established": {
+        "gamma": "none",
+        "by": "Lemma 2"
+      },
+      "verdict": "agrees",
+      "detail": "proved by Lemma 2"
+    },
+    {
+      "label": "t = -1/2, u = -1/2",
+      "params": {
+        "t": "-1/2",
+        "u": "-1/2"
+      },
+      "features": {
+        "t": "-1/2",
+        "u": "-1/2"
+      },
+      "prediction": "none",
+      "established": {
+        "gamma": "none",
+        "by": "Lemma 2"
+      },
+      "verdict": "agrees",
+      "detail": "proved by Lemma 2"
+    },
+    {
+      "label": "t = -1/6, u = -1/2",
+      "params": {
+        "t": "-1/6",
+        "u": "-1/2"
+      },
+      "features": {
+        "t": "-1/6",
+        "u": "-1/2"
+      },
+      "prediction": "none",
+      "established": {
+        "gamma": "none",
+        "by": "Lemma 2"
+      },
+      "verdict": "agrees",
+      "detail": "proved by Lemma 2"
+    },
+    {
+      "label": "t = 1/6, u = -1/2",
+      "params": {
+        "t": "1/6",
+        "u": "-1/2"
+      },
+      "features": {
+        "t": "1/6",
+        "u": "-1/2"
+      },
+      "prediction": "2",
+      "established": {
+        "gamma": "2",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "t = 1/2, u = -1/2",
+      "params": {
+        "t": "1/2",
+        "u": "-1/2"
+      },
+      "features": {
+        "t": "1/2",
+        "u": "-1/2"
+      },
+      "prediction": "2",
+      "established": {
+        "gamma": "2",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "t = 5/6, u = -1/2",
+      "params": {
+        "t": "5/6",
+        "u": "-1/2"
+      },
+      "features": {
+        "t": "5/6",
+        "u": "-1/2"
+      },
+      "prediction": "2",
+      "established": {
+        "gamma": "2",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "t = -5/6, u = -1/6",
+      "params": {
+        "t": "-5/6",
+        "u": "-1/6"
+      },
+      "features": {
+        "t": "-5/6",
+        "u": "-1/6"
+      },
+      "prediction": "none",
+      "established": {
+        "gamma": "none",
+        "by": "Lemma 2"
+      },
+      "verdict": "agrees",
+      "detail": "proved by Lemma 2"
+    },
+    {
+      "label": "t = -1/2, u = -1/6",
+      "params": {
+        "t": "-1/2",
+        "u": "-1/6"
+      },
+      "features": {
+        "t": "-1/2",
+        "u": "-1/6"
+      },
+      "prediction": "none",
+      "established": {
+        "gamma": "none",
+        "by": "Lemma 2"
+      },
+      "verdict": "agrees",
+      "detail": "proved by Lemma 2"
+    },
+    {
+      "label": "t = -1/6, u = -1/6",
+      "params": {
+        "t": "-1/6",
+        "u": "-1/6"
+      },
+      "features": {
+        "t": "-1/6",
+        "u": "-1/6"
+      },
+      "prediction": "none",
+      "established": {
+        "gamma": "none",
+        "by": "Lemma 2"
+      },
+      "verdict": "agrees",
+      "detail": "proved by Lemma 2"
+    },
+    {
+      "label": "t = 1/6, u = -1/6",
+      "params": {
+        "t": "1/6",
+        "u": "-1/6"
+      },
+      "features": {
+        "t": "1/6",
+        "u": "-1/6"
+      },
+      "prediction": "2",
+      "established": {
+        "gamma": "2",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "t = 1/2, u = -1/6",
+      "params": {
+        "t": "1/2",
+        "u": "-1/6"
+      },
+      "features": {
+        "t": "1/2",
+        "u": "-1/6"
+      },
+      "prediction": "2",
+      "established": {
+        "gamma": "2",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "t = 5/6, u = -1/6",
+      "params": {
+        "t": "5/6",
+        "u": "-1/6"
+      },
+      "features": {
+        "t": "5/6",
+        "u": "-1/6"
+      },
+      "prediction": "2",
+      "established": {
+        "gamma": "2",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "t = -5/6, u = 1/6",
+      "params": {
+        "t": "-5/6",
+        "u": "1/6"
+      },
+      "features": {
+        "t": "-5/6",
+        "u": "1/6"
+      },
+      "prediction": "none",
+      "established": null,
+      "verdict": "consistent",
+      "detail": "no certified positive response at any tested scale"
+    },
+    {
+      "label": "t = -1/2, u = 1/6",
+      "params": {
+        "t": "-1/2",
+        "u": "1/6"
+      },
+      "features": {
+        "t": "-1/2",
+        "u": "1/6"
+      },
+      "prediction": "none",
+      "established": null,
+      "verdict": "consistent",
+      "detail": "no certified positive response at any tested scale"
+    },
+    {
+      "label": "t = -1/6, u = 1/6",
+      "params": {
+        "t": "-1/6",
+        "u": "1/6"
+      },
+      "features": {
+        "t": "-1/6",
+        "u": "1/6"
+      },
+      "prediction": "none",
+      "established": null,
+      "verdict": "consistent",
+      "detail": "no certified positive response at any tested scale"
+    },
+    {
+      "label": "t = 1/6, u = 1/6",
+      "params": {
+        "t": "1/6",
+        "u": "1/6"
+      },
+      "features": {
+        "t": "1/6",
+        "u": "1/6"
+      },
+      "prediction": "2",
+      "established": {
+        "gamma": "2",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "t = 1/2, u = 1/6",
+      "params": {
+        "t": "1/2",
+        "u": "1/6"
+      },
+      "features": {
+        "t": "1/2",
+        "u": "1/6"
+      },
+      "prediction": "2",
+      "established": {
+        "gamma": "2",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "t = 5/6, u = 1/6",
+      "params": {
+        "t": "5/6",
+        "u": "1/6"
+      },
+      "features": {
+        "t": "5/6",
+        "u": "1/6"
+      },
+      "prediction": "2",
+      "established": {
+        "gamma": "2",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "t = -5/6, u = 1/2",
+      "params": {
+        "t": "-5/6",
+        "u": "1/2"
+      },
+      "features": {
+        "t": "-5/6",
+        "u": "1/2"
+      },
+      "prediction": "none",
+      "established": null,
+      "verdict": "consistent",
+      "detail": "no certified positive response at any tested scale"
+    },
+    {
+      "label": "t = -1/2, u = 1/2",
+      "params": {
+        "t": "-1/2",
+        "u": "1/2"
+      },
+      "features": {
+        "t": "-1/2",
+        "u": "1/2"
+      },
+      "prediction": "none",
+      "established": null,
+      "verdict": "consistent",
+      "detail": "no certified positive response at any tested scale"
+    },
+    {
+      "label": "t = -1/6, u = 1/2",
+      "params": {
+        "t": "-1/6",
+        "u": "1/2"
+      },
+      "features": {
+        "t": "-1/6",
+        "u": "1/2"
+      },
+      "prediction": "none",
+      "established": null,
+      "verdict": "consistent",
+      "detail": "no certified positive response at any tested scale"
+    },
+    {
+      "label": "t = 1/6, u = 1/2",
+      "params": {
+        "t": "1/6",
+        "u": "1/2"
+      },
+      "features": {
+        "t": "1/6",
+        "u": "1/2"
+      },
+      "prediction": "2",
+      "established": {
+        "gamma": "2",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "t = 1/2, u = 1/2",
+      "params": {
+        "t": "1/2",
+        "u": "1/2"
+      },
+      "features": {
+        "t": "1/2",
+        "u": "1/2"
+      },
+      "prediction": "2",
+      "established": {
+        "gamma": "2",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "t = 5/6, u = 1/2",
+      "params": {
+        "t": "5/6",
+        "u": "1/2"
+      },
+      "features": {
+        "t": "5/6",
+        "u": "1/2"
+      },
+      "prediction": "2",
+      "established": {
+        "gamma": "2",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "t = -5/6, u = 5/6",
+      "params": {
+        "t": "-5/6",
+        "u": "5/6"
+      },
+      "features": {
+        "t": "-5/6",
+        "u": "5/6"
+      },
+      "prediction": "none",
+      "established": null,
+      "verdict": "consistent",
+      "detail": "no certified positive response at any tested scale"
+    },
+    {
+      "label": "t = -1/2, u = 5/6",
+      "params": {
+        "t": "-1/2",
+        "u": "5/6"
+      },
+      "features": {
+        "t": "-1/2",
+        "u": "5/6"
+      },
+      "prediction": "none",
+      "established": null,
+      "verdict": "consistent",
+      "detail": "no certified positive response at any tested scale"
+    },
+    {
+      "label": "t = -1/6, u = 5/6",
+      "params": {
+        "t": "-1/6",
+        "u": "5/6"
+      },
+      "features": {
+        "t": "-1/6",
+        "u": "5/6"
+      },
+      "prediction": "2",
+      "established": null,
+      "measured": "2.0",
+      "verdict": "consistent",
+      "detail": "local slopes approach 2.000 (prediction 2.000)"
+    },
+    {
+      "label": "t = 1/6, u = 5/6",
+      "params": {
+        "t": "1/6",
+        "u": "5/6"
+      },
+      "features": {
+        "t": "1/6",
+        "u": "5/6"
+      },
+      "prediction": "2",
+      "established": {
+        "gamma": "2",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "t = 1/2, u = 5/6",
+      "params": {
+        "t": "1/2",
+        "u": "5/6"
+      },
+      "features": {
+        "t": "1/2",
+        "u": "5/6"
+      },
+      "prediction": "2",
+      "established": {
+        "gamma": "2",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "t = 5/6, u = 5/6",
+      "params": {
+        "t": "5/6",
+        "u": "5/6"
+      },
+      "features": {
+        "t": "5/6",
+        "u": "5/6"
+      },
+      "prediction": "2",
+      "established": {
+        "gamma": "2",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    }
+  ],
+  "recorded_with": {
+    "commit": "1a822fc6e8b645c98fee9a0f27315bc62ea01af5",
+    "short": "1a822fc",
+    "code_id": "code-23ad9e729a48",
+    "calculator_id": "calc-e464d311b8f7"
+  }
+}

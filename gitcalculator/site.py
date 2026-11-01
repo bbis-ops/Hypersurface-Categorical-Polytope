@@ -126,6 +126,11 @@ def build(out: Path, *, pyodide: Path | None = None, fragment: bool = False, liv
     ledger = {"schema": LEDGER_SCHEMA, "head": bundle["head"], "linkable": linkable,
               "remote_commits": remote_commits, "live_engine": live, "presets": {},
               "counterarguments": counter_catalogue(), "witnesses": check_witnesses(backend().handle)}
+    from .conjecture import FEATURES, recorded, sheet as conjecture_sheet
+    from .sheet import github_repository, pages_url
+    calculator = pages_url(github_repository(bundle["head"].get("remote")))
+    ledger["conjectures"] = [dict(r, sheet=conjecture_sheet(r, calculator=calculator)) for r in recorded()]
+    ledger["conjecture_features"] = FEATURES
     for name, preset in PRESETS.items():
         receipt = calculate(preset_request(name))
         ledger["presets"][name] = {"title": preset["title"], "note": preset["note"], "request": preset["request"],

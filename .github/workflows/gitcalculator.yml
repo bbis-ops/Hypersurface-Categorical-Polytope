@@ -25,6 +25,8 @@ jobs:
         run: python -m gitcalculator counter
       - name: Recorded calculations have not drifted
         run: python -m gitcalculator tape verify
+      - name: Recorded conjectures still stand where they stood
+        run: python -m gitcalculator conjecture verify
 
   pages-enabled:
     # Finds where GitHub Pages publishes this repository, when Pages is switched

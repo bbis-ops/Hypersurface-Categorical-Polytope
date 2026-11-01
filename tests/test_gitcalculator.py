@@ -549,3 +549,62 @@ def test_browser_phase_map_matches_python_cell_for_cell():
         cells = [[o["verdict"], o["gamma"], o["winners"]] for o in (python["outcomes"][k] for k in python["grid"])]
         assert js["cells"] == cells, name
         assert js["laws"] == {law["monomial"]: law["terms"] for law in python["laws"]}, name
+
+
+# --- conjectures -------------------------------------------------------------------------
+
+def test_conjecture_rules_are_a_small_safe_language():
+    from gitcalculator.conjecture import NONE, UNKNOWN, RuleError, evaluate, parse_rule
+    features = {"face_gamma": Fraction(6), "curved_gamma": Fraction(3), "t": Fraction(-1, 2), "u": Fraction(1, 4), "isolated": True}
+    run = lambda rule: evaluate(parse_rule(rule), features)
+    assert run("min(face_gamma, curved_gamma)") == 3 and run("1/(1 - 1/4)") == Fraction(4, 3)
+    assert run("if(t < 0 and u*u <= -4*t, none, face_gamma)") is NONE
+    assert run("min(none, 2)") == 2 and run("max(none, 2)") is NONE  # zero response is an infinite exponent
+    assert run("min(ambient_gamma, face_gamma)") == 6 and run("ambient_gamma + 1") is UNKNOWN
+    assert run("if(known(ambient_gamma), 2, 3)") == 3 and run("2^-1") == Fraction(1, 2)
+    for bad in ["import os", "__class__", "face_gamma.real", "min()", "if(1, 2)", "open('x')", "x" * 3000]:
+        with pytest.raises(RuleError):
+            parse_rule(bad)
+
+
+def test_conjectures_meet_theorems_and_certified_witnesses():
+    from gitcalculator import conjecture as C
+    names = ["tilted-simplex", "signed-sharp", "tied-maximizers", "critical-layer"]
+    fastest = C.run({"rule": "min(face_gamma, curved_gamma)"}, {"kind": "presets", "names": names}, "quick")
+    verdicts = {i["label"]: i["verdict"] for i in fastest["instances"]}
+    assert verdicts == {"tilted-simplex": "agrees", "signed-sharp": "agrees", "tied-maximizers": "contradicted",
+                        "critical-layer": "no claim"}
+    assert fastest["status"] == "contradicted"
+    ambient = C.run({"rule": "ambient_gamma"}, {"kind": "presets", "names": names[:2]}, "quick")
+    assert ambient["status"] == "refuted" and "proves γ = 4/3" in ambient["instances"][0]["detail"]
+    # every witness is re-checked here from the input alone, in exact arithmetic
+    item = next(i for i in fastest["instances"] if i["verdict"] == "contradicted")
+    from gitcalculator.certify import certify
+    _, model = certify(item["input"], {})
+    x = [Fraction(v) for v in item["witness"]["x"]]
+    assert all(sum(a * xi for a, xi in zip(row, x)) <= b for row, b in zip(model.rows, model.rhs))
+    s = X.to_fraction(item["witness"]["s"])
+    gain = (X.evaluate_exact(model.base_tree, x) - model.base_at_vertex
+            + s * (X.evaluate_exact(model.perturbation_tree, x) - model.perturbation_at_vertex))
+    assert gain >= X.to_fraction(item["witness"]["lower_bound"]) > 0
+
+
+def test_recorded_conjectures_hold_and_their_sheets_render_on_github():
+    from gitcalculator import conjecture as C
+    if not any(C.FOLDER.glob("*.json")):
+        pytest.skip("no recorded conjectures")
+    assert {row["name"]: row["changed"] for row in C.verify() if not row["unchanged"]} == {}
+    check = _ghmath().check_text
+    for stored in C.recorded():
+        markdown = C.sheet(stored, calculator="https://o.github.io/r/")
+        assert check(markdown) == [], stored["name"]
+        assert markdown.startswith(f"### Conjecture: {stored['title']} · {C.STATUS_TEXT[stored['status']]}")
+
+
+def test_command_line_tests_a_conjecture():
+    out = io.StringIO()
+    with redirect_stdout(out):
+        assert main(["conjecture", "test", "--rule", "if(isolated, min(face_gamma, curved_gamma), unknown)", "--budget", "quick"]) == 0
+    assert "SURVIVES EVERY TEST" in out.getvalue()
+    with pytest.raises(SystemExit):
+        main(["conjecture", "test", "--rule", "__import__('os')"])

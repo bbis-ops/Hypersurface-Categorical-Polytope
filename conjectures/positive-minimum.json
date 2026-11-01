@@ -1,0 +1,240 @@
+{
+  "schema": "gitcalculator.conjecture.v1",
+  "name": "positive-minimum",
+  "title": "Least positive monomial",
+  "statement": "The positive monomial of $R$ with the least weighted degree sets the response: $\\gamma = 1/(1-q_+)$, where $q_+$ is the least weighted degree among the monomials of $R$ with a positive coefficient. Signed terms and curved channels play no part.",
+  "rule": "1/(1 - min_positive_q)",
+  "corpus": {
+    "kind": "presets"
+  },
+  "budget": "standard",
+  "status": "refuted",
+  "counts": {
+    "refuted": 3,
+    "contradicted": 1,
+    "agrees": 5,
+    "consistent": 1,
+    "inconclusive": 1,
+    "untestable": 0,
+    "no claim": 2
+  },
+  "instances": [
+    {
+      "label": "tilted-simplex",
+      "params": {},
+      "features": {
+        "min_positive_q": "1/4"
+      },
+      "prediction": "4/3",
+      "established": {
+        "gamma": "4/3",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "sheared-simplex",
+      "params": {},
+      "features": {
+        "min_positive_q": "1/4"
+      },
+      "prediction": "4/3",
+      "established": {
+        "gamma": "4/3",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "signed-channel",
+      "params": {},
+      "features": {
+        "min_positive_q": "1/2"
+      },
+      "prediction": "2",
+      "established": {
+        "gamma": "3",
+        "by": "V.22"
+      },
+      "verdict": "refuted",
+      "input": {
+        "system": "([[-1,0],[0,-1],[1,0],[0,1]], [0,0,1,1])",
+        "base": "-(x0**6+x1**6)",
+        "perturbation": "-x0**2+x0*x1**2",
+        "request_id": "signed-channel"
+      },
+      "detail": "V.22 proves γ = 3"
+    },
+    {
+      "label": "signed-sharp",
+      "params": {},
+      "features": {
+        "min_positive_q": "1/2"
+      },
+      "prediction": "2",
+      "established": {
+        "gamma": "3",
+        "by": "V.22"
+      },
+      "verdict": "refuted",
+      "input": {
+        "system": "([[-1,0],[0,-1],[1,0],[0,1]], [0,0,1,1])",
+        "base": "-(x0**6+x1**6)",
+        "perturbation": "-x0**2+x0*x1**2+x1**5",
+        "request_id": "signed-sharp"
+      },
+      "detail": "V.22 proves γ = 3"
+    },
+    {
+      "label": "curved-cancellation",
+      "params": {},
+      "features": {
+        "min_positive_q": "1/2"
+      },
+      "prediction": "2",
+      "established": {
+        "gamma": "6",
+        "by": "V.22"
+      },
+      "verdict": "refuted",
+      "input": {
+        "system": "([[-1,0],[0,-1],[1,0],[0,1]], [0,0,1,1])",
+        "base": "-(x0**6+x1**6)",
+        "perturbation": "-x0**2+x0*x1**2-x1**4/4+x1**5",
+        "request_id": "curved-cancellation"
+      },
+      "detail": "V.22 proves γ = 6"
+    },
+    {
+      "label": "interior-zero",
+      "params": {},
+      "features": {
+        "min_positive_q": "1/2"
+      },
+      "prediction": "2",
+      "established": null,
+      "measured": "4.005",
+      "verdict": "inconclusive",
+      "detail": "lower bounds decay like s^4.01; a lower bound below the predicted order may only mean the search missed the optimum"
+    },
+    {
+      "label": "active-set",
+      "params": {},
+      "features": {
+        "min_positive_q": "1/4"
+      },
+      "prediction": "4/3",
+      "established": {
+        "gamma": "4/3",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "tied-faces",
+      "params": {},
+      "features": {
+        "min_positive_q": "1/4"
+      },
+      "prediction": "4/3",
+      "established": {
+        "gamma": "4/3",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "cross-term",
+      "params": {},
+      "features": {
+        "min_positive_q": "1/2"
+      },
+      "prediction": "2",
+      "established": null,
+      "measured": "2.0",
+      "verdict": "consistent",
+      "detail": "local slopes approach 2.000 (prediction 2.000)"
+    },
+    {
+      "label": "tied-maximizers",
+      "params": {},
+      "features": {
+        "min_positive_q": "1/2"
+      },
+      "prediction": "2",
+      "established": null,
+      "measured": "1.0",
+      "verdict": "contradicted",
+      "detail": "certified lower bounds grow like s^1, faster than s^2: L(s)/s^γ rises by a factor of 10^1.5 as s decreases",
+      "input": {
+        "system": "([[-1,0],[0,-1],[1,0],[0,1]], [0,0,1,1])",
+        "base": "-((x0*(1-x0))**2 + x1**2)",
+        "perturbation": "x0",
+        "request_id": "tied-maximizers"
+      },
+      "witness": {
+        "s": "1.00000e-3",
+        "lower_bound": "1.00000000000e-3",
+        "c": [
+          "1.00000000000e+0",
+          "0"
+        ],
+        "x": [
+          "1",
+          "0"
+        ],
+        "axes": [
+          "c0",
+          "c1"
+        ]
+      }
+    },
+    {
+      "label": "critical-layer",
+      "params": {},
+      "features": {
+        "min_positive_q": "1"
+      },
+      "prediction": null,
+      "established": {
+        "gamma": "none",
+        "by": "Lemma 2"
+      },
+      "verdict": "no claim",
+      "detail": "the rule makes no prediction here"
+    },
+    {
+      "label": "pyramid-apex",
+      "params": {},
+      "features": {},
+      "prediction": null,
+      "established": null,
+      "verdict": "no claim",
+      "detail": "the rule makes no prediction here"
+    },
+    {
+      "label": "cube-3d",
+      "params": {},
+      "features": {
+        "min_positive_q": "1/6"
+      },
+      "prediction": "6/5",
+      "established": {
+        "gamma": "6/5",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    }
+  ],
+  "recorded_with": {
+    "commit": "1a822fc6e8b645c98fee9a0f27315bc62ea01af5",
+    "short": "1a822fc",
+    "code_id": "code-23ad9e729a48",
+    "calculator_id": "calc-e464d311b8f7"
+  }
+}

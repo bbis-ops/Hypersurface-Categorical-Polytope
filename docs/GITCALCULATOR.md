@@ -3,7 +3,7 @@
 **The face-selection law as a calculator** · computed by the backend, certified
 against the theorem, attacked by the counter-arguments, pinned to git.
 
-[**Quick start →**](#quick-start) · [Six modes](#six-questions-one-law) · [Reading a receipt](#reading-a-receipt) · [The exact certificate](#the-exact-certificate) · [Certified measurement](#certified-measurement) · [Counter-arguments](#counter-arguments) · [Design, Sweep, Map, Attack](#design-sweep-map-and-attack) · [History](#history-answers-have-commits) · [The tape](#the-tape) · [Web calculator](#the-web-calculator) · [Scope](#scope-and-limits)
+[**Quick start →**](#quick-start) · [Seven modes](#seven-questions-one-law) · [Reading a receipt](#reading-a-receipt) · [The exact certificate](#the-exact-certificate) · [Certified measurement](#certified-measurement) · [Counter-arguments](#counter-arguments) · [Design, Sweep, Map, Attack](#design-sweep-map-and-attack) · [History](#history-answers-have-commits) · [Conjectures](#conjectures) · [The tape](#the-tape) · [Web calculator](#the-web-calculator) · [Scope](#scope-and-limits)
 
 | 01 · Theorem | 02 · Backend | 03 · Counter-arguments | 04 · Git |
 | :--- | :--- | :--- | :--- |
@@ -33,10 +33,10 @@ together with the evidence for each step:
    id. The same input can be replayed against every code state in the
    repository's history.
 
-## Six questions, one law
+## Seven questions, one law
 
 Because the law maps geometry to an exponent exactly, the calculator runs it in
-six directions.
+seven directions.
 
 | Mode | The question it answers | Command |
 | :--- | :--- | :--- |
@@ -46,6 +46,7 @@ six directions.
 | **Map** | Which chambers does a two-parameter family $G_{t,u}$ fall into, and where are the walls? | `map` |
 | **Attack** | Which nearby inputs break this answer? | `attack` |
 | **History** | What did every version of the code answer, and was it right? | `history` |
+| **Conjecture** | Does a candidate law survive everything the calculator can certify? | `conjecture` |
 
 Every mode runs in two independent implementations: the Python package, and an
 exact JavaScript engine that runs in the browser. A regression test checks that
@@ -107,6 +108,7 @@ python -m gitcalculator calc --system "([[-1,0],[0,-1],[1,1]], [0,0,1])" --base 
 | `presets` | The thirteen canonical calculations |
 | `counter` | Every counter-argument with its claim, refutation and executable witness; exits nonzero if a witness fails |
 | `history` | Replays one input across every code state in git |
+| `conjecture test` / `record` / `verify` | Tests a candidate law on the presets or a family, records it in [`conjectures/`](../conjectures/), and rechecks every recorded verdict |
 | `tape record` / `tape verify` | Records calculations in [`calculations/`](../calculations/) and checks them for drift |
 | `site --out DIR` | Builds the static web calculator |
 | `visit URL` | Loads a published calculator the way a browser does and checks every file against git |
@@ -399,6 +401,98 @@ the [mathematical audit](MATHEMATICAL_AUDIT.md) describes:
 The replay runs each state's own code in this process, with its copy of
 `categorical_polytope` swapped into `sys.modules`. Snapshots are extracted
 with `git archive` into the ignored `tmp/gitcalculator/` directory.
+
+## Conjectures
+
+The step from "this instrument works" to "here is a new law of comparable
+strength" is still human mathematical work. The calculator does not take that
+step. It makes the work around it rigorous and shareable once someone has an
+insight: it states the candidate law precisely, tests it against everything
+the calculator can certify, and publishes the evidence so that anyone can
+recheck it.
+
+A conjecture is a **rule** that predicts $\gamma$ from certified features of an
+input, written in a small language that is parsed and never executed as code:
+
+```bash
+python -m gitcalculator conjecture test --rule "min(face_gamma, curved_gamma)"
+```
+
+| Feature | Meaning |
+| :--- | :--- |
+| `theorem_gamma` | $\gamma$ where an established theorem decides it: the face law, V.22, or `none` for proved zero response |
+| `face_gamma`, `face_q` | $\gamma$ and $q^\ast$ from the exact face data, licensed or not |
+| `curved_gamma` | $\gamma$ of the V.22 curved reduction, where it is licensed |
+| `ambient_gamma` | $\gamma$ read along the ambient axes instead of the edge chart |
+| `min_positive_q` | the least weighted degree among the monomials of $R$ with a positive coefficient |
+| `beta_min`, `beta_max`, `n` | the loss orders along the edges, and the dimension |
+| `isolated`, `principal`, `licensed` | Hypothesis 0, Hypothesis 2, and the theorem's license, each checked exactly |
+| `t`, `u` | the parameters of a family |
+
+The language has `min`, `max`, `abs`, `if(condition, then, else)` and
+`known(x)`. It has the constants `none` (zero response, an infinite exponent)
+and `unknown` (no claim). Its operators are `+ - * / ^`, comparisons, and
+`and`, `or`, `not`. A feature the calculator cannot compute is unknown, and `min`
+and `max` skip unknown values. `python -m gitcalculator conjecture features`
+prints the list.
+
+A rule is tested on a **corpus**: the thirteen presets by default, or a family
+$G_t$ or $G_{t,u}$ on a grid of rational points (`--system`, `--base`,
+`--perturbation`, `--t-from` … `--u-to`, `--points`). Each input gets one
+verdict:
+
+| Verdict | What it rests on |
+| :--- | :--- |
+| `agrees` | An established theorem decides the input and gives the same answer |
+| `refuted` | An established theorem decides the input and gives a different answer. This is decisive |
+| `consistent` | No theorem decides it; certified lower bounds follow the predicted order |
+| `contradicted` | No theorem decides it; certified lower bounds outgrow the predicted order. It comes with a witness point of $P$ that anyone can check in exact arithmetic. This is finite-scale evidence, not an asymptotic proof |
+| `inconclusive`, `untestable`, `no claim` | The bounds have not separated; no certified evidence exists (a non-simple vertex, for instance); or the rule abstains |
+
+A conjecture that survives is not proved. It has met every theorem the
+calculator knows on its corpus, and no certified bound has contradicted it.
+
+### How a law gets sharpened
+
+The five recorded conjectures in [`conjectures/`](../conjectures/) trace one
+line of thought on the presets.
+
+| Conjecture | Rule | Outcome |
+| :--- | :--- | :--- |
+| Ambient axes | `ambient_gamma` | Refuted by theorems: the face law proves $4/3$ on the tilted simplex, and V.22 proves $3$ on signed-sharp |
+| Least positive monomial | `1/(1 - min_positive_q)` | Refuted three times by the V.22 theorem: signed terms and curved channels matter |
+| The fastest channel wins | `min(face_gamma, curved_gamma)` | Agrees with all eight theorems that decide an input. Contradicted at `tied-maximizers`, whose rival maximizer gives $\Delta(s) \ge 10^{-3}$ at $s = 10^{-3}$, witnessed by the point $(1, 0)$ |
+| The fastest channel wins at an isolated maximizer | `if(isolated, min(face_gamma, curved_gamma), unknown)` | Survives every test |
+| Positivity on the orthant decides the quadratic form | `if(t > 0 or (u > 0 and u*u > -4*t), 2, none)` | Survives on a $6 \times 6$ grid of the quadratic-form family. 27 inputs agree with theorems, and 9 that the certificate cannot decide are consistent with certified bounds |
+
+The last law reaches past the certificate. The certificate's sufficient tests
+refuse the cells where the form $t c_0^2 + u c_0 c_1 - c_1^2$ is negative on the
+orthant with $u \gt 0$. The conjecture predicts zero response there, and no
+certified bound finds any response.
+
+### Recording and sharing
+
+```bash
+python -m gitcalculator conjecture record my-law --rule "..." --title "..." --statement "..."
+python -m gitcalculator conjecture verify
+```
+
+`record` writes `conjectures/NAME.json`: the rule, the corpus, every verdict
+and every witness. Run with only the name, it re-records an existing
+conjecture from its own definition. `verify` recomputes every recorded
+conjecture, and the workflow runs it on every push, so a change to the code
+that would flip a recorded verdict cannot pass silently. `--markdown` prints a
+conjecture sheet: the statement, the rule, the corpus, the verdicts, every
+refutation with its witness, and the command that reproduces it, in GitHub
+Markdown.
+
+The **Conjecture** tab on the web page shows the recorded conjectures at once.
+It tests a new one with the repository's own Python, running in the page, one
+input at a time. From there a conjecture can be copied as a sheet, opened as a
+GitHub issue, or proposed for `conjectures/`. A proposal is byte for byte what
+`conjecture record` writes, so CI rechecks it exactly. A shared link carries
+the rule and the corpus, and runs nothing until the reader presses *Test the
+conjecture*.
 
 ## The tape
 

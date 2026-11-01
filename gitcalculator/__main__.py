@@ -69,6 +69,24 @@ def main(argv: list[str] | None = None) -> int:
     phase.add_argument("--resolution", type=int, default=24, help="cells along each axis (at most 128)")
     phase.add_argument("--json", action="store_true")
 
+    conj = sub.add_parser("conjecture", help="test a candidate law against everything the calculator can certify")
+    conj.add_argument("action", choices=("test", "record", "verify", "features"))
+    conj.add_argument("name", nargs="?", help="record: the file name in conjectures/ (lowercase letters, digits, dashes)")
+    conj.add_argument("--rule", help="the prediction, such as 'min(face_gamma, curved_gamma)'; see 'conjecture features'")
+    conj.add_argument("--title", help="a short name for the law")
+    conj.add_argument("--statement", help="the law in words (Markdown, with $math$)")
+    conj.add_argument("--system", help="test on a family instead of the presets: the polyhedron")
+    conj.add_argument("--base", help="the base objective F")
+    conj.add_argument("--perturbation", help="the family G, written with t, or t and u")
+    conj.add_argument("--t-from", default="-1")
+    conj.add_argument("--t-to", default="1")
+    conj.add_argument("--u-from", default="-1")
+    conj.add_argument("--u-to", default="1")
+    conj.add_argument("--points", type=int, default=5, help="rational points per parameter (at most 15)")
+    conj.add_argument("--budget", choices=("quick", "standard"), default="standard")
+    conj.add_argument("--markdown", action="store_true", help="print the conjecture sheet in GitHub Markdown")
+    conj.add_argument("--json", action="store_true")
+
     attack = sub.add_parser("attack", help="generate counterexamples to one answer")
     _inputs(attack)
 
@@ -107,7 +125,7 @@ def main(argv: list[str] | None = None) -> int:
     # An expression such as -(x0**4+x1**4) starts like an option; bind it to its flag.
     raw = list(sys.argv[1:] if argv is None else argv)
     valued = {"--system", "--base", "--perturbation", "--target", "--from", "--to", "--observed",
-              "--t-from", "--t-to", "--u-from", "--u-to"}
+              "--t-from", "--t-to", "--u-from", "--u-to", "--rule"}
     bound: list[str] = []
     while raw:
         token = raw.pop(0)
@@ -148,6 +166,57 @@ def main(argv: list[str] | None = None) -> int:
             else:
                 print(f"\ntarget γ = {target['gamma']} is not reachable by any qualified face or V.22 channel here; "
                       f"nearest: {target['nearest_below']} below, {target['nearest_above']} above")
+        return 0
+
+    if args.command == "conjecture":
+        from . import conjecture as C
+        if args.action == "features":
+            print("Features a rule can use (unknown where the calculator cannot compute one):")
+            for name, meaning in C.FEATURES.items():
+                print(f"  {name:<15} {meaning}")
+            print("\nFunctions: min, max (skip unknown values), abs, if(condition, then, else), known(x).")
+            print("Constants: none (zero response, an infinite exponent), unknown (no claim), true, false.")
+            print("Operators: + - * / ^ (integer powers), < <= > >= == !=, and, or, not.")
+            return 0
+        if args.action == "verify":
+            report = C.verify()
+            for row in report:
+                print(f"{'same ' if row['unchanged'] else 'DRIFT'}  {row['name']:<28} {C.STATUS_TEXT[row['status']]}")
+                for line in row["changed"]:
+                    print(f"         {line}")
+            print(f"{sum(r['unchanged'] for r in report)}/{len(report)} recorded conjectures unchanged")
+            return 0 if all(r["unchanged"] for r in report) else 1
+        stored_path = C.FOLDER / f"{args.name}.json" if args.name else None
+        if args.action == "record" and not args.rule and stored_path and stored_path.is_file():
+            stored = json.loads(stored_path.read_text(encoding="utf-8"))  # re-record from its own definition
+            path = C.record_conjecture(stored, stored["corpus"], stored["budget"])
+            print(f"recorded {path.relative_to(C.ROOT)}: {C.STATUS_TEXT[json.loads(path.read_text(encoding='utf-8'))['status']]}")
+            return 0
+        if not args.rule:
+            raise SystemExit("give the law as --rule, for example --rule 'min(face_gamma, curved_gamma)'")
+        family = {k: getattr(args, k) for k in ("system", "base", "perturbation")}
+        if any(family.values()) and not all(family.values()):
+            raise SystemExit("a family needs all of --system --base --perturbation")
+        corpus = ({"kind": "family", **family, "t": [args.t_from, args.t_to], "u": [args.u_from, args.u_to], "points": args.points}
+                  if all(family.values()) else {"kind": "presets"})
+        meta = {"name": args.name, "title": args.title or args.name, "statement": args.statement or "", "rule": args.rule}
+        try:
+            if args.action == "record":
+                path = C.record_conjecture(meta, corpus, args.budget)
+                stored = json.loads(path.read_text(encoding="utf-8"))
+                print(f"recorded {path.relative_to(C.ROOT)}: {C.STATUS_TEXT[stored['status']]}")
+                return 0
+            result = C.run(meta, corpus, args.budget)
+        except C.RuleError as error:
+            raise SystemExit(f"conjecture: {error}")
+        if args.json:
+            print(json.dumps(result, indent=2, ensure_ascii=False))
+        elif args.markdown:
+            from .provenance import git_state
+            from .sheet import github_repository, pages_url
+            print(C.sheet(result, calculator=pages_url(github_repository(git_state().get("remote")))), end="")
+        else:
+            print(C.render_text(result))
         return 0
 
     if args.command == "map":

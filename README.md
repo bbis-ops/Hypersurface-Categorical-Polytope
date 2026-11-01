@@ -311,7 +311,7 @@ schema versions identify different things.
 The [gitcalculator](docs/GITCALCULATOR.md) turns the theorem, the backend, and
 the counter-arguments into one instrument. Each calculation is computed by the
 public backend and certified against the theorem's hypotheses in exact rational
-arithmetic. It is then tested against thirteen counter-arguments drawn from the
+arithmetic. It is then tested against fourteen counter-arguments drawn from the
 [mathematical audit](docs/MATHEMATICAL_AUDIT.md) and the revision records, and
 against certified lower bounds on $\Delta(s)$. Finally it is pinned to the git
 blob id of every file that produced it.

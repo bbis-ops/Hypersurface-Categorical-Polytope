@@ -6,7 +6,7 @@
     "base": "-(x0**4+x1**4)",
     "perturbation": "x0+x1"
   },
-  "receipt_id": "gc-5a9fbb2c1536de9d",
+  "receipt_id": "gc-6c3e5fe931181a3a",
   "answer": {
     "verdict": "proved",
     "headline": "Δ(s) = Θ(s^4/3)",
@@ -63,12 +63,13 @@
       "active-set": "clear",
       "critical-layer": "clear",
       "inverse-tolerance": "clear",
-      "non-simple": "clear"
+      "non-simple": "clear",
+      "loss-absorption": "clear"
     }
   },
   "recorded_with": {
-    "commit": "b6e4350d854e5eb017691f2651f37b46fbf3a864",
+    "commit": "c2f1e7db9c833a08e2e615488743604567dfa17f",
     "code_id": "code-23ad9e729a48",
-    "calculator_id": "calc-d0fa59fc8cee"
+    "calculator_id": "calc-47973d185bc6"
   }
 }

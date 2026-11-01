@@ -345,6 +345,7 @@
     faces: ["§5 Faces and admissibility", `${THEOREM}#5-faces-and-admissibility-defined-from-the-data-alone`, "Restrict the combined R to each face; qualify its first nonzero layer if 0 < q_S < 1 and it is positive in the relative interior."],
     H5: ["Hypothesis 5 · positive-gain envelope", `${THEOREM}#6-upper-control-on-unqualified-faces`, "R₊ ≤ K·D₀^q* near zero (with q* = 1 and Lemma 2 when no face qualifies)."],
     selection: ["§8 Selection, qualified", `${THEOREM}#8-selection-qualified`, "Under Hypotheses 0–5, Δ(s) = Θ(s^γ) with γ = 1/(1 − q*)."],
+    absorption: ["Lemma A · absorption by the loss", "docs/FORMAL_LOSS_ABSORPTION.md#statement", "If every coefficient of D is nonnegative and each positive monomial of R is divisible by a positive monomial of D, then s·R ≤ D near zero for small s; with Hypothesis 0, Δ(s) = 0."],
   };
   const ORDER = Object.keys(LINKS);
   function link(id, status, method, detail, values) {
@@ -510,6 +511,27 @@
     return { table, qStar };
   }
 
+  // Lemma A, as certify._absorption: can a nonnegative loss absorb every positive term of the gain?
+  const cmpExps = (a, b) => { for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return a[i] - b[i]; return 0; };
+  function absorption(model, gain) {
+    const loss = [...model.loss].map(([k, c]) => [exps(k), c]);
+    if (!loss.length || loss.some(([, c]) => c.sign() < 0)) return { ok: false };
+    const divisors = loss.filter(([, d]) => d.sign() > 0).sort((a, b) => cmpExps(a[0], b[0]));
+    const positives = [...gain].map(([k, c]) => [exps(k), c]).filter(([, r]) => r.sign() > 0).sort((a, b) => cmpExps(a[0], b[0]));
+    const demand = new Map(), pairs = [];
+    for (const [alpha, r] of positives) {
+      const options = divisors.filter(([beta]) => beta.every((b, i) => b <= alpha[i]));
+      if (!options.length) return { ok: false };
+      let best = options[0]; // largest coefficient, then least exponent
+      for (const o of options.slice(1)) { const c = o[1].cmp(best[1]); if (c > 0 || (c === 0 && cmpExps(o[0], best[0]) < 0)) best = o; }
+      demand.set(key(best[0]), (demand.get(key(best[0])) || Q.ZERO).add(r));
+      pairs.push(`${monomialText(alpha, model.axes)} by ${monomialText(best[0], model.axes)}`);
+    }
+    if (!demand.size) return { ok: true, pairs: [], s0: null };
+    let s0 = null;
+    for (const [bk, total] of demand) { const v = model.loss.get(bk).div(total); if (!s0 || v.lt(s0)) s0 = v; }
+    return { ok: true, pairs, s0 };
+  }
   function envelope(model, gain, cutoff) {
     const entries = [...gain].map(([k, c]) => [exps(k), c]);
     const negatives = entries.filter(([, c]) => c.sign() < 0).map(([e]) => e);
@@ -544,9 +566,21 @@
       `D(c) = ${polyText(model.loss, model.axes)}, R(c) = ${polyText(gain, model.axes)}.`, { loss: polyText(model.loss, model.axes), gain: polyText(gain, model.axes) }));
     const status = (id) => (links.find((l) => l.id === id) || {}).status;
     links.push(link("H3", "exact", "exact pullback", gain.size ? `R(c) = ${polyText(gain, model.axes)} is a finite polynomial with R(0) = 0.` : "R ≡ 0 near v: the perturbation is constant there, so Δ(s) = 0."));
+    const concludeByAbsorption = () => { // Lemma A decides zero response where the face law cannot (Hypothesis 2 may fail)
+      if (["standing", "vertex", "transport", "H0", "H3"].some((id) => status(id) !== "exact")) return false;
+      const a = absorption(model, gain);
+      if (!a.ok) return false;
+      links.push(link("absorption", "exact", "monomial division by a nonnegative loss",
+        (a.pairs.length ? `Every positive monomial of R is divisible by a positive monomial of D (${a.pairs.join("; ")}), ` : "R has no positive monomial, ") +
+        "and every coefficient of D is nonnegative, so s·R ≤ D on [0, min(ρ, 1)]ⁿ" + (a.s0 ? ` for 0 < s ≤ ${a.s0}` : " for every s > 0") +
+        "; with Hypothesis 0, Δ(s) = 0 for all sufficiently small s > 0.", { pairs: a.pairs, s0: a.s0 ? String(a.s0) : null }));
+      delete result.open_links;
+      Object.assign(result, { status: "zero_response", conclusion: "Δ(s) = 0 for all sufficiently small s > 0", q_star: null, gamma: null });
+      return true;
+    };
     if (!model.weights) {
       ["faces", "H5", "selection"].forEach((id) => links.push(link(id, "not_reached", "—", "Face weights need the exact principal part (H1/H2).")));
-      result.status = "incomplete"; return { result, gain };
+      result.status = "incomplete"; concludeByAbsorption(); return { result, gain };
     }
     if (!gain.size) {
       links.push(link("faces", "exact", "exact face restriction", "Every face is inactive."));
@@ -581,6 +615,7 @@
       links.push(link("selection", qStar ? "unresolved" : "not_reached", "conditional on the open links",
         (qStar ? `The exact face data give q* = ${qStar} and γ = ${gamma}, but ` : "No qualified face; ") + `open links: ${open.join(", ")}.`, { open_links: open }));
       Object.assign(result, { status: "incomplete", conclusion: null, open_links: open, q_star: qStar ? String(qStar) : null, gamma: gamma ? String(gamma) : null });
+      concludeByAbsorption();
     }
     result._table = table; result._qStar = qStar;
     return { result, gain };
@@ -761,6 +796,6 @@
   global.GitCalc = Object.assign(global.GitCalc || {}, {
     Q, floorDecimal, log10Q, parseExpression, parseSystem, evalQ, curvature, transport, centered, polyText, monomialText, exps, key, wdeg,
     pconst, pvar, padd, pscale, pmul, ppow, pevalQ, dot, solveQ, vertexEnum, isBounded, combinations, LINKS, ORDER, link,
-    localize, analyze, faceTable, envelope, curvedReduction, ambientAxes, measure, NonPolynomial,
+    localize, analyze, faceTable, envelope, absorption, curvedReduction, ambientAxes, measure, NonPolynomial,
   });
 })(typeof globalThis !== "undefined" ? globalThis : this);

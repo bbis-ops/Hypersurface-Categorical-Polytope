@@ -27,6 +27,11 @@ function run(job) {
     return { status: m.status, cells: m.grid.map((k) => [m.outcomes[k].verdict, m.outcomes[k].gamma, m.outcomes[k].winners]),
       laws: Object.fromEntries(m.laws.map((l) => [l.monomial, l.terms])) };
   }
+  if (job.mode === "certificate") {
+    const r = G.solve(job.request, { measure: false });
+    return { status: r.certificate.status, meaning: r.answer.meaning, links: Object.fromEntries(r.certificate.links.map((l) => [l.id, l.status])),
+      absorption: (r.certificate.links.find((l) => l.id === "absorption") || null), counters: r.counterarguments.map((c) => [c.id, c.effect]) };
+  }
   if (job.mode === "sheet") return { markdown: G.sheet(job.receipt, job.options || {}) };
   if (job.mode === "solve-sheet") return { markdown: G.sheet(G.solve(job.request, { budget: "quick" }), job.options || {}) };
   if (job.mode === "geometry") {

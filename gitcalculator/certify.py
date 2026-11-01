@@ -57,6 +57,9 @@ LINKS: dict[str, tuple[str, str, str]] = {
            "R₊ ≤ K·D₀^q* near zero (with q* = 1 and Lemma 2 when no face qualifies)."),
     "selection": ("§8 Selection, qualified", f"{THEOREM}#8-selection-qualified",
                   "Under Hypotheses 0–5, Δ(s) = Θ(s^γ) with γ = 1/(1 − q*)."),
+    "absorption": ("Lemma A · absorption by the loss", "docs/FORMAL_LOSS_ABSORPTION.md#statement",
+                   "If every coefficient of D is nonnegative and each positive monomial of R is divisible by a positive "
+                   "monomial of D, then s·R ≤ D near zero for small s; with Hypothesis 0, Δ(s) = 0."),
 }
 GRID_LIMIT = 4096
 
@@ -306,6 +309,35 @@ def _minimal(faces: list[list[int]]) -> list[list[int]]:
     return sorted(f for f in faces if not any(set(g) < set(f) for g in faces))
 
 
+def _absorption(model: LocalModel) -> tuple[bool, list[str], Fraction | None]:
+    """Lemma A: can the loss absorb every positive term of the gain?
+
+    Needs every coefficient of D nonnegative and, for each positive monomial c^α
+    of R, a positive monomial c^β of D with β ≤ α. On [0, min(ρ, 1)]ⁿ then
+    c^α ≤ c^β, so s·R ≤ D once s ≤ s₀ = min over β of d_β / (the coefficients
+    of R assigned to β). Returns the assignments and s₀ (None when R has no
+    positive monomial, where any s > 0 works).
+    """
+    if not model.polynomial or not model.loss or any(c < 0 for c in model.loss.values()):
+        return False, [], None
+    divisors = sorted((beta, d) for beta, d in model.loss.items() if d > 0)
+    demand: dict[tuple[int, ...], Fraction] = {}
+    pairs = []
+    for alpha, r in sorted(model.gain.items()):
+        if r <= 0:
+            continue
+        options = [(beta, d) for beta, d in divisors if all(b <= a for b, a in zip(beta, alpha))]
+        if not options:
+            return False, [], None
+        beta, _ = max(options, key=lambda o: (o[1], tuple(-x for x in o[0])))  # largest coefficient, then least exponent
+        demand[beta] = demand.get(beta, Fraction(0)) + r
+        pairs.append(f"{X.monomial_text(alpha, model.axes)} by {X.monomial_text(beta, model.axes)}")
+    if not demand:
+        return True, [], None
+    weight = dict(divisors)
+    return True, pairs, min(weight[beta] / total for beta, total in demand.items())
+
+
 def certify(request: Mapping[str, Any], response: Mapping[str, Any]) -> tuple[dict[str, Any], LocalModel | None]:
     """Return the certificate and, when a simple vertex was found, its local model."""
     ledger = _Ledger()
@@ -471,10 +503,29 @@ def certify(request: Mapping[str, Any], response: Mapping[str, Any]) -> tuple[di
                f"R(c) = {X.poly_text(gain, axes)} is a finite polynomial with R(0) = 0." if gain else
                "R ≡ 0 near v: the perturbation is constant there, so Δ(s) = 0.")
 
+    def conclude_by_absorption() -> bool:
+        """Lemma A decides zero response where the face law cannot (Hypothesis 2 may fail)."""
+        if any(ledger.status(key) != "exact" for key in ("standing", "vertex", "transport", "H0", "H3")):
+            return False
+        ok, pairs, s0 = _absorption(model)
+        if not ok:
+            return False
+        ledger.add("absorption", "exact", "monomial division by a nonnegative loss",
+                   (f"Every positive monomial of R is divisible by a positive monomial of D ({'; '.join(pairs)}), "
+                    if pairs else "R has no positive monomial, ") +
+                   "and every coefficient of D is nonnegative, so s·R ≤ D on [0, min(ρ, 1)]ⁿ" +
+                   (f" for 0 < s ≤ {X.label(s0)}" if s0 is not None else " for every s > 0") +
+                   "; with Hypothesis 0, Δ(s) = 0 for all sufficiently small s > 0.",
+                   pairs=pairs, s0=X.label(s0))
+        result.pop("open_links", None)
+        result.update(status="zero_response", conclusion="Δ(s) = 0 for all sufficiently small s > 0", q_star=None, gamma=None)
+        return True
+
     if model.weights is None:
         for key in ("faces", "H5", "selection"):
             ledger.add(key, "not_reached", "—", "Face weights need the exact principal part (H1/H2).")
         result["status"] = "incomplete"
+        conclude_by_absorption()
         return result, model
 
     if not gain:
@@ -536,4 +587,5 @@ def certify(request: Mapping[str, Any], response: Mapping[str, Any]) -> tuple[di
                    open_links=open_links)
         result.update(status="incomplete", conclusion=None, open_links=open_links,
                       q_star=X.label(q_star), gamma=X.label(1 / (1 - q_star)) if q_star is not None else None)
+        conclude_by_absorption()
     return result, model

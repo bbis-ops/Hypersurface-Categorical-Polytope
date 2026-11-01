@@ -516,3 +516,36 @@ def test_a_new_calculation_can_be_recorded_on_the_tape(tmp_path):
         main(["tape", "record", "Not A Name", "--system", SIMPLEX, "--base", "-x0", "--perturbation", "x0"])
     with pytest.raises(SystemExit):
         main(["tape", "record", "two-inputs-missing", "--system", SIMPLEX])
+
+
+# --- the phase map ----------------------------------------------------------------------
+
+def test_phase_map_finds_the_chambers_and_exact_coefficient_laws():
+    from gitcalculator.modes import phase_map
+    from gitcalculator.presets import MAP_PRESETS
+    family = MAP_PRESETS["two-edges"]
+    result = phase_map(family["system"], family["base"], family["perturbation"], resolution=6)
+    shares = {(o["verdict"], o["gamma"], o["winners"]): o["cells"] for o in result["outcomes"]}
+    assert shares == {("proved", None, ""): 9, ("proved", "4/3", "{c0}"): 18, ("proved", "2", "{c1}"): 9}
+    assert {law["monomial"]: law["terms"] for law in result["laws"]} == {"c0": {"1,0": "1"}, "c1": {"0,1": "1"}}
+    channel = MAP_PRESETS["signed-channel"]
+    curved = phase_map(channel["system"], channel["base"], channel["perturbation"], resolution=4)
+    assert {(o["verdict"], o["gamma"]) for o in curved["outcomes"]} == {("proved", None), ("proved-v22", "3"), ("proved", "6")}
+    out = io.StringIO()
+    with redirect_stdout(out):
+        assert main(["map", "--preset", "two-edges", "--resolution", "4"]) == 0
+    assert "A  Δ(s) = 0 for small s (proved)" in out.getvalue() and "a(t, u) = t" in out.getvalue()
+
+
+@pytest.mark.skipif(NODE is None, reason="node is not installed")
+def test_browser_phase_map_matches_python_cell_for_cell():
+    from gitcalculator.modes import phase_map
+    from gitcalculator.presets import MAP_PRESETS
+    names = sorted(MAP_PRESETS)
+    requests = [dict(system=MAP_PRESETS[n]["system"], base=MAP_PRESETS[n]["base"], perturbation=MAP_PRESETS[n]["perturbation"],
+                     t_from="-1", t_to="1", u_from="-1", u_to="1", resolution=8) for n in names]
+    for name, request, js in zip(names, requests, _browser([{"mode": "map", "request": r} for r in requests])):
+        python = phase_map(request["system"], request["base"], request["perturbation"], resolution=8)
+        cells = [[o["verdict"], o["gamma"], o["winners"]] for o in (python["outcomes"][k] for k in python["grid"])]
+        assert js["cells"] == cells, name
+        assert js["laws"] == {law["monomial"]: law["terms"] for law in python["laws"]}, name

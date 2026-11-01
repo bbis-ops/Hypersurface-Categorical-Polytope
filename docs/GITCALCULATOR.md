@@ -3,7 +3,7 @@
 **The face-selection law as a calculator** · computed by the backend, certified
 against the theorem, attacked by the counter-arguments, pinned to git.
 
-[**Quick start →**](#quick-start) · [Five modes](#five-questions-one-law) · [Reading a receipt](#reading-a-receipt) · [The exact certificate](#the-exact-certificate) · [Certified measurement](#certified-measurement) · [Counter-arguments](#counter-arguments) · [Design, Sweep, Attack](#design-sweep-and-attack) · [History](#history-answers-have-commits) · [The tape](#the-tape) · [Web calculator](#the-web-calculator) · [Scope](#scope-and-limits)
+[**Quick start →**](#quick-start) · [Six modes](#six-questions-one-law) · [Reading a receipt](#reading-a-receipt) · [The exact certificate](#the-exact-certificate) · [Certified measurement](#certified-measurement) · [Counter-arguments](#counter-arguments) · [Design, Sweep, Map, Attack](#design-sweep-map-and-attack) · [History](#history-answers-have-commits) · [The tape](#the-tape) · [Web calculator](#the-web-calculator) · [Scope](#scope-and-limits)
 
 | 01 · Theorem | 02 · Backend | 03 · Counter-arguments | 04 · Git |
 | :--- | :--- | :--- | :--- |
@@ -33,16 +33,17 @@ together with the evidence for each step:
    id. The same input can be replayed against every code state in the
    repository's history.
 
-## Five questions, one law
+## Six questions, one law
 
 Because the law maps geometry to an exponent exactly, the calculator runs it in
-five directions.
+six directions.
 
 | Mode | The question it answers | Command |
 | :--- | :--- | :--- |
 | **Solve** | What is $\gamma$ for this $P$, $F$, $G$, and is it a theorem? | `calc` |
 | **Design** | Which exponents can this vertex produce at all, and which $G$ reaches a target $\gamma$? | `design` |
 | **Sweep** | Where does $\gamma$ change along a family $G_t$, exactly? | `sweep` |
+| **Map** | Which chambers does a two-parameter family $G_{t,u}$ fall into, and where are the walls? | `map` |
 | **Attack** | Which nearby inputs break this answer? | `attack` |
 | **History** | What did every version of the code answer, and was it right? | `history` |
 
@@ -101,6 +102,7 @@ python -m gitcalculator calc --system "([[-1,0],[0,-1],[1,1]], [0,0,1])" --base 
 | `calc` | One receipt; `--json` for the full record, `--markdown` for a proof sheet, `--history` to add the replay, `--observed 4/3` for the inverse check |
 | `design` | The exponent spectrum of the vertex; `--target 3/2` synthesizes and certifies perturbations for one exponent |
 | `sweep` | The exact phase fan of a family written with the parameter `t`, over `--from` and `--to` |
+| `map` | The phase map of a family written with `t` and `u`: one exact certificate per cell, and each coefficient as a polynomial $a(t,u)$ |
 | `attack` | Generated counterexamples: every mutation of the input, re-certified |
 | `presets` | The thirteen canonical calculations |
 | `counter` | Every counter-argument with its claim, refutation and executable witness; exits nonzero if a witness fails |
@@ -245,7 +247,7 @@ Two calculations show what the combination adds.
   exactly. The exponent agrees with the measurement, but the theorem as stated
   does not deliver it. The receipt reports `licensed`, not `proved`.
 
-## Design, Sweep and Attack
+## Design, Sweep, Map and Attack
 
 [`modes.py`](../gitcalculator/modes.py) and its browser twin
 [`modes.js`](../gitcalculator/web/modes.js) run the certificate in three new
@@ -304,6 +306,46 @@ appears as an exact wall at $t=1/3$.
 ```bash
 python -m gitcalculator sweep --system "([[-1,0],[0,-1],[1,0],[0,1]], [0,0,1,1])" --base "-(x0**4+x1**4)" --perturbation "-x0**2 + t*x0*x1 - x1**2" --from 0 --to 4
 ```
+
+### Map: the phase diagram in two parameters
+
+A family $G_{t,u}$ with two parameters has a phase diagram rather than a phase
+strip. The map certifies one rational point at the centre of every cell, in
+exact arithmetic. It then names each chamber by its outcome: zero response, an
+exponent with its winning face, a V.22 curved reduction, an unlicensed
+candidate, or a refusal. Each coefficient of the transported perturbation is
+an exact polynomial $a(t,u)$, interpolated from exact transports. Its zero set
+is a wall, traced root by root along horizontal and vertical scanlines. A
+chamber can also end where no coefficient vanishes. In the `quadratic-form`
+family, the face $\lbrace c_0, c_1 \rbrace$ qualifies only where
+$t c_0^2 + u c_0 c_1 - c_1^2$ turns positive inside the orthant. That happens
+on the parabola $u^2 = -4t$, which the cells show and no coefficient predicts.
+
+```bash
+python -m gitcalculator map --preset signed-channel
+```
+
+```text
+  A  Δ(s) = 0 for small s (proved)                   25.0%
+  B  γ = 3 by the V.22 curved reduction              50.0%
+  C  γ = 6, face {c1} (proved)                       25.0%
+
+  coefficient of each monomial of R, as a polynomial in t and u:
+    c0^2         weighted degree 1/3    a(t, u) = -1
+    c0·c1^2      weighted degree 1/2    a(t, u) = t
+    c1^5         weighted degree 5/6    a(t, u) = u
+```
+
+In the signed channel, $G_{t,u} = -x_0^2 + t\,x_0x_1^2 + u\,x_1^5$ on the
+square with $F = -(x_0^6+x_1^6)$. Where the cross term is positive, the V.22
+curved channel sets $\gamma = 3$ whatever $u$ is. Where it is negative, the
+face law gives $\gamma = 6$ for $u \gt 0$, and nothing at all for $u \lt 0$. The
+repository's signed-sharp counterexample is the point $t = u = 1$. The four
+families are `signed-channel`, `two-edges`, `tie` and `quadratic-form`, and
+`--t-from`, `--t-to`, `--u-from`, `--u-to` and `--resolution` set the window.
+On the web page, the Map tab draws the same map with letters on its chambers,
+and a click on any cell solves that exact point. A test requires the browser
+and Python maps to agree cell for cell.
 
 ### Attack: counterexamples generated for your input
 

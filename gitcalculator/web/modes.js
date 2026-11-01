@@ -450,6 +450,124 @@
       kinds_changed: [...new Set(fragile.map((r) => r.kind))], kinds_stable: [...new Set(stable.map((r) => r.kind))].filter((k) => !fragile.some((r) => r.kind === k)) } };
   }
 
+  // ===== Map: the exact phase diagram of a two-parameter family G(t, u) ===========
+  // Every cell is one exact certificate at a rational (t, u). The coefficient of
+  // each monomial of R is an exact polynomial a(t, u), found by interpolating
+  // exact transports in u; its zero set is a wall, traced by exact roots along
+  // horizontal and vertical scanlines.
+  const MAP_LIMIT = 128;
+  function substituteParameters(expression, t, u) {
+    let e = String(expression);
+    if (t != null) e = e.replace(/\bt\b/g, `(${t})`);
+    if (u != null) e = e.replace(/\bu\b/g, `(${u})`);
+    return e;
+  }
+  function parameterDegrees(expression, n) {
+    // t and u become two extra variables, so no cancellation between them can hide a degree.
+    const renamed = String(expression).replace(/\bt\b/g, `x${n}`).replace(/\bu\b/g, `x${n + 1}`);
+    const m = n + 2, tree = G.parseExpression(renamed, m);
+    const identity = { n: m, vertex: new Array(m).fill(Q.ZERO), axes: [...Array(m).keys()].map((i) => "x" + i),
+      generators: [...Array(m).keys()].map((i) => [...Array(m).keys()].map((k) => (i === k ? Q.ONE : Q.ZERO))) };
+    let dt = 0, du = 0;
+    for (const [k, c] of G.transport(tree, identity, null)) if (!c.isZero()) { const e = exps(k); dt = Math.max(dt, e[n]); du = Math.max(du, e[n + 1]); }
+    return { dt, du };
+  }
+  function lagrange(points) { // [[x, y]] -> Map power -> Q
+    const out = new Map();
+    points.forEach(([xi, yi], i) => {
+      if (yi.isZero()) return;
+      let basis = new Map([[0, Q.ONE]]), denom = Q.ONE;
+      points.forEach(([xj], j) => {
+        if (i === j) return;
+        const next = new Map();
+        for (const [k, c] of basis) { next.set(k + 1, (next.get(k + 1) || Q.ZERO).add(c)); next.set(k, (next.get(k) || Q.ZERO).sub(c.mul(xj))); }
+        basis = next; denom = denom.mul(xi.sub(xj));
+      });
+      for (const [k, c] of basis) out.set(k, (out.get(k) || Q.ZERO).add(c.mul(yi).div(denom)));
+    });
+    for (const [k, c] of [...out]) if (c.isZero()) out.delete(k);
+    return out;
+  }
+  function phaseMap(request) {
+    const inputs = { system: request.system, base: request.base };
+    const local = localize(inputs);
+    if (!local.model) return { status: "not_applicable", reason: local.result.reason || "no simple base maximizer", links: local.result.links };
+    const model = local.model, n = model.n;
+    if (!model.weights) return { status: "not_applicable", reason: "the phase map needs the exact diagonal principal part (Hypothesis 2)", links: local.result.links };
+    let t0, t1, u0, u1, degrees;
+    try {
+      [t0, t1, u0, u1] = [request.t_from ?? "-1", request.t_to ?? "1", request.u_from ?? "-1", request.u_to ?? "1"].map((v) => Q.parse(String(v)));
+      degrees = parameterDegrees(request.perturbation, n);
+    } catch (error) { return { status: "not_applicable", reason: error.message }; }
+    if (!t0.lt(t1) || !u0.lt(u1)) return { status: "not_applicable", reason: "each range needs from < to" };
+    const N = Math.max(2, Math.min(MAP_LIMIT, Number(request.resolution) || 64));
+
+    // exact coefficient laws a(t, u) = sum a_kl t^k u^l, monomial by monomial
+    const samples = [...Array(degrees.du + 1).keys()].map((j) => u0.add(u1.sub(u0).mul(new Q(BigInt(j), BigInt(Math.max(1, degrees.du))))));
+    const perU = samples.map((uj) => {
+      const tree = G.parseExpression(substituteParameters(request.perturbation, null, String(uj)), n, true);
+      const byMonomial = new Map();
+      for (const [k, c] of G.centered(G.transport(tree, model, null, true), n)) {
+        const e = exps(k), mk = key(e.slice(0, n)), tp = e[n];
+        if (!byMonomial.has(mk)) byMonomial.set(mk, new Map());
+        byMonomial.get(mk).set(tp, (byMonomial.get(mk).get(tp) || Q.ZERO).add(c));
+      }
+      return byMonomial;
+    });
+    const monomials = new Set(perU.flatMap((m) => [...m.keys()]));
+    const laws = [];
+    for (const mk of monomials) {
+      const terms = new Map(); // "k,l" -> Q
+      for (let k = 0; k <= degrees.dt; k++) {
+        const column = lagrange(samples.map((uj, j) => [uj, (perU[j].get(mk) || new Map()).get(k) || Q.ZERO]));
+        for (const [l, c] of column) terms.set(`${k},${l}`, c);
+      }
+      if (terms.size) laws.push({ key: mk, e: exps(mk), terms });
+    }
+    laws.sort((a, b) => wdeg(a.e, model.weights).cmp(wdeg(b.e, model.weights)) || a.key.localeCompare(b.key));
+    const along = (terms, value, fixedName) => { // the law on a scanline where fixedName = value, as power -> Q in the other parameter
+      const out = new Map();
+      for (const [kl, c] of terms) { const [k, l] = kl.split(",").map(Number); const free = fixedName === "u" ? k : l, power = fixedName === "u" ? l : k;
+        out.set(free, (out.get(free) || Q.ZERO).add(c.mul(value.pow(power)))); }
+      for (const [k, c] of [...out]) if (c.isZero()) out.delete(k);
+      return out;
+    };
+
+    // exact outcomes at the cell centres
+    const keyOf = (o) => `${o.verdict}|${o.gamma}|${(o.verdict === "proved" || o.verdict === "unlicensed") && o.gamma ? o.winners : ""}`;
+    const index = new Map(), outcomes = [], grid = new Array(N * N);
+    const centre = (lo, hi, i) => lo.add(hi.sub(lo).mul(new Q(BigInt(2 * i + 1), BigInt(2 * N))));
+    const ts = [...Array(N).keys()].map((i) => centre(t0, t1, i)), us = [...Array(N).keys()].map((j) => centre(u0, u1, j));
+    for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
+      const o = outcome(local, { perturbation: substituteParameters(request.perturbation, String(ts[i]), String(us[j])) }, null), k = keyOf(o);
+      if (!index.has(k)) { index.set(k, outcomes.length); outcomes.push({ key: k, verdict: o.verdict, gamma: o.gamma, q_star: o.q_star, winners: k.split("|")[2], status: o.status, cells: 0, sample: { t: String(ts[i]), u: String(us[j]) } }); }
+      const at = index.get(k); outcomes[at].cells++; grid[j * N + i] = at;
+    }
+
+    // walls: exact roots of every non-constant law along 2N scanlines each way
+    const walls = [];
+    const lines = 2 * N;
+    for (const law of laws) {
+      if ([...law.terms.keys()].every((kl) => kl === "0,0")) continue;
+      const points = [];
+      for (let j = 0; j <= lines; j++) {
+        const u = u0.add(u1.sub(u0).mul(new Q(BigInt(j), BigInt(lines)))), line = along(law.terms, u, "u");
+        if (line.size) for (const r of rootsIn(line, t0, t1)) points.push([(r.at || r.lo.add(r.hi).div(new Q(2n))).toNumber(), u.toNumber()]);
+      }
+      for (let i = 0; i <= lines; i++) {
+        const t = t0.add(t1.sub(t0).mul(new Q(BigInt(i), BigInt(lines)))), line = along(law.terms, t, "t");
+        if (line.size) for (const r of rootsIn(line, u0, u1)) points.push([t.toNumber(), (r.at || r.lo.add(r.hi).div(new Q(2n))).toNumber()]);
+      }
+      if (points.length) walls.push({ monomial: monomialText(law.e, model.axes), points });
+    }
+    const lawText = (terms) => polyText(new Map([...terms].map(([kl, c]) => [kl, c])), ["t", "u"]);
+    return { status: "complete", t: [String(t0), String(t1)], u: [String(u0), String(u1)], resolution: N, axes: model.axes,
+      degrees, grid, outcomes,
+      laws: laws.map((l) => ({ monomial: monomialText(l.e, model.axes), degree: String(wdeg(l.e, model.weights)), law: lawText(l.terms),
+        terms: Object.fromEntries([...l.terms].map(([kl, c]) => [kl, String(c)])) })),
+      walls };
+  }
+
   // ===== proof sheets: a receipt as GitHub Markdown, as gitcalculator/sheet.py writes it =====
   const SHEET_VERDICTS = { proved: "proved", "proved-v22": "proved by V.22", licensed: "licensed", unlicensed: "not licensed", refused: "refused", contradicted: "contradicted" };
   const GITHUB_RE = /^(?:https:\/\/github\.com\/|git@github\.com:)([^/\s]+)\/([^/\s]+?)(?:\.git)?\/?$/;
@@ -552,5 +670,5 @@
     return out.join("\n");
   }
 
-  Object.assign(G, { ENGINE_VERSION, normalize, assess, REGISTRY, solve, outcome, design, sweep, attack, spectrumOf, affineText, slackMonomial, decimalText, sheet, sheetLink, sheetCommand, githubRepository, pagesUrl });
+  Object.assign(G, { ENGINE_VERSION, normalize, assess, REGISTRY, solve, outcome, design, sweep, attack, spectrumOf, affineText, slackMonomial, decimalText, phaseMap, substituteParameters, sheet, sheetLink, sheetCommand, githubRepository, pagesUrl });
 })(typeof globalThis !== "undefined" ? globalThis : this);

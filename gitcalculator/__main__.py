@@ -7,7 +7,7 @@ import json
 import sys
 from pathlib import Path
 
-from .presets import PRESETS, preset_request
+from .presets import MAP_PRESETS, PRESETS, preset_request
 
 
 def _request(args: argparse.Namespace) -> dict:
@@ -57,6 +57,18 @@ def main(argv: list[str] | None = None) -> int:
     sweep.add_argument("--from", dest="low", default="-1")
     sweep.add_argument("--to", dest="high", default="1")
 
+    phase = sub.add_parser("map", help="the exact phase map of a two-parameter family G(t, u)")
+    phase.add_argument("--preset", choices=sorted(MAP_PRESETS), help="a canonical family")
+    phase.add_argument("--system")
+    phase.add_argument("--base")
+    phase.add_argument("--perturbation", help="G written with the parameters t and u")
+    phase.add_argument("--t-from", default="-1")
+    phase.add_argument("--t-to", default="1")
+    phase.add_argument("--u-from", default="-1")
+    phase.add_argument("--u-to", default="1")
+    phase.add_argument("--resolution", type=int, default=24, help="cells along each axis (at most 128)")
+    phase.add_argument("--json", action="store_true")
+
     attack = sub.add_parser("attack", help="generate counterexamples to one answer")
     _inputs(attack)
 
@@ -94,7 +106,8 @@ def main(argv: list[str] | None = None) -> int:
 
     # An expression such as -(x0**4+x1**4) starts like an option; bind it to its flag.
     raw = list(sys.argv[1:] if argv is None else argv)
-    valued = {"--system", "--base", "--perturbation", "--target", "--from", "--to", "--observed"}
+    valued = {"--system", "--base", "--perturbation", "--target", "--from", "--to", "--observed",
+              "--t-from", "--t-to", "--u-from", "--u-to"}
     bound: list[str] = []
     while raw:
         token = raw.pop(0)
@@ -136,6 +149,20 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"\ntarget γ = {target['gamma']} is not reachable by any qualified face or V.22 channel here; "
                       f"nearest: {target['nearest_below']} below, {target['nearest_above']} above")
         return 0
+
+    if args.command == "map":
+        from .modes import phase_map, render_map
+        family = dict(MAP_PRESETS[args.preset]) if args.preset else {}
+        for name in ("system", "base", "perturbation"):
+            if getattr(args, name):
+                family[name] = getattr(args, name)
+        missing = [name for name in ("system", "base", "perturbation") if not family.get(name)]
+        if missing:
+            raise SystemExit(f"give --preset, or all of --system --base --perturbation (missing: {', '.join(missing)})")
+        result = phase_map(family["system"], family["base"], family["perturbation"], (args.t_from, args.t_to),
+                           (args.u_from, args.u_to), args.resolution)
+        print(json.dumps(result, indent=2, ensure_ascii=False) if args.json else render_map(result, family["perturbation"]))
+        return 0 if result["status"] == "complete" else 1
 
     if args.command == "sweep":
         from .modes import sweep as run_sweep

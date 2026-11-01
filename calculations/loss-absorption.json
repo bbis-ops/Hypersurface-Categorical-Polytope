@@ -1,0 +1,78 @@
+{
+  "schema": "gitcalculator.tape.v1",
+  "name": "loss-absorption",
+  "input": {
+    "system": "([[-1,0],[0,-1],[1,0],[0,1]], [0,0,1,1])",
+    "base": "-(x0**4+x1**4+x0*x1)",
+    "perturbation": "x0*x1"
+  },
+  "receipt_id": "gc-364bbe43f44f4f6b",
+  "answer": {
+    "verdict": "proved",
+    "headline": "Δ(s) = 0 for all sufficiently small s > 0",
+    "gamma": "2",
+    "q_star": "1/2"
+  },
+  "signature": {
+    "verdict": "proved",
+    "gamma": "2",
+    "q_star": "1/2",
+    "backend": {
+      "status": "unlicensed",
+      "licensed": false,
+      "gamma": "2",
+      "q_star": "1/2",
+      "blockers": [
+        "weighted principal part"
+      ],
+      "refusal": null
+    },
+    "certificate": {
+      "status": "zero_response",
+      "links": {
+        "standing": "exact",
+        "vertex": "exact",
+        "transport": "exact",
+        "H2": "failed",
+        "H1": "unresolved",
+        "H0": "exact",
+        "H3": "exact",
+        "faces": "exact",
+        "H5": "exact",
+        "selection": "unresolved",
+        "absorption": "exact"
+      }
+    },
+    "curved": {
+      "status": "outside_scope",
+      "blockers": [
+        "no exact feasible simple vertex satisfies the quadratic-reduction hypotheses"
+      ]
+    },
+    "ambient_gamma": "2",
+    "measurement": {
+      "backend": "insufficient"
+    },
+    "counter": {
+      "finite-scale": "caveat",
+      "empty-not-zero": "averted",
+      "homogeneity-probe": "averted",
+      "isolation-probe": "averted",
+      "loss-absorption": "averted",
+      "ambient-axes": "clear",
+      "signed-channel": "clear",
+      "signed-sharp": "clear",
+      "interior-zero": "clear",
+      "active-set": "clear",
+      "critical-layer": "clear",
+      "tied-coefficient": "clear",
+      "inverse-tolerance": "clear",
+      "non-simple": "clear"
+    }
+  },
+  "recorded_with": {
+    "commit": "21b8347be8c6c8d06e5c5b29c1d48421b5f4dff1",
+    "code_id": "code-23ad9e729a48",
+    "calculator_id": "calc-d3770f8a5e11"
+  }
+}

@@ -21,12 +21,14 @@ from typing import Any, Callable, Mapping
 from categorical_polytope.ambient_face_compiler import transport_ambient_polynomial
 
 from . import exact as X
-from .certify import LocalModel, _faces
+from .certify import LocalModel, _faces, certify
 
 SQUARE = "([[-1,0],[0,-1],[1,0],[0,1]], [0,0,1,1])"
 SIMPLEX = "([[-1,0],[0,-1],[1,1]], [0,0,1])"
 PYRAMID = ("([[-1,0,0],[0,-1,0],[1,0,0],[0,1,0],[0,0,-1],[1,0,1],[-1,0,1],[0,1,1],[0,-1,1]], "
            "[0,0,1,1,0,1,0,1,0])")
+# Issue #33: a qualified face under the diagonal weights, a mixed loss term below them, and no response at all.
+ABSORPTION = {"system": SQUARE, "base": "-(x0**4+x1**4+x0*x1)", "perturbation": "x0*x1"}
 
 
 @dataclass
@@ -173,7 +175,8 @@ def _interior(ctx: Context):
 
 def _empty(ctx: Context):
     if ctx.certificate.get("status") == "zero_response":
-        return "averted", "Lemma 2 certifies Δ(s) = 0 for small s, so here the refusal does mean no response."
+        lemma = "Lemma A (absorption by the loss)" if ctx.status("absorption") == "exact" else "Lemma 2"
+        return "averted", f"{lemma} certifies Δ(s) = 0 for small s, so here the refusal does mean no response."
     if ctx.certificate.get("q_star") or ctx.response.get("status") in {"licensed", "unlicensed"}:
         return "clear", "A response exponent was produced."
     if ctx.measurement.get("positive_gain_found"):
@@ -270,6 +273,23 @@ def _simple(ctx: Context):
     if ctx.status("vertex") == "failed":
         return "blocks", ctx.link("vertex").get("detail", "")
     return "clear", "The selected vertex is simple."
+
+
+def _absorbed(ctx: Context):
+    candidate = any(f.get("winning") for f in ctx.faces())
+    if ctx.status("absorption") == "exact":
+        pairs = (ctx.link("absorption").get("values") or {}).get("pairs") or []
+        return "averted", (("A face qualifies under the diagonal weights, but the loss" if candidate else "The loss") +
+                           " absorbs every positive term of the gain" + (f" ({'; '.join(pairs)})" if pairs else "") +
+                           ", so Lemma A proves Δ(s) = 0 for small s.")
+    if ctx.status("H2") == "failed" and candidate:
+        return "caveat", ("Hypothesis 2 fails, so the face data's exponent is only a candidate: a mixed term of the loss "
+                          "below the diagonal weights can absorb the gain it divides.")
+    return "clear", "The principal part is diagonal, or no face candidate rests on a non-diagonal one."
+
+
+def _absorption_witness(response: Mapping[str, Any]) -> bool:
+    return response.get("status") in {"unlicensed", "refused"} and certify(ABSORPTION, response)[0]["status"] == "zero_response"
 
 
 def _status(*allowed: str) -> Callable[[Mapping[str, Any]], bool]:
@@ -416,6 +436,17 @@ REGISTRY: tuple[CounterArgument, ...] = (
         "refused",
         _status("refused"),
         _simple),
+    CounterArgument(
+        "loss-absorption", "A qualified face fixes the exponent without a diagonal principal part",
+        "Under global isolation, the face data's exponent holds even when Hypothesis 2 fails.",
+        "D = x⁴ + y⁴ + xy, R = xy: the face {x, y} qualifies with q = 1/2 under the diagonal weights, yet "
+        "F + sG = −x⁴ − y⁴ − (1 − s)xy ≤ 0 on the square, so Δ(s) = 0 for s ≤ 1. The mixed loss term absorbs the gain "
+        "monomial it divides (Lemma A).",
+        ("docs/FORMAL_LOSS_ABSORPTION.md#statement", "docs/FORMAL_FACE_SELECTION.md#4-hypotheses-with-uniform-remainders"),
+        ABSORPTION,
+        "not licensed by the backend, and zero response proved by Lemma A",
+        _absorption_witness,
+        _absorbed),
 )
 
 EFFECT_ORDER = {"blocks": 0, "caveat": 1, "averted": 2, "clear": 3}

@@ -18,6 +18,14 @@
     "untestable": 0,
     "no claim": 4
   },
+  "claims": {
+    "made": 9,
+    "decided": 8,
+    "beyond": 1,
+    "beyond_verdicts": {
+      "consistent": 1
+    }
+  },
   "instances": [
     {
       "label": "tilted-simplex",
@@ -203,9 +211,9 @@
     }
   ],
   "recorded_with": {
-    "commit": "1a822fc6e8b645c98fee9a0f27315bc62ea01af5",
-    "short": "1a822fc",
+    "commit": "c2f1e7db9c833a08e2e615488743604567dfa17f",
+    "short": "c2f1e7d",
     "code_id": "code-23ad9e729a48",
-    "calculator_id": "calc-e464d311b8f7"
+    "calculator_id": "calc-47973d185bc6"
   }
 }

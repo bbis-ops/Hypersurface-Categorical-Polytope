@@ -26,7 +26,7 @@ together with the evidence for each step:
 2. **Certify.** An independent checker re-derives the local model from the
    request alone and discharges the theorem's hypotheses in exact rational
    arithmetic wherever it can.
-3. **Attack.** Thirteen counter-arguments from the repository's own audit and
+3. **Attack.** Fourteen counter-arguments from the repository's own audit and
    revision records are applied to the input. A separate measurement computes
    certified lower bounds on $\Delta(s)$ that can contradict a prediction.
 4. **Pin.** Every source file and cited document is identified by its git blob
@@ -161,6 +161,7 @@ It shares no numerics with the backend's predictor.
 | [Hypotheses 1 and 2](FORMAL_FACE_SELECTION.md#4-hypotheses-with-uniform-remainders) | The weighted Newton data of $D$: every monomial other than the diagonal principal part must have weighted degree above one |
 | [Faces](FORMAL_FACE_SELECTION.md#5-faces-and-admissibility-defined-from-the-data-alone) | Exact restriction, first nonzero layer, and a rational relative-interior witness |
 | [Hypothesis 5](FORMAL_FACE_SELECTION.md#6-upper-control-on-unqualified-faces) | Monomial domination and absorption, a sufficient test |
+| [Lemma A](FORMAL_LOSS_ABSORPTION.md#statement) | Zero response where the face law cannot decide: a nonnegative loss, and every positive monomial of $R$ divisible by a positive monomial of $D$ |
 
 The envelope test needs one line of algebra. A positive monomial whose weighted
 degree is at least the cutoff is bounded by the base on the compact normalized
@@ -174,6 +175,17 @@ $$
 When every positive monomial is controlled, $R_+\le KD_0^{q_\ast}$ holds near
 the vertex. With no qualified face, the same test with cutoff one proves
 $\Delta(s)=0$ for small $s$ by Lemma 2.
+
+Lemma 2 needs Hypothesis 2. [Lemma A](FORMAL_LOSS_ABSORPTION.md) does not. If
+every coefficient of $D$ is nonnegative and each positive monomial of $R$ is
+divisible by a positive monomial of $D$, then $sR\le D$ near the vertex for
+small $s$. With Hypothesis 0, that gives $\Delta(s)=0$. The certificate tries
+it whenever the face law leaves the answer open.
+
+A face can qualify under the diagonal weights while a mixed term of the loss
+absorbs it. For $F=-(x_0^4+x_1^4+x_0x_1)$ and $G=x_0x_1$ on the square, for
+instance, the face data suggest $\gamma=2$, but
+$F+sG=-x_0^4-x_1^4-(1-s)x_0x_1\le0$ for $s\le1$.
 
 The certificate also compares its exact $q_\ast$ and minimal winning faces with
 the backend's selection.
@@ -232,8 +244,9 @@ must produce, and an assessment of how it bears on your input: `blocks`,
 | `finite-scale` | The asymptotic law gives the response at a given $s$ | [Finite scale](CURVED_FINITE_SCALE.md) |
 | `inverse-tolerance` | Inverse matching identifies the mechanism exactly | [Inverse](FACE_SELECTION_BACKEND.md#forward-and-inverse-power) |
 | `non-simple` | The law applies at any vertex | [Scope](FORMAL_FACE_SELECTION.md#10-scope) |
+| `loss-absorption` | A qualified face fixes the exponent without a diagonal principal part | [Lemma A](FORMAL_LOSS_ABSORPTION.md#statement) |
 
-`python -m gitcalculator counter` runs all thirteen witnesses. A regression
+`python -m gitcalculator counter` runs all fourteen witnesses. A regression
 test also checks that every cited file and heading exists.
 
 Two calculations show what the combination adds.
@@ -427,6 +440,7 @@ python -m gitcalculator conjecture test --rule "min(face_gamma, curved_gamma)"
 | `min_positive_q` | the least weighted degree among the monomials of $R$ with a positive coefficient |
 | `beta_min`, `beta_max`, `n` | the loss orders along the edges, and the dimension |
 | `isolated`, `principal`, `licensed` | Hypothesis 0, Hypothesis 2, and the theorem's license, each checked exactly |
+| `loss_mixed_q` | the least weighted degree among the mixed monomials of $D$, or `none` when $D$ has none |
 | `t`, `u` | the parameters of a family |
 
 The language has `min`, `max`, `abs`, `if(condition, then, else)` and
@@ -449,8 +463,24 @@ verdict:
 | `contradicted` | No theorem decides it; certified lower bounds outgrow the predicted order. It comes with a witness point of $P$ that anyone can check in exact arithmetic. This is finite-scale evidence, not an asymptotic proof |
 | `inconclusive`, `untestable`, `no claim` | The bounds have not separated; no certified evidence exists (a non-simple vertex, for instance); or the rule abstains |
 
-A conjecture that survives is not proved. It has met every theorem the
-calculator knows on its corpus, and no certified bound has contradicted it.
+A trial ends in one of five states:
+
+| Status | Meaning |
+| :--- | :--- |
+| `refuted` | A theorem gives a different answer on some input |
+| `contradicted` | Certified bounds contradict it on some input |
+| `survives` | Nothing goes against it, and at least one claim beyond the theorems is consistent with certified bounds |
+| `theorems-only` | Every claim falls on an input a theorem already decides, and they all agree. The rule restates the theorems on this corpus, and has not yet said anything new |
+| `untested` | The rule made no claim at least one test could check |
+
+Every sheet and the Conjecture tab also count the claims that go beyond the
+theorems. A conjecture that survives is still not proved. It has met every
+theorem the calculator knows on its corpus, and no certified bound has
+contradicted it.
+
+Certified lower bounds can only contradict a prediction that is too slow. A
+predicted response where there is none needs a theorem to refute it, such as
+Lemma 2, V.22, or [Lemma A](FORMAL_LOSS_ABSORPTION.md).
 
 ### How a law gets sharpened
 
@@ -469,6 +499,14 @@ The last law reaches past the certificate. The certificate's sufficient tests
 refuse the cells where the form $t c_0^2 + u c_0 c_1 - c_1^2$ is negative on the
 orthant with $u \gt 0$. The conjecture predicts zero response there, and no
 certified bound finds any response.
+
+[Issue #33](https://github.com/bbis-ops/Hypersurface-Categorical-Polytope/issues/33)
+proposed `if(isolated and not principal, face_gamma, unknown)`. On the presets
+it made one claim beyond the theorems, at `cross-term`, which was consistent. On
+$F=-(x_0^4+x_1^4+x_0x_1)$ with $G=x_0x_1$ or $G=x_0x_1^2$, Lemma A now refutes
+it, because the response is zero. The refinement
+`if(isolated and not principal and loss_mixed_q >= 1, face_gamma, unknown)`
+abstains there, and `cross-term` keeps it alive.
 
 ### Recording and sharing
 

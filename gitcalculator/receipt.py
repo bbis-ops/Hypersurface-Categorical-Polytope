@@ -30,10 +30,11 @@ SCHEMA = "gitcalculator.receipt.v1"
 INPUT_KEYS = ("system", "base", "perturbation", "observed_exponent", "observation_tolerance")
 STEP_CHALLENGES = {
     "standing": (), "vertex": ("non-simple",), "transport": ("ambient-axes",),
-    "H0": ("isolation-probe",), "H1": (), "H2": ("homogeneity-probe",), "H3": (),
+    "H0": ("isolation-probe",), "H1": (), "H2": ("homogeneity-probe", "loss-absorption"), "H3": (),
     "faces": ("interior-zero", "critical-layer", "tied-coefficient"),
     "H5": ("signed-channel", "signed-sharp"),
     "selection": ("empty-not-zero", "active-set", "finite-scale", "inverse-tolerance"),
+    "absorption": ("loss-absorption",),
 }
 VERDICTS = {
     "proved": "Every hypothesis of the theorem is discharged in exact arithmetic.",
@@ -43,6 +44,11 @@ VERDICTS = {
     "refused": "The input lies outside the law as stated.",
     "contradicted": "Certified lower bounds contradict a licensed exponent: a candidate counterexample.",
 }
+ABSORBED = "Zero response is proved exactly: the loss absorbs every positive term of the gain (Lemma A)."
+
+
+def absorbed(certificate: Mapping[str, Any]) -> bool:
+    return any(l["id"] == "absorption" and l["status"] == "exact" for l in certificate.get("links", []))
 _BACKEND: FaceSelectionBackend | None = None
 
 
@@ -249,7 +255,8 @@ def calculate(request: Mapping[str, Any], *, budget: str = "standard", include_b
         "schema": SCHEMA,
         "input": inputs,
         "answer": {
-            "verdict": verdict, "meaning": VERDICTS[verdict], "headline": headline,
+            "verdict": verdict, "meaning": ABSORBED if verdict == "proved" and absorbed(certificate) else VERDICTS[verdict],
+            "headline": headline,
             "gamma": gamma, "q_star": q_star, "coefficient": coefficient,
             "backend_status": response.get("status"), "certificate_status": certificate.get("status"),
         },

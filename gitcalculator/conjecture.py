@@ -66,6 +66,7 @@ FEATURES = {
     "curved_gamma": "γ of the V.22 curved reduction, where it is licensed",
     "ambient_gamma": "γ read along the ambient axes instead of the edge chart",
     "min_positive_q": "the least weighted degree among monomials of R with a positive coefficient",
+    "loss_mixed_q": "the least weighted degree among the mixed monomials of D (none when D has none)",
     "beta_min": "the smallest loss order βᵢ along the edges",
     "beta_max": "the largest loss order βᵢ along the edges",
     "n": "the dimension",
@@ -285,8 +286,12 @@ def features(inputs: Mapping[str, Any], params: Mapping[str, str]):
     ambient = ambient_axes_prediction(model) or {}
     status = certificate.get("status")
     fraction = lambda v: X.to_fraction(v) if v is not None else None
+    # The face data's answer, licensed or not: q* of the winning faces, even where another lemma decides the input.
+    winners = [f for f in next((l.get("values", {}).get("faces", []) for l in certificate.get("links", [])
+                                if l["id"] == "faces"), []) if f.get("winning") and f.get("degree")]
+    face_q = X.to_fraction(winners[0]["degree"]) if winners else fraction(certificate.get("q_star"))
     found: dict[str, Any] = {
-        "face_gamma": fraction(certificate.get("gamma")), "face_q": fraction(certificate.get("q_star")),
+        "face_gamma": 1 / (1 - face_q) if face_q is not None and face_q < 1 else None, "face_q": face_q,
         "curved_gamma": fraction(curved.get("gamma")) if curved.get("status") == "licensed" else None,
         "ambient_gamma": fraction(ambient.get("gamma")),
         "isolated": links.get("H0") == "exact", "principal": links.get("H2") == "exact",
@@ -300,11 +305,14 @@ def features(inputs: Mapping[str, Any], params: Mapping[str, str]):
             found["beta_min"], found["beta_max"] = min(betas), max(betas)
             positive = [X.weighted_degree(s, model.weights) for s, c in model.gain.items() if c > 0]
             found["min_positive_q"] = min(positive) if positive else None
+            mixed = [X.weighted_degree(s, model.weights) for s, c in model.loss.items() if c and sum(1 for e in s if e) >= 2]
+            found["loss_mixed_q"] = min(mixed) if mixed else NONE  # no mixed term: infinitely far above any degree
     established = None
     if status == "theorem" and certificate.get("gamma"):
         established = {"gamma": X.to_fraction(certificate["gamma"]), "by": "the face-selection theorem"}
     elif status == "zero_response":
-        established = {"gamma": NONE, "by": "Lemma 2"}
+        lemma = any(l["id"] == "absorption" and l["status"] == "exact" for l in certificate.get("links", []))
+        established = {"gamma": NONE, "by": "Lemma A (absorption by the loss)" if lemma else "Lemma 2"}
     elif curved.get("status") == "licensed":
         established = {"gamma": X.to_fraction(curved["gamma"]), "by": "V.22"}
     found["theorem_gamma"] = established["gamma"] if established else None
@@ -380,8 +388,9 @@ ORDER = ("refuted", "contradicted", "agrees", "consistent", "inconclusive", "unt
 def assemble(meta: Mapping[str, Any], corpus: Mapping[str, Any], budget: str, instances: Sequence[Mapping[str, Any]],
              provenance: Mapping[str, Any] | None = None) -> dict[str, Any]:
     counts = {v: sum(1 for i in instances if i["verdict"] == v) for v in ORDER}
+    # Agreeing with the theorems only restates them; a conjecture survives once a claim beyond them holds up.
     status = ("refuted" if counts["refuted"] else "contradicted" if counts["contradicted"]
-              else "survives" if counts["agrees"] + counts["consistent"] else "untested")
+              else "survives" if counts["consistent"] else "theorems-only" if counts["agrees"] else "untested")
     if provenance is None:
         git = git_state()
         provenance = {"commit": git.get("commit"), "short": git.get("short"),
@@ -389,7 +398,31 @@ def assemble(meta: Mapping[str, Any], corpus: Mapping[str, Any], budget: str, in
                       "calculator_id": fingerprint(python_files("gitcalculator"), "calc")}
     return {"schema": SCHEMA, "name": meta.get("name"), "title": meta.get("title") or meta.get("name") or "Conjecture",
             "statement": meta.get("statement") or "", "rule": meta["rule"], "corpus": dict(corpus), "budget": budget,
-            "status": status, "counts": counts, "instances": list(instances), "recorded_with": dict(provenance)}
+            "status": status, "counts": counts, "claims": claims(instances), "instances": list(instances),
+            "recorded_with": dict(provenance)}
+
+
+def claims(instances: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    """How many claims the rule made, and how many of them went beyond the established theorems."""
+    made = [i for i in instances if i.get("prediction") is not None]
+    beyond = [i for i in made if not i.get("established")]
+    verdicts = {v: sum(1 for i in beyond if i["verdict"] == v) for v in ORDER}
+    return {"made": len(made), "decided": len(made) - len(beyond), "beyond": len(beyond),
+            "beyond_verdicts": {v: n for v, n in verdicts.items() if n}}
+
+
+def claims_text(record: Mapping[str, Any]) -> str:
+    c = record.get("claims") or claims(record["instances"])
+    if not c["made"]:
+        return "The rule made no claim on this corpus."
+    if not c["beyond"]:
+        return (f"All {c['made']} claims fall on inputs that an established theorem decides, so this trial tests "
+                "nothing beyond the theorems.") if c["made"] > 1 else (
+                "Its one claim falls on an input that an established theorem decides, so this trial tests nothing "
+                "beyond the theorems.")
+    split = ", ".join(f"{n} {v}" for v, n in c["beyond_verdicts"].items())
+    return (f"{c['beyond']} of {c['made']} claim{'s' if c['made'] != 1 else ''} go{'es' if c['beyond'] == 1 else ''} "
+            f"beyond the established theorems: {split}.")
 
 
 def run(meta: Mapping[str, Any], corpus: Mapping[str, Any], budget: str = "standard",
@@ -470,6 +503,7 @@ STATUS_TEXT = {
     "refuted": "refuted by a theorem",
     "contradicted": "contradicted by certified bounds",
     "survives": "survives every test",
+    "theorems-only": "agrees with the theorems; nothing beyond them tested",
     "untested": "untested",
 }
 
@@ -492,7 +526,7 @@ def sheet(record: Mapping[str, Any], *, calculator: str | None = None) -> str:
                "inconclusive": "the bounds have not separated", "untestable": "no certified evidence is available",
                "no claim": "the rule abstains"}
     out += [f"| {v} | {counts[v]} | {meaning[v]} |" for v in ORDER if counts.get(v)]
-    out.append("")
+    out += ["", f"**Claims beyond the theorems.** {text(claims_text(record))}", ""]
     against = [i for i in instances if i["verdict"] in {"refuted", "contradicted"}]
     if against:
         out += ["#### Against the conjecture", ""]
@@ -547,5 +581,6 @@ def render_text(record: Mapping[str, Any]) -> str:
             if item.get("witness"):
                 w = item["witness"]
                 lines.append(f"  {'':<{width}}  witness: s = {w['s']}, x = ({', '.join(w['x'])}), Δ(s) ≥ {w['lower_bound']}")
-    lines += ["", "  " + ", ".join(f"{record['counts'][v]} {v}" for v in ORDER if record["counts"].get(v))]
+    lines += ["", "  " + ", ".join(f"{record['counts'][v]} {v}" for v in ORDER if record["counts"].get(v)),
+              "  " + claims_text(record)]
     return "\n".join(lines)

@@ -608,3 +608,64 @@ def test_command_line_tests_a_conjecture():
     assert "SURVIVES EVERY TEST" in out.getvalue()
     with pytest.raises(SystemExit):
         main(["conjecture", "test", "--rule", "__import__('os')"])
+
+
+# --- Lemma A: absorption by the loss ------------------------------------------------
+
+ABSORBING = "-(x0**4+x1**4+x0*x1)"
+
+
+def test_lemma_a_proves_zero_response_where_the_face_law_cannot():
+    from gitcalculator.certify import certify
+    links = lambda cert: {l["id"]: l for l in cert["links"]}
+    for perturbation, pair in (("x0*x1", "c0·c1 by c0·c1"), ("x0*x1**2", "c0·c1^2 by c0·c1"), ("x0*x1 - x0**2", "c0·c1 by c0·c1")):
+        cert, model = certify({"system": SQUARE, "base": ABSORBING, "perturbation": perturbation}, {})
+        found = links(cert)
+        assert cert["status"] == "zero_response" and found["H2"]["status"] == "failed", perturbation
+        assert found["absorption"]["status"] == "exact" and found["absorption"]["values"] == {"pairs": [pair], "s0": "1"}
+        # the inequality itself, at sample points of the box: s·R ≤ D for s ≤ s0 = 1
+        for c in ((Fraction(1, 2), Fraction(1, 3)), (Fraction(1, 10), Fraction(1)), (Fraction(1), Fraction(1))):
+            assert X.poly_evaluate(model.gain, c) <= X.poly_evaluate(model.loss, c)
+    for base, perturbation in ((ABSORBING, "x0"), (ABSORBING, "x0+x1"), ("-(x0**2+x0*x1+x1**2)", "x0"), ("-(x0**2-x0*x1+x1**2)", "x0*x1")):
+        cert, _ = certify({"system": SQUARE, "base": base, "perturbation": perturbation}, {})
+        assert cert["status"] != "zero_response" and "absorption" not in links(cert), (base, perturbation)
+    receipt = calculate({"system": SQUARE, "base": ABSORBING, "perturbation": "x0*x1"}, budget="quick")
+    assert receipt["answer"]["verdict"] == "proved" and "Lemma A" in receipt["answer"]["meaning"]
+    assert effects(receipt)["loss-absorption"] == "averted" and effects(receipt)["empty-not-zero"] == "averted"
+    assert effects(calculate(preset_request("cross-term"), budget="quick"))["loss-absorption"] == "caveat"
+
+
+@pytest.mark.skipif(NODE is None, reason="node is not installed")
+def test_browser_engine_applies_lemma_a_identically():
+    from gitcalculator.certify import certify
+    cases = [(ABSORBING, g) for g in ("x0*x1", "x0*x1**2", "x0*x1 - x0**2", "x0", "x0+x1")] + [("-(x0**2+x0*x1+x1**2)", "x0")]
+    requests = [{"system": SQUARE, "base": b, "perturbation": g} for b, g in cases]
+    for request, js in zip(requests, _browser([{"mode": "certificate", "request": r} for r in requests])):
+        python, _ = certify(request, {})
+        assert js["status"] == python["status"], request
+        assert js["links"] == {l["id"]: l["status"] for l in python["links"]}, request
+        mine = next((l for l in python["links"] if l["id"] == "absorption"), None)
+        assert (js["absorption"] or {}).get("detail") == (mine or {}).get("detail"), request
+        assert (js["absorption"] or {}).get("values") == (mine or {}).get("values"), request
+        assert dict(js["counters"])["loss-absorption"] in {"averted", "caveat", "clear"}
+
+
+def test_conjectures_count_claims_beyond_the_theorems_and_lemma_a_refutes_issue_33():
+    from gitcalculator import conjecture as C
+    restated = C.run({"rule": "if(isolated and principal, min(face_gamma, curved_gamma), unknown)"},
+                     {"kind": "presets"}, "quick")
+    assert restated["status"] == "theorems-only" and restated["claims"] == {"made": 8, "decided": 8, "beyond": 0, "beyond_verdicts": {}}
+    assert "tests nothing beyond the theorems" in C.claims_text(restated) and "tests nothing beyond" in C.sheet(restated)
+    corpus = {"kind": "inputs", "inputs": [
+        {"label": "absorbed", "system": SQUARE, "base": ABSORBING, "perturbation": "x0*x1"},
+        {"label": "cross-term", "system": SQUARE, "base": "-(x0**2+x0*x1+x1**2)", "perturbation": "x0"}]}
+    issue = C.run({"rule": "if(isolated and not principal, face_gamma, unknown)"}, corpus, "quick")
+    verdicts = {i["label"]: (i["prediction"], i["verdict"]) for i in issue["instances"]}
+    assert issue["status"] == "refuted" and verdicts["absorbed"] == ("2", "refuted")
+    assert "Lemma A (absorption by the loss) proves zero response" in issue["instances"][0]["detail"]
+    refined = C.run({"rule": "if(isolated and not principal and loss_mixed_q >= 1, face_gamma, unknown)"}, corpus, "quick")
+    assert [i["features"].get("loss_mixed_q") for i in refined["instances"]] == ["1/2", "1"]
+    assert {i["label"]: i["verdict"] for i in refined["instances"]} == {"absorbed": "no claim", "cross-term": "consistent"}
+    assert refined["status"] == "survives" and refined["claims"]["beyond"] == 1
+    no_mixed, _, _ = C.features({"system": SQUARE, "base": "-(x0**4+x1**2)", "perturbation": "x0"}, {})
+    assert no_mixed["loss_mixed_q"] is C.NONE  # no mixed term: infinitely far above any degree

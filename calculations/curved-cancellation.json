@@ -6,7 +6,7 @@
     "base": "-(x0**6+x1**6)",
     "perturbation": "-x0**2+x0*x1**2-x1**4/4+x1**5"
   },
-  "receipt_id": "gc-1ed33d813c495029",
+  "receipt_id": "gc-94be908677fd6d96",
   "answer": {
     "verdict": "proved-v22",
     "headline": "Δ(s) ~ 3125/46656·s^6",
@@ -68,12 +68,13 @@
       "critical-layer": "clear",
       "tied-coefficient": "clear",
       "inverse-tolerance": "clear",
-      "non-simple": "clear"
+      "non-simple": "clear",
+      "loss-absorption": "clear"
     }
   },
   "recorded_with": {
-    "commit": "b6e4350d854e5eb017691f2651f37b46fbf3a864",
+    "commit": "c2f1e7db9c833a08e2e615488743604567dfa17f",
     "code_id": "code-23ad9e729a48",
-    "calculator_id": "calc-d0fa59fc8cee"
+    "calculator_id": "calc-47973d185bc6"
   }
 }

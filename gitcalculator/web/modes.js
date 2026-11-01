@@ -49,7 +49,7 @@
       return stuck.length ? ["blocks", `Mixed-sign initial forms without a positive witness: ${stuck.map((f) => `{${f.face.join(", ")}}: ${f.initial_form}`).join("; ")}.`] : ["clear", "Every initial form is decided by its signs or an exact witness."];
     },
     "empty-not-zero": (ctx) => {
-      if (ctx.certificate.status === "zero_response") return ["averted", "Lemma 2 certifies Δ(s) = 0 for small s, so here the refusal does mean no response."];
+      if (ctx.certificate.status === "zero_response") return ["averted", `${linkOf(ctx, "absorption").status === "exact" ? "Lemma A (absorption by the loss)" : "Lemma 2"} certifies Δ(s) = 0 for small s, so here the refusal does mean no response.`];
       if (ctx.certificate.q_star) return ["clear", "A response exponent was produced."];
       if (ctx.measurement.positive_gain_found) { const g = ctx.measurement.measured_exponent; return ["caveat", "No face qualifies, yet certified lower bounds are positive" + (g ? ` and scale like s^${g}.` : ".")]; }
       return ["caveat", "No qualified face. That alone proves neither zero response nor a competing law."];
@@ -100,6 +100,15 @@
       return ["caveat", `Inverse status ${status}: q_obs = 1 − 1/γ_obs = ${qObs.toFixed(4)} is compared with the qualified face degrees within tolerance ${tol}; it does not reconstruct the objective.`];
     },
     "non-simple": (ctx) => (linkOf(ctx, "vertex").status === "failed" ? ["blocks", linkOf(ctx, "vertex").detail] : ["clear", "The selected vertex is simple."]),
+    "loss-absorption": (ctx) => {
+      const candidate = faces(ctx).some((f) => f.winning), a = linkOf(ctx, "absorption");
+      if (a.status === "exact") {
+        const pairs = (a.values || {}).pairs || [];
+        return ["averted", (candidate ? "A face qualifies under the diagonal weights, but the loss" : "The loss") + " absorbs every positive term of the gain" + (pairs.length ? ` (${pairs.join("; ")})` : "") + ", so Lemma A proves Δ(s) = 0 for small s."];
+      }
+      if (linkOf(ctx, "H2").status === "failed" && candidate) return ["caveat", "Hypothesis 2 fails, so the face data's exponent is only a candidate: a mixed term of the loss below the diagonal weights can absorb the gain it divides."];
+      return ["clear", "The principal part is diagonal, or no face candidate rests on a non-diagonal one."];
+    },
   };
   const REGISTRY = [
     ["ambient-axes", "Ambient axes decide the exponent", "Probing F and G along the ambient coordinate axes at v gives the Newton data.", "At the simplex vertex (0,1), the ambient direction (1,0) leaves P and sees quadratic decay, predicting γ = 2. The feasible chart u₀ = (1,−1), u₁ = (0,−1) gives D = c₀⁴ + c₁², R = c₀, and Δ(s) = 3·4^(−4/3)·s^(4/3).", ["README.md#the-decisive-example-feasibility-comes-before-degree", "docs/FORMAL_AMBIENT_FACE_TRANSPORT.md#why-ambient-axes-fail"], { system: SIMPLEX, base: "-((x0+x1-1)**2 + x0**4)", perturbation: "x0" }],
@@ -115,6 +124,7 @@
     ["finite-scale", "The asymptotic law gives the response at a given s", "Δ(s) ≈ C·s^γ is accurate whenever the exponent is licensed.", "The runbook's finite-scale pair shares the licensed exponent 3, yet one request lies outside a 10% tolerance at its scale: asymptotic validity and finite-scale accuracy are separate decisions.", ["docs/CURVED_FINITE_SCALE.md", "docs/RUNBOOK.md#finite-scale-accuracy-is-a-separate-question"], null],
     ["inverse-tolerance", "Inverse matching identifies the mechanism exactly", "An observed exponent recovers the winning mechanism.", "The inverse block compares q_obs = 1 − 1/γ_obs with the admitted face degrees within an absolute tolerance; it can be ambiguous or unmatched and never reconstructs the objective.", ["docs/FACE_SELECTION_BACKEND.md#forward-and-inverse-power"], null],
     ["non-simple", "The law applies at any vertex", "Face selection works at every maximizing vertex.", "At the apex of a square pyramid four constraints are active in dimension three. The tangent cone is not simplicial, there is no edge chart, and the theorem does not apply.", ["docs/FORMAL_FACE_SELECTION.md#10-scope"], { system: PYRAMID, base: "x2", perturbation: "x0" }],
+    ["loss-absorption", "A qualified face fixes the exponent without a diagonal principal part", "Under global isolation, the face data's exponent holds even when Hypothesis 2 fails.", "D = x⁴ + y⁴ + xy, R = xy: the face {x, y} qualifies with q = 1/2 under the diagonal weights, yet F + sG = −x⁴ − y⁴ − (1 − s)xy ≤ 0 on the square, so Δ(s) = 0 for s ≤ 1. The mixed loss term absorbs the gain monomial it divides (Lemma A).", ["docs/FORMAL_LOSS_ABSORPTION.md#statement", "docs/FORMAL_FACE_SELECTION.md#4-hypotheses-with-uniform-remainders"], { system: SQUARE, base: "-(x0**4+x1**4+x0*x1)", perturbation: "x0*x1" }],
   ];
   const EFFECT_ORDER = { blocks: 0, caveat: 1, averted: 2, clear: 3 };
   function assess(ctx) {
@@ -126,7 +136,8 @@
   }
 
   // ===== receipts ==============================================================
-  const STEP_CHALLENGES = { standing: [], vertex: ["non-simple"], transport: ["ambient-axes"], H0: ["isolation-probe"], H1: [], H2: ["homogeneity-probe"], H3: [], faces: ["interior-zero", "critical-layer", "tied-coefficient"], H5: ["signed-channel", "signed-sharp"], selection: ["empty-not-zero", "active-set", "finite-scale", "inverse-tolerance"] };
+  const STEP_CHALLENGES = { standing: [], vertex: ["non-simple"], transport: ["ambient-axes"], H0: ["isolation-probe"], H1: [], H2: ["homogeneity-probe", "loss-absorption"], H3: [], faces: ["interior-zero", "critical-layer", "tied-coefficient"], H5: ["signed-channel", "signed-sharp"], selection: ["empty-not-zero", "active-set", "finite-scale", "inverse-tolerance"], absorption: ["loss-absorption"] };
+  const ABSORBED = "Zero response is proved exactly: the loss absorbs every positive term of the gain (Lemma A).";
   const VERDICTS = {
     proved: "Every hypothesis of the theorem is discharged in exact arithmetic.",
     "proved-v22": "The curved-reduction theorem V.22 applies, with exact checks.",
@@ -203,7 +214,7 @@
       measurement: Object.fromEntries((measurement.verdicts || []).map((v) => [v.id, v.verdict])), counter: Object.fromEntries(counter.map((c) => [c.id, c.effect])) };
     const receipt = {
       schema: "gitcalculator.receipt.v1", engine: ENGINE_VERSION, input: inputs,
-      answer: { verdict, meaning: VERDICTS[verdict], headline, gamma, q_star: qStar, coefficient, backend_status: "not run (browser engine)", certificate_status: cert.status },
+      answer: { verdict, meaning: verdict === "proved" && (cert.links || []).some((l) => l.id === "absorption" && l.status === "exact") ? ABSORBED : VERDICTS[verdict], headline, gamma, q_star: qStar, coefficient, backend_status: "not run (browser engine)", certificate_status: cert.status },
       steps, certificate, alternatives, measurement, counterarguments: counter,
       newton: newtonData(model || local.model, cert), geometry: geometryData(local, measurement),
       provenance: { git: options.git || {}, code_id: "browser engine", calculator_id: options.engineBlob || ENGINE_VERSION, sources: {}, documents: {}, runtime: { engine: "javascript", python: "—" } },

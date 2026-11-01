@@ -1076,8 +1076,15 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
     return store.starting;
   }
   // ===== Conjecture: a candidate law, tested with the repository's Python ==========
-  const CONJ_STATUS = { refuted: "refuted by a theorem", contradicted: "contradicted by certified bounds", survives: "survives every test", untested: "untested" };
-  const CONJ_CLASS = { refuted: "v-contradicted", contradicted: "v-unlicensed", survives: "v-proved", untested: "v-refused" };
+  const CONJ_STATUS = { refuted: "refuted by a theorem", contradicted: "contradicted by certified bounds", survives: "survives every test", "theorems-only": "agrees with the theorems; nothing beyond them tested", untested: "untested" };
+  const CONJ_CLASS = { refuted: "v-contradicted", contradicted: "v-unlicensed", survives: "v-proved", "theorems-only": "v-licensed", untested: "v-refused" };
+  function claimsText(record) { // as conjecture.claims_text
+    const made = record.instances.filter((i) => i.prediction != null), beyond = made.filter((i) => !i.established);
+    if (!made.length) return "The rule made no claim on this corpus.";
+    if (!beyond.length) return made.length > 1 ? `All ${made.length} claims fall on inputs that an established theorem decides, so this trial tests nothing beyond the theorems.` : "Its one claim falls on an input that an established theorem decides, so this trial tests nothing beyond the theorems.";
+    const split = CONJ_ORDER.map((v) => [v, beyond.filter((i) => i.verdict === v).length]).filter(([, n]) => n).map(([v, n]) => `${n} ${v}`).join(", ");
+    return `${beyond.length} of ${made.length} claim${made.length !== 1 ? "s" : ""} go${beyond.length === 1 ? "es" : ""} beyond the established theorems: ${split}.`;
+  }
   const CONJ_ORDER = ["refuted", "contradicted", "agrees", "consistent", "inconclusive", "untestable", "no claim"];
   const PY_PLAN = "import json\nfrom gitcalculator import conjecture as C\nJOB = json.loads(REQUEST_JSON)\nC.parse_rule(JOB['meta']['rule'])\njson.dumps(C.plan(JOB['corpus']), ensure_ascii=False)";
   const PY_TRIAL = "import json\nfrom gitcalculator import conjecture as C\nJOB = json.loads(REQUEST_JSON)\njson.dumps(C.trial(JOB['rule'], JOB['item'], JOB['budget']), ensure_ascii=False)";
@@ -1118,7 +1125,7 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
     $("c-statement").textContent = record.statement || "";
     const counts = record.counts || {};
     $("c-meaning").textContent = `Rule ${record.rule}, on ${record.instances.length} input${record.instances.length === 1 ? "" : "s"}: ` +
-      CONJ_ORDER.filter((k) => counts[k]).map((k) => `${counts[k]} ${k}`).join(", ") + ".";
+      CONJ_ORDER.filter((k) => counts[k]).map((k) => `${counts[k]} ${k}`).join(", ") + ". " + claimsText(record);
     const w = record.recorded_with || {};
     $("c-stamp").innerHTML = `${origin} · commit ${esc(w.short || "—")} · Python ${esc(w.code_id || "—")}`;
     const against = record.instances.filter((i) => i.verdict === "refuted" || i.verdict === "contradicted");

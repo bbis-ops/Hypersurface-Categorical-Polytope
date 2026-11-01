@@ -21,6 +21,14 @@ function run(job) {
       ambient: r.alternatives.ambient_axes ? r.alternatives.ambient_axes.gamma : null,
     };
   }
+  if (job.mode === "map") {
+    const m = G.phaseMap(job.request);
+    if (m.status !== "complete") return { status: m.status };
+    return { status: m.status, cells: m.grid.map((k) => [m.outcomes[k].verdict, m.outcomes[k].gamma, m.outcomes[k].winners]),
+      laws: Object.fromEntries(m.laws.map((l) => [l.monomial, l.terms])) };
+  }
+  if (job.mode === "sheet") return { markdown: G.sheet(job.receipt, job.options || {}) };
+  if (job.mode === "solve-sheet") return { markdown: G.sheet(G.solve(job.request, { budget: "quick" }), job.options || {}) };
   if (job.mode === "geometry") {
     const g = G.solve(job.request, { measure: false }).geometry;
     return { n: g.n, vertex_index: g.vertex_index, active: g.active, simple: g.simple, facets: g.facets };

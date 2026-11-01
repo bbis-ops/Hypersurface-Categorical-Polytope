@@ -6,7 +6,9 @@ import io
 import json
 import re
 import shutil
+import socket
 import subprocess
+import threading
 from contextlib import redirect_stdout
 from fractions import Fraction
 
@@ -21,7 +23,9 @@ from gitcalculator.measure import floor_decimal
 from gitcalculator.presets import preset_request
 from gitcalculator.provenance import ROOT, blob_id
 from gitcalculator.receipt import backend, calculate
+from gitcalculator.site import LEDGER_SCHEMA, PYODIDE_VERSION, render_page, server
 from gitcalculator.tape import TAPE, verify
+from gitcalculator.visit import visit
 
 SIMPLEX = "([[-1,0],[0,-1],[1,1]], [0,0,1])"
 
@@ -168,6 +172,111 @@ def test_bundled_snapshots_are_checked_against_their_blob_ids(tmp_path):
     bundle["blobs"][blob_id(good.encode())] = "print('tampered')\n"
     with pytest.raises(ValueError):
         BundleSource(bundle, tmp_path / "other").materialize(source.states()[0])
+
+
+def _site(root, head, blobs, page=None):
+    """A small published calculator: the real page, a one-preset ledger, a bundle and a stub Pyodide."""
+    (root / "index.html").write_text(page or render_page(head), encoding="utf-8")
+    ledger = {"schema": LEDGER_SCHEMA, "head": head, "live_engine": True,
+              "presets": {"tilted-simplex": {"receipt": {"id": "gc-0"}, "history": {"states": []}}}}
+    (root / "ledger.json").write_text(json.dumps(ledger), encoding="utf-8")
+    bundle = {"schema": BUNDLE_SCHEMA, "head": head, "blobs": blobs, "documents": {}, "calculator": {"files": {}},
+              "states": [{"code_id": "code-x", "commits": [], "files": {f"categorical_polytope/{i}.py": b
+                                                                        for i, b in enumerate(blobs)}}],
+              "pyodide": {"version": PYODIDE_VERSION, "index": "./pyodide/"}}
+    (root / "bundle.json").write_text(json.dumps(bundle), encoding="utf-8")
+    runtime = root / "pyodide"
+    runtime.mkdir(exist_ok=True)
+    (runtime / "pyodide.js").write_text("// loader\n")
+    (runtime / "pyodide.asm.js").write_text("// runtime\n")
+    (runtime / "pyodide.asm.wasm").write_bytes(b"\0asm\x01\0\0\0")
+    (runtime / "python_stdlib.zip").write_bytes(b"PK\x03\x04" + bytes(26))
+    (runtime / "pyodide-lock.json").write_text(json.dumps({"info": {"version": PYODIDE_VERSION}}))
+
+
+@pytest.fixture
+def published(tmp_path):
+    """Serve ``tmp_path`` the way GitHub Pages serves the calculator, and yield its address."""
+    httpd = server(tmp_path, 0, quiet=True)
+    threading.Thread(target=httpd.serve_forever, daemon=True).start()
+    yield f"http://127.0.0.1:{httpd.server_address[1]}/"
+    httpd.shutdown()
+    httpd.server_close()
+
+
+def test_visit_checks_every_file_a_browser_loads(tmp_path, published):
+    head = {"commit": "f" * 40, "short": "fffffff", "dirty": False}
+    good = "print('ok')\n"
+    _site(tmp_path, head, {blob_id(good.encode()): good})
+    report = visit(published)
+    assert report["ok"], report["problems"]
+    assert [row["path"] for row in report["files"]][:3] == ["index.html", "ledger.json", "bundle.json"]
+    assert {row["path"] for row in report["files"] if row["status"] == 200} >= {"pyodide/pyodide.asm.wasm"}
+    assert any("not in this clone" in note for note in report["files"][0]["notes"])
+    assert report["checked_against_git"] is False
+
+    out = io.StringIO()
+    with redirect_stdout(out):
+        assert main(["visit", published]) == 0
+        assert main(["visit", published, "--commit", "e" * 40]) == 1
+    assert "every file it loads checks out" in out.getvalue() and "serving build fffffff, not eeeeeee" in out.getvalue()
+
+    bundle = json.loads((tmp_path / "bundle.json").read_text())
+    bundle["blobs"][blob_id(good.encode())] = "print('tampered')\n"
+    (tmp_path / "bundle.json").write_text(json.dumps(bundle))
+    assert any("does not hash to its id" in p for p in visit(published)["problems"])
+
+    _site(tmp_path, head, {blob_id(good.encode()): good})
+    ledger = json.loads((tmp_path / "ledger.json").read_text())
+    ledger["head"] = {"commit": "e" * 40}
+    (tmp_path / "ledger.json").write_text(json.dumps(ledger))
+    (tmp_path / "pyodide" / "python_stdlib.zip").unlink()
+    problems = visit(published)["problems"]
+    assert "ledger.json: from build eeeeeee, but the page is build fffffff" in problems
+    assert "pyodide/python_stdlib.zip: HTTP 404" in problems
+
+    engine = (ROOT / "gitcalculator" / "web" / "engine.js").read_text(encoding="utf-8")
+    page = render_page(head).replace(engine, engine + "/* edited after the build */\n", 1)
+    _site(tmp_path, head, {blob_id(good.encode()): good}, page=page)
+    assert "index.html: the inlined engine.js does not hash to its stamped blob id" in visit(published)["problems"]
+
+    with socket.socket() as probe:  # an address where nothing listens
+        probe.bind(("127.0.0.1", 0))
+        closed = f"http://127.0.0.1:{probe.getsockname()[1]}/"
+    unreachable = visit(closed)
+    assert not unreachable["ok"] and unreachable["files"][0]["status"] is None
+
+
+def _git_text(spec):
+    try:
+        return subprocess.run(["git", "show", spec], cwd=ROOT, check=True, capture_output=True).stdout.decode()
+    except (OSError, subprocess.CalledProcessError):
+        return None
+
+
+@pytest.mark.skipif(_git_text("HEAD:gitcalculator/web/engine.js") is None, reason="needs git and a commit with the engine")
+def test_visit_compares_a_clean_build_with_its_commit(tmp_path, published):
+    commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+    head = {"commit": commit, "short": commit[:7], "dirty": False}
+    engine, modes = _git_text("HEAD:gitcalculator/web/engine.js"), _git_text("HEAD:gitcalculator/web/modes.js")
+    stamp = {"engine_blob": blob_id(engine.encode()), "modes_blob": blob_id(modes.encode()),
+             "commit": commit, "short": commit[:7]}
+    page = (f"<!doctype html><title>gitcalculator</title><script>window.GITCALC_BUILD = {json.dumps(stamp)};</script>\n"
+            f"<script>\n{engine}</script>\n<script>\n{modes}</script>\n")
+    committed = _git_text("HEAD:gitcalculator/presets.py")
+    _site(tmp_path, head, {blob_id(committed.encode()): committed}, page=page)
+    report = visit(published, commit=commit)
+    assert report["ok"] and report["checked_against_git"], report["problems"]
+    assert "every blob is an object in this repository" in report["files"][2]["notes"]
+
+    stray = "print('never committed, 7f3a')\n"
+    _site(tmp_path, head, {blob_id(committed.encode()): committed, blob_id(stray.encode()): stray}, page=page)
+    assert any("not objects in this repository" in p for p in visit(published, commit=commit)["problems"])
+
+    head = dict(head, dirty=True, dirty_paths=["gitcalculator/presets.py"])
+    _site(tmp_path, head, {blob_id(committed.encode()): committed, blob_id(stray.encode()): stray}, page=page)
+    assert visit(published)["ok"]
+    assert "uncommitted changes" in " ".join(visit(published, commit=commit)["problems"])
 
 
 def _has_history() -> bool:
@@ -338,3 +447,105 @@ def test_browser_engine_facets_match_exact_python_geometry():
     assert sorted(len(f) for f in cube["facets"]) == [4] * 6 and cube["simple"] and len(cube["active"]) == 3
     assert sorted(len(f) for f in pyramid["facets"] if len(f) >= 3) == [3, 3, 3, 3, 4]
     assert not pyramid["simple"] and len(pyramid["active"]) == 4
+
+
+# --- proof sheets and the tape from GitHub ------------------------------------------
+
+def _ghmath():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("ghmath", ROOT / "experiments" / "ghmath.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+@pytest.fixture(scope="module")
+def every_receipt():
+    from gitcalculator.presets import PRESETS
+    return {name: calculate(preset_request(name), budget="quick") for name in sorted(PRESETS)}
+
+
+def test_proof_sheets_render_on_github_and_pin_their_links(every_receipt):
+    from gitcalculator.sheet import sheet
+    check = _ghmath().check_text
+    for name, receipt in every_receipt.items():
+        markdown = sheet(receipt, repository="https://github.com/o/r", ref="abc123", calculator="https://o.github.io/r/")
+        assert check(markdown) == [], (name, check(markdown))
+        assert markdown.startswith(f"### {receipt['answer']['headline'].replace('>', chr(92) + '>').replace('~', chr(92) + '~')} · ")
+        statuses = [line.split(" | ")[1] for line in markdown.splitlines() if line.startswith("| [")]
+        assert statuses == [link["status"].replace("_", " ") for link in receipt["certificate"]["links"]], name
+        assert "https://github.com/o/r/blob/abc123/docs/" in markdown and "https://o.github.io/r/?system=" in markdown
+    proved = sheet(every_receipt["cube-3d"])
+    assert "\\frac{1}{1 - \\tfrac{1}{6}} = \\tfrac{6}{5}" in proved
+    assert "\\Delta(s) \\sim \\tfrac{1}{432}\\, s^{3}" in sheet(every_receipt["signed-sharp"])
+    unpinned = sheet(every_receipt["cube-3d"], repository="https://github.com/o/r", ref="abc123", linkable=[])
+    assert "/blob/" not in unpinned and "/commit/" not in unpinned  # nothing links where the files are not known to exist
+
+
+@pytest.mark.skipif(NODE is None, reason="node is not installed")
+def test_the_browser_writes_the_same_proof_sheet(every_receipt):
+    from gitcalculator.sheet import sheet
+    from gitcalculator.presets import PRESETS
+    options = [{}, {"repository": "https://github.com/o/r", "ref": "abc123", "calculator": "https://o.github.io/r/",
+                    "linkable": ["docs/FORMAL_FACE_SELECTION.md"]}]
+    jobs = [{"mode": "sheet", "receipt": r, "options": o} for r in every_receipt.values() for o in options]
+    jobs += [{"mode": "solve-sheet", "request": preset_request(n), "options": options[1]} for n in sorted(PRESETS)]
+    results = _browser(jobs)
+    expected = [sheet(r, **o) for r in every_receipt.values() for o in options]
+    assert [r["markdown"] for r in results[:len(expected)]] == expected
+    check = _ghmath().check_text
+    assert {n: check(r["markdown"]) for n, r in zip(sorted(PRESETS), results[len(expected):]) if check(r["markdown"])} == {}
+
+
+def test_command_line_prints_a_proof_sheet():
+    out = io.StringIO()
+    with redirect_stdout(out):
+        assert main(["calc", "--preset", "cube-3d", "--budget", "quick", "--markdown"]) == 0
+    text = out.getvalue()
+    assert text.startswith("### Δ(s) = Θ(s^6/5) · proved\n\n```math\n") and "python -m gitcalculator calc --system" in text
+
+
+def test_a_new_calculation_can_be_recorded_on_the_tape(tmp_path):
+    from gitcalculator import tape
+    request = {"system": SIMPLEX, "base": "-((x0+x1-1)**2 + x0**4)", "perturbation": "x0 + x1**3"}
+    path = tape.record("orthant-check", request, tmp_path)
+    stored = json.loads(path.read_text(encoding="utf-8"))
+    assert stored["input"] == request and stored["name"] == "orthant-check"
+    assert [row["unchanged"] for row in tape.verify(tmp_path)] == [True]
+    with pytest.raises(SystemExit):
+        main(["tape", "record", "Not A Name", "--system", SIMPLEX, "--base", "-x0", "--perturbation", "x0"])
+    with pytest.raises(SystemExit):
+        main(["tape", "record", "two-inputs-missing", "--system", SIMPLEX])
+
+
+# --- the phase map ----------------------------------------------------------------------
+
+def test_phase_map_finds_the_chambers_and_exact_coefficient_laws():
+    from gitcalculator.modes import phase_map
+    from gitcalculator.presets import MAP_PRESETS
+    family = MAP_PRESETS["two-edges"]
+    result = phase_map(family["system"], family["base"], family["perturbation"], resolution=6)
+    shares = {(o["verdict"], o["gamma"], o["winners"]): o["cells"] for o in result["outcomes"]}
+    assert shares == {("proved", None, ""): 9, ("proved", "4/3", "{c0}"): 18, ("proved", "2", "{c1}"): 9}
+    assert {law["monomial"]: law["terms"] for law in result["laws"]} == {"c0": {"1,0": "1"}, "c1": {"0,1": "1"}}
+    channel = MAP_PRESETS["signed-channel"]
+    curved = phase_map(channel["system"], channel["base"], channel["perturbation"], resolution=4)
+    assert {(o["verdict"], o["gamma"]) for o in curved["outcomes"]} == {("proved", None), ("proved-v22", "3"), ("proved", "6")}
+    out = io.StringIO()
+    with redirect_stdout(out):
+        assert main(["map", "--preset", "two-edges", "--resolution", "4"]) == 0
+    assert "A  Δ(s) = 0 for small s (proved)" in out.getvalue() and "a(t, u) = t" in out.getvalue()
+
+
+@pytest.mark.skipif(NODE is None, reason="node is not installed")
+def test_browser_phase_map_matches_python_cell_for_cell():
+    from gitcalculator.modes import phase_map
+    from gitcalculator.presets import MAP_PRESETS
+    names = sorted(MAP_PRESETS)
+    requests = [dict(system=MAP_PRESETS[n]["system"], base=MAP_PRESETS[n]["base"], perturbation=MAP_PRESETS[n]["perturbation"],
+                     t_from="-1", t_to="1", u_from="-1", u_to="1", resolution=8) for n in names]
+    for name, request, js in zip(names, requests, _browser([{"mode": "map", "request": r} for r in requests])):
+        python = phase_map(request["system"], request["base"], request["perturbation"], resolution=8)
+        cells = [[o["verdict"], o["gamma"], o["winners"]] for o in (python["outcomes"][k] for k in python["grid"])]
+        assert js["cells"] == cells, name
+        assert js["laws"] == {law["monomial"]: law["terms"] for law in python["laws"]}, name

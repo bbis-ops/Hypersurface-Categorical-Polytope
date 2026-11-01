@@ -7,7 +7,7 @@ import json
 import sys
 from pathlib import Path
 
-from .presets import PRESETS, preset_request
+from .presets import MAP_PRESETS, PRESETS, preset_request
 
 
 def _request(args: argparse.Namespace) -> dict:
@@ -42,6 +42,8 @@ def main(argv: list[str] | None = None) -> int:
     calc.add_argument("--budget", choices=("quick", "standard"), default="standard")
     calc.add_argument("--full", action="store_true", help="include the complete backend response")
     calc.add_argument("--history", action="store_true", help="also replay the input across git history")
+    calc.add_argument("--markdown", action="store_true",
+                      help="print a proof sheet in GitHub Markdown, for an issue or a pull request")
 
     design = sub.add_parser("design", help="the exponent spectrum of a vertex, and perturbations that reach a target")
     design.add_argument("--preset", choices=sorted(PRESETS), help="take P and F from a preset")
@@ -54,6 +56,18 @@ def main(argv: list[str] | None = None) -> int:
     _inputs(sweep)
     sweep.add_argument("--from", dest="low", default="-1")
     sweep.add_argument("--to", dest="high", default="1")
+
+    phase = sub.add_parser("map", help="the exact phase map of a two-parameter family G(t, u)")
+    phase.add_argument("--preset", choices=sorted(MAP_PRESETS), help="a canonical family")
+    phase.add_argument("--system")
+    phase.add_argument("--base")
+    phase.add_argument("--perturbation", help="G written with the parameters t and u")
+    phase.add_argument("--t-from", default="-1")
+    phase.add_argument("--t-to", default="1")
+    phase.add_argument("--u-from", default="-1")
+    phase.add_argument("--u-to", default="1")
+    phase.add_argument("--resolution", type=int, default=24, help="cells along each axis (at most 128)")
+    phase.add_argument("--json", action="store_true")
 
     attack = sub.add_parser("attack", help="generate counterexamples to one answer")
     _inputs(attack)
@@ -68,7 +82,10 @@ def main(argv: list[str] | None = None) -> int:
 
     tape = sub.add_parser("tape", help="record or verify calculations kept in calculations/")
     tape.add_argument("action", choices=("record", "verify"))
-    tape.add_argument("names", nargs="*", help="presets to record (default: all)")
+    tape.add_argument("names", nargs="*", help="presets to record (default: all), or one new name with --system --base --perturbation")
+    tape.add_argument("--system", help="record a new calculation: the polyhedron")
+    tape.add_argument("--base", help="the base objective F")
+    tape.add_argument("--perturbation", help="the perturbation G")
 
     site = sub.add_parser("site", help="build the static web calculator")
     site.add_argument("--out", type=Path, default=Path("tmp/gitcalculator/site"))
@@ -76,13 +93,21 @@ def main(argv: list[str] | None = None) -> int:
     site.add_argument("--fragment", action="store_true", help="omit the document skeleton (for a Claude artifact)")
     site.add_argument("--recorded-only", action="store_true", help="ship recorded receipts without the live engine")
 
+    visit = sub.add_parser("visit", help="load a published web calculator as a browser does and check every file")
+    visit.add_argument("url", help="where the calculator is published, such as https://OWNER.github.io/REPOSITORY/")
+    visit.add_argument("--commit", help="require this build, and check it against this clone's git objects")
+    visit.add_argument("--wait", type=float, default=0.0, metavar="SECONDS",
+                       help="retry for up to this long, for a deployment that is still reaching every server")
+    visit.add_argument("--json", action="store_true", help="print JSON instead of the report")
+
     serve = sub.add_parser("serve", help="build the web calculator and open it at http://127.0.0.1:PORT")
     serve.add_argument("--port", type=int, default=8000)
     serve.add_argument("--pyodide", type=Path, help="a local Pyodide directory to vendor instead of the CDN")
 
     # An expression such as -(x0**4+x1**4) starts like an option; bind it to its flag.
     raw = list(sys.argv[1:] if argv is None else argv)
-    valued = {"--system", "--base", "--perturbation", "--target", "--from", "--to", "--observed"}
+    valued = {"--system", "--base", "--perturbation", "--target", "--from", "--to", "--observed",
+              "--t-from", "--t-to", "--u-from", "--u-to"}
     bound: list[str] = []
     while raw:
         token = raw.pop(0)
@@ -124,6 +149,20 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"\ntarget γ = {target['gamma']} is not reachable by any qualified face or V.22 channel here; "
                       f"nearest: {target['nearest_below']} below, {target['nearest_above']} above")
         return 0
+
+    if args.command == "map":
+        from .modes import phase_map, render_map
+        family = dict(MAP_PRESETS[args.preset]) if args.preset else {}
+        for name in ("system", "base", "perturbation"):
+            if getattr(args, name):
+                family[name] = getattr(args, name)
+        missing = [name for name in ("system", "base", "perturbation") if not family.get(name)]
+        if missing:
+            raise SystemExit(f"give --preset, or all of --system --base --perturbation (missing: {', '.join(missing)})")
+        result = phase_map(family["system"], family["base"], family["perturbation"], (args.t_from, args.t_to),
+                           (args.u_from, args.u_to), args.resolution)
+        print(json.dumps(result, indent=2, ensure_ascii=False) if args.json else render_map(result, family["perturbation"]))
+        return 0 if result["status"] == "complete" else 1
 
     if args.command == "sweep":
         from .modes import sweep as run_sweep
@@ -176,6 +215,11 @@ def main(argv: list[str] | None = None) -> int:
             receipt["history"] = replay(receipt["input"])
         if args.json:
             print(json.dumps(receipt, indent=2, ensure_ascii=False))
+        elif args.markdown:
+            from .sheet import sheet
+            from .site import link_target
+            ref, linkable = link_target(receipt["provenance"]["git"])
+            print(sheet(receipt, ref=ref, linkable=linkable or None), end="")
         else:
             print(render_text(receipt))
             if args.history:
@@ -208,6 +252,14 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "tape":
         from . import tape
         if args.action == "record":
+            given = {k: getattr(args, k) for k in ("system", "base", "perturbation") if getattr(args, k)}
+            if given:
+                import re
+                if len(given) < 3 or len(args.names) != 1 or not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,63}", args.names[0]):
+                    raise SystemExit("a new calculation needs one name (lowercase letters, digits and dashes) "
+                                     "and all of --system --base --perturbation")
+                print(f"recorded {tape.record(args.names[0], given).relative_to(tape.ROOT)}")
+                return 0
             for name in args.names or list(PRESETS):
                 print(f"recorded {tape.record(name, preset_request(name)).relative_to(tape.ROOT)}")
             return 0
@@ -225,17 +277,22 @@ def main(argv: list[str] | None = None) -> int:
         print(f"web calculator written to {out}")
         return 0
 
+    if args.command == "visit":
+        from .visit import render, visit_until
+
+        def progress(attempt: int, report: dict) -> None:
+            print(f"attempt {attempt}: {report['problems'][0]}; retrying", file=sys.stderr, flush=True)
+
+        report = visit_until(args.url, commit=args.commit, wait=args.wait, progress=progress)
+        print(json.dumps(report, indent=2) if args.json else render(report))
+        return 0 if report["ok"] else 1
+
     if args.command == "serve":
-        import mimetypes
-        from functools import partial
-        from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
-        from .site import build
-        out = build(Path("tmp/gitcalculator/serve"), pyodide=args.pyodide)
-        mimetypes.add_type("application/wasm", ".wasm")
-        server = ThreadingHTTPServer(("127.0.0.1", args.port), partial(SimpleHTTPRequestHandler, directory=str(out)))
+        from .site import build, server
+        httpd = server(build(Path("tmp/gitcalculator/serve"), pyodide=args.pyodide), args.port)
         print(f"gitcalculator running at http://127.0.0.1:{args.port}/  (Ctrl+C stops it)", flush=True)
         try:
-            server.serve_forever()
+            httpd.serve_forever()
         except KeyboardInterrupt:
             pass
         return 0

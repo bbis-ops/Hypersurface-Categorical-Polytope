@@ -80,3 +80,22 @@ def preset_request(name: str) -> dict:
     if name not in PRESETS:
         raise KeyError(f"unknown preset {name!r}; choose from {', '.join(PRESETS)}")
     return dict(PRESETS[name]["request"], request_id=name)
+
+
+# Two-parameter families for the phase map (python -m gitcalculator map, and Map on the web page).
+MAP_PRESETS = {
+    "signed-channel": {"title": "The signed channel", "system": SQUARE,
+                       "base": "-(x0**6+x1**6)", "perturbation": "-x0**2 + t*x0*x1**2 + u*x1**5",
+                       "note": "Where the cross term is positive, the V.22 curved channel takes over from the face law; "
+                               "t = u = 1 is the signed-sharp counterexample."},
+    "two-edges": {"title": "Two edges", "system": SQUARE,
+                  "base": "-(x0**4 + x1**2)", "perturbation": "t*x0 + u*x1",
+                  "note": "Each edge's sign opens or closes its face: γ = 4/3 through c0, 2 through c1, and no response."},
+    "tie": {"title": "A tie and an absorbed cross term", "system": SQUARE,
+            "base": "-(x0**2 + x1**4)", "perturbation": "t*x0 + u*x1**2 + x0*x1",
+            "note": "Both edges tie at q* = 1/2; where both coefficients are negative, they absorb the positive cross term."},
+    "quadratic-form": {"title": "A quadratic form on the orthant", "system": SQUARE,
+                       "base": "-(x0**4+x1**4)", "perturbation": "t*x0**2 + u*x0*x1 - x1**2",
+                       "note": "The face {c0,c1} qualifies only where the form is positive inside the orthant: a parabolic "
+                               "wall no single coefficient sees."},
+}

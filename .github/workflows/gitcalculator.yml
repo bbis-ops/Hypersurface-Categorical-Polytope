@@ -27,26 +27,34 @@ jobs:
         run: python -m gitcalculator tape verify
 
   pages-enabled:
-    # Deploys only where GitHub Pages is switched on with the GitHub Actions
-    # source (Settings -> Pages); elsewhere this job reports and stops.
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    # Finds where GitHub Pages publishes this repository, when Pages is switched
+    # on with the GitHub Actions source (Settings -> Pages); elsewhere this job
+    # reports that, and the jobs that publish and visit the site are skipped.
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       pages: read
     outputs:
       enabled: ${{ steps.check.outputs.enabled }}
+      url: ${{ steps.check.outputs.url }}
     steps:
       - id: check
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           source=$(gh api "repos/${GITHUB_REPOSITORY}/pages" --jq .build_type 2>/dev/null || true)
-          echo "Pages build type: ${source:-not enabled}"
-          echo "enabled=$([ "$source" = workflow ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          url=$(gh api "repos/${GITHUB_REPOSITORY}/pages" --jq .html_url 2>/dev/null || true)
+          echo "Pages build type: ${source:-not enabled}${url:+, published at $url}"
+          if [ "$source" = workflow ] && [ -n "$url" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+            echo "url=$url" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          fi
 
   pages:
     needs: [verify, pages-enabled]
-    if: needs.pages-enabled.outputs.enabled == 'true'
+    if: github.ref == 'refs/heads/main' && needs.pages-enabled.outputs.enabled == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -78,3 +86,37 @@ jobs:
           path: _site
       - id: deploy
         uses: actions/deploy-pages@v4
+
+  live:
+    # Loads the published calculator from the public internet and checks every
+    # file a browser loads (python -m gitcalculator visit). After a deployment
+    # the page must be this commit's build, down to its git objects; on other
+    # branches the job reports on the calculator that main last published.
+    needs: [pages-enabled, pages]
+    if: >-
+      !cancelled() && needs.pages-enabled.outputs.enabled == 'true' &&
+      (needs.pages.result == 'success' || github.ref != 'refs/heads/main')
+    continue-on-error: ${{ github.ref != 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # every bundled blob is looked up in the git objects
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Visit the published calculator
+        env:
+          URL: ${{ needs.pages-enabled.outputs.url }}
+          COMMIT: ${{ github.ref == 'refs/heads/main' && github.sha || '' }}
+        run: |
+          set +e
+          if [ -n "$COMMIT" ]; then
+            python -m gitcalculator visit "$URL" --commit "$COMMIT" --wait 600 > visit.txt
+          else
+            python -m gitcalculator visit "$URL" --wait 60 > visit.txt
+          fi
+          status=$?
+          cat visit.txt
+          { echo "### The published calculator"; echo; echo '```'; cat visit.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          exit $status

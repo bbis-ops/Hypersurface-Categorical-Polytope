@@ -450,5 +450,225 @@
       kinds_changed: [...new Set(fragile.map((r) => r.kind))], kinds_stable: [...new Set(stable.map((r) => r.kind))].filter((k) => !fragile.some((r) => r.kind === k)) } };
   }
 
-  Object.assign(G, { ENGINE_VERSION, normalize, assess, REGISTRY, solve, outcome, design, sweep, attack, spectrumOf, affineText, slackMonomial, decimalText });
+  // ===== Map: the exact phase diagram of a two-parameter family G(t, u) ===========
+  // Every cell is one exact certificate at a rational (t, u). The coefficient of
+  // each monomial of R is an exact polynomial a(t, u), found by interpolating
+  // exact transports in u; its zero set is a wall, traced by exact roots along
+  // horizontal and vertical scanlines.
+  const MAP_LIMIT = 128;
+  function substituteParameters(expression, t, u) {
+    let e = String(expression);
+    if (t != null) e = e.replace(/\bt\b/g, `(${t})`);
+    if (u != null) e = e.replace(/\bu\b/g, `(${u})`);
+    return e;
+  }
+  function parameterDegrees(expression, n) {
+    // t and u become two extra variables, so no cancellation between them can hide a degree.
+    const renamed = String(expression).replace(/\bt\b/g, `x${n}`).replace(/\bu\b/g, `x${n + 1}`);
+    const m = n + 2, tree = G.parseExpression(renamed, m);
+    const identity = { n: m, vertex: new Array(m).fill(Q.ZERO), axes: [...Array(m).keys()].map((i) => "x" + i),
+      generators: [...Array(m).keys()].map((i) => [...Array(m).keys()].map((k) => (i === k ? Q.ONE : Q.ZERO))) };
+    let dt = 0, du = 0;
+    for (const [k, c] of G.transport(tree, identity, null)) if (!c.isZero()) { const e = exps(k); dt = Math.max(dt, e[n]); du = Math.max(du, e[n + 1]); }
+    return { dt, du };
+  }
+  function lagrange(points) { // [[x, y]] -> Map power -> Q
+    const out = new Map();
+    points.forEach(([xi, yi], i) => {
+      if (yi.isZero()) return;
+      let basis = new Map([[0, Q.ONE]]), denom = Q.ONE;
+      points.forEach(([xj], j) => {
+        if (i === j) return;
+        const next = new Map();
+        for (const [k, c] of basis) { next.set(k + 1, (next.get(k + 1) || Q.ZERO).add(c)); next.set(k, (next.get(k) || Q.ZERO).sub(c.mul(xj))); }
+        basis = next; denom = denom.mul(xi.sub(xj));
+      });
+      for (const [k, c] of basis) out.set(k, (out.get(k) || Q.ZERO).add(c.mul(yi).div(denom)));
+    });
+    for (const [k, c] of [...out]) if (c.isZero()) out.delete(k);
+    return out;
+  }
+  function phaseMap(request) {
+    const inputs = { system: request.system, base: request.base };
+    const local = localize(inputs);
+    if (!local.model) return { status: "not_applicable", reason: local.result.reason || "no simple base maximizer", links: local.result.links };
+    const model = local.model, n = model.n;
+    if (!model.weights) return { status: "not_applicable", reason: "the phase map needs the exact diagonal principal part (Hypothesis 2)", links: local.result.links };
+    let t0, t1, u0, u1, degrees;
+    try {
+      [t0, t1, u0, u1] = [request.t_from ?? "-1", request.t_to ?? "1", request.u_from ?? "-1", request.u_to ?? "1"].map((v) => Q.parse(String(v)));
+      degrees = parameterDegrees(request.perturbation, n);
+    } catch (error) { return { status: "not_applicable", reason: error.message }; }
+    if (!t0.lt(t1) || !u0.lt(u1)) return { status: "not_applicable", reason: "each range needs from < to" };
+    const N = Math.max(2, Math.min(MAP_LIMIT, Number(request.resolution) || 64));
+
+    // exact coefficient laws a(t, u) = sum a_kl t^k u^l, monomial by monomial
+    const samples = [...Array(degrees.du + 1).keys()].map((j) => u0.add(u1.sub(u0).mul(new Q(BigInt(j), BigInt(Math.max(1, degrees.du))))));
+    const perU = samples.map((uj) => {
+      const tree = G.parseExpression(substituteParameters(request.perturbation, null, String(uj)), n, true);
+      const byMonomial = new Map();
+      for (const [k, c] of G.centered(G.transport(tree, model, null, true), n)) {
+        const e = exps(k), mk = key(e.slice(0, n)), tp = e[n];
+        if (!byMonomial.has(mk)) byMonomial.set(mk, new Map());
+        byMonomial.get(mk).set(tp, (byMonomial.get(mk).get(tp) || Q.ZERO).add(c));
+      }
+      return byMonomial;
+    });
+    const monomials = new Set(perU.flatMap((m) => [...m.keys()]));
+    const laws = [];
+    for (const mk of monomials) {
+      const terms = new Map(); // "k,l" -> Q
+      for (let k = 0; k <= degrees.dt; k++) {
+        const column = lagrange(samples.map((uj, j) => [uj, (perU[j].get(mk) || new Map()).get(k) || Q.ZERO]));
+        for (const [l, c] of column) terms.set(`${k},${l}`, c);
+      }
+      if (terms.size) laws.push({ key: mk, e: exps(mk), terms });
+    }
+    laws.sort((a, b) => wdeg(a.e, model.weights).cmp(wdeg(b.e, model.weights)) || a.key.localeCompare(b.key));
+    const along = (terms, value, fixedName) => { // the law on a scanline where fixedName = value, as power -> Q in the other parameter
+      const out = new Map();
+      for (const [kl, c] of terms) { const [k, l] = kl.split(",").map(Number); const free = fixedName === "u" ? k : l, power = fixedName === "u" ? l : k;
+        out.set(free, (out.get(free) || Q.ZERO).add(c.mul(value.pow(power)))); }
+      for (const [k, c] of [...out]) if (c.isZero()) out.delete(k);
+      return out;
+    };
+
+    // exact outcomes at the cell centres
+    const keyOf = (o) => `${o.verdict}|${o.gamma}|${(o.verdict === "proved" || o.verdict === "unlicensed") && o.gamma ? o.winners : ""}`;
+    const index = new Map(), outcomes = [], grid = new Array(N * N);
+    const centre = (lo, hi, i) => lo.add(hi.sub(lo).mul(new Q(BigInt(2 * i + 1), BigInt(2 * N))));
+    const ts = [...Array(N).keys()].map((i) => centre(t0, t1, i)), us = [...Array(N).keys()].map((j) => centre(u0, u1, j));
+    for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
+      const o = outcome(local, { perturbation: substituteParameters(request.perturbation, String(ts[i]), String(us[j])) }, null), k = keyOf(o);
+      if (!index.has(k)) { index.set(k, outcomes.length); outcomes.push({ key: k, verdict: o.verdict, gamma: o.gamma, q_star: o.q_star, winners: k.split("|")[2], status: o.status, cells: 0, sample: { t: String(ts[i]), u: String(us[j]) } }); }
+      const at = index.get(k); outcomes[at].cells++; grid[j * N + i] = at;
+    }
+
+    // walls: exact roots of every non-constant law along 2N scanlines each way
+    const walls = [];
+    const lines = 2 * N;
+    for (const law of laws) {
+      if ([...law.terms.keys()].every((kl) => kl === "0,0")) continue;
+      const points = [];
+      for (let j = 0; j <= lines; j++) {
+        const u = u0.add(u1.sub(u0).mul(new Q(BigInt(j), BigInt(lines)))), line = along(law.terms, u, "u");
+        if (line.size) for (const r of rootsIn(line, t0, t1)) points.push([(r.at || r.lo.add(r.hi).div(new Q(2n))).toNumber(), u.toNumber()]);
+      }
+      for (let i = 0; i <= lines; i++) {
+        const t = t0.add(t1.sub(t0).mul(new Q(BigInt(i), BigInt(lines)))), line = along(law.terms, t, "t");
+        if (line.size) for (const r of rootsIn(line, u0, u1)) points.push([t.toNumber(), (r.at || r.lo.add(r.hi).div(new Q(2n))).toNumber()]);
+      }
+      if (points.length) walls.push({ monomial: monomialText(law.e, model.axes), points });
+    }
+    const lawText = (terms) => polyText(new Map([...terms].map(([kl, c]) => [kl, c])), ["t", "u"]);
+    return { status: "complete", t: [String(t0), String(t1)], u: [String(u0), String(u1)], resolution: N, axes: model.axes,
+      degrees, grid, outcomes,
+      laws: laws.map((l) => ({ monomial: monomialText(l.e, model.axes), degree: String(wdeg(l.e, model.weights)), law: lawText(l.terms),
+        terms: Object.fromEntries([...l.terms].map(([kl, c]) => [kl, String(c)])) })),
+      walls };
+  }
+
+  // ===== proof sheets: a receipt as GitHub Markdown, as gitcalculator/sheet.py writes it =====
+  const SHEET_VERDICTS = { proved: "proved", "proved-v22": "proved by V.22", licensed: "licensed", unlicensed: "not licensed", refused: "refused", contradicted: "contradicted" };
+  const GITHUB_RE = /^(?:https:\/\/github\.com\/|git@github\.com:)([^/\s]+)\/([^/\s]+?)(?:\.git)?\/?$/;
+  const filled = (o) => Boolean(o) && Object.keys(o).length > 0;
+  const mdText = (v) => String(v).split(/\s+/).filter(Boolean).join(" ").replace(/([\\`*_<>|$~])/g, "\\$1");
+  function mdCode(v) {
+    const body = String(v).replace(/\|/g, "\\|"), runs = body.match(/`+/g) || [];
+    const fence = "`".repeat(Math.max(0, ...runs.map((r) => r.length)) + 1), pad = body.startsWith("`") || body.endsWith("`") ? " " : "";
+    return fence + pad + body + pad + fence;
+  }
+  function tex(v) {
+    let body = String(v).trim(), sign = "";
+    if (body.startsWith("-")) { sign = "-"; body = body.slice(1); }
+    const i = body.indexOf("/");
+    return i < 0 ? sign + body : `${sign}\\tfrac{${body.slice(0, i)}}{${body.slice(i + 1)}}`;
+  }
+  const shellQuote = (v) => "'" + String(v).replace(/'/g, "'\\''") + "'";
+  function githubRepository(remote) { const m = GITHUB_RE.exec(remote || ""); return m ? `https://github.com/${m[1]}/${m[2]}` : null; }
+  function pagesUrl(repository) { const m = GITHUB_RE.exec(repository || ""); return m ? `https://${m[1].toLowerCase()}.github.io/${m[2]}/` : null; }
+  function formula(answer) {
+    const gamma = answer.gamma, q = answer.q_star, coefficient = (answer.coefficient || {}).exact;
+    if (answer.certificate_status === "zero_response") return "\\Delta(s) = 0 \\quad \\text{for all sufficiently small } s \\gt 0";
+    if (answer.verdict === "proved-v22" && gamma) return `\\Delta(s) \\sim ${coefficient ? tex(coefficient) : "C"}\\, s^{${gamma}}`;
+    if (gamma && q) return `\\Delta(s) = \\Theta\\big(s^{\\gamma}\\big), \\quad \\gamma = \\frac{1}{1 - q^\\ast} = \\frac{1}{1 - ${tex(q)}} = ${tex(gamma)}`;
+    return null;
+  }
+  function calculationPairs(request) {
+    const pairs = ["system", "base", "perturbation"].filter((k) => request[k]).map((k) => [k, String(request[k])]);
+    if (request.observed_exponent != null) pairs.push(["observed", String(request.observed_exponent)]);
+    return pairs;
+  }
+  const SHEET_FLAGS = { system: "--system", base: "--base", perturbation: "--perturbation", observed: "--observed" };
+  const sheetCommand = (request) => "python -m gitcalculator calc " + calculationPairs(request).map(([k, v]) => `${SHEET_FLAGS[k]} ${shellQuote(v)}`).join(" ");
+  const sheetLink = (request, calculator) => `${calculator}?${new URLSearchParams(calculationPairs(request))}#solve`;
+  function sheet(receipt, options = {}) {
+    const answer = receipt.answer, request = receipt.input, git = (receipt.provenance || {}).git || {};
+    const repository = options.repository || githubRepository(git.remote), ref = options.ref || git.commit;
+    const calculator = options.calculator || pagesUrl(repository), files = options.linkable == null ? null : new Set(options.linkable);
+    const doc = (label, path) => {
+      const i = path.indexOf("#"), file = i < 0 ? path : path.slice(0, i), anchor = i < 0 ? "" : path.slice(i + 1);
+      if (!repository || !ref || (files && !files.has(file))) return mdText(label);
+      return `[${mdText(label).replace(/\[/g, "(").replace(/\]/g, ")")}](${repository}/blob/${ref}/${file}${anchor ? "#" + anchor : ""})`;
+    };
+    const out = [`### ${mdText(answer.headline)} · ${SHEET_VERDICTS[answer.verdict] || mdText(answer.verdict)}`, ""];
+    const math = formula(answer);
+    if (math != null) out.push("```math", math, "```", "");
+    out.push(mdText(answer.meaning), "");
+
+    out.push("| Input | |", "| :--- | :--- |", `| Polyhedron $Ax \\le b$ | ${mdCode(request.system)} |`,
+      `| Base objective $F$ | ${mdCode(request.base)} |`, `| Perturbation $G$ | ${mdCode(request.perturbation)} |`);
+    if (request.observed_exponent != null) out.push(`| Observed exponent | ${mdCode(String(request.observed_exponent))} |`);
+    out.push("");
+
+    const certificate = receipt.certificate || {};
+    out.push(`#### Exact certificate: ${mdText(String(certificate.status ?? "—").replace(/_/g, " "))}`, "", "| Clause | Status | What was checked |", "| :--- | :--- | :--- |");
+    for (const l of certificate.links || []) out.push(`| ${doc(l.clause, l.doc)} | ${mdText(l.status.replace(/_/g, " "))} | ${mdText(l.detail || "")} |`);
+    out.push("");
+
+    const alternatives = receipt.alternatives || {}, curved = alternatives.curved_reduction, ambient = alternatives.ambient_axes, rows = [];
+    if (filled(curved)) {
+      const found = curved.status === "licensed"
+        ? `licensed: $\\gamma = ${tex(curved.gamma)}$` + (curved.coefficient ? `, $C = ${tex(curved.coefficient)}$` : "")
+        : mdText(String(curved.status ?? "").replace(/_/g, " ")) + ((curved.blockers || []).length ? `: ${mdText(curved.blockers[0])}` : "");
+      rows.push(`| V.22 curved reduction | ${found} |`);
+    }
+    if (filled(ambient)) rows.push(`| Ambient axes, ignoring the edge chart | ${ambient.gamma ? `$\\gamma = ${tex(ambient.gamma)}$` : "no exponent"} |`);
+    if (rows.length) out.push("#### Alternatives", "", "| Reading | Result |", "| :--- | :--- |", ...rows, "");
+
+    const measurement = receipt.measurement || {}, verdicts = measurement.verdicts || [];
+    if (measurement.status === "complete" && (verdicts.length || measurement.measured_exponent != null)) {
+      const exponent = measurement.measured_exponent, scales = measurement.series_length ?? (measurement.rows || []).length;
+      out.push("#### Measurement", "", `Certified lower bounds $\\Delta(s) \\ge L(s)$ at ${scales} scales, each witnessed by a point of $P$ checked in exact arithmetic`
+        + (exponent != null ? `; measured exponent ${mdText(String(exponent))}.` : "."), "");
+      if (verdicts.length) {
+        out.push("| Prediction | $\\gamma$ | Verdict |", "| :--- | :--- | :--- |");
+        for (const v of verdicts) out.push(`| ${mdText(v.label)} | ${v.gamma ? `$${tex(v.gamma)}$` : "—"} | ${mdText(v.verdict)} |`);
+        out.push("");
+      }
+    }
+
+    const counters = receipt.counterarguments || [], bearing = counters.filter((c) => c.effect !== "clear");
+    if (counters.length) {
+      out.push("#### Counter-arguments", "");
+      if (bearing.length) {
+        out.push("| Counter-argument | Effect | Here |", "| :--- | :--- | :--- |");
+        for (const c of bearing) out.push(`| ${mdText(c.title)} | ${mdText(c.effect)} | ${mdText(c.detail || "")} |`);
+        out.push("");
+      }
+      const clear = counters.length - bearing.length;
+      if (clear) out.push(`${clear} other counter-argument${clear !== 1 ? "s" : ""} do${clear === 1 ? "es" : ""} not apply to this input.`, "");
+    }
+
+    const provenance = receipt.provenance || {};
+    const engine = receipt.engine ? `exact JS engine ${mdCode(receipt.engine)}` : `Python ${mdCode(provenance.code_id || "—")} · ${mdCode(provenance.calculator_id || "—")}`;
+    const commit = git.commit, short = git.short || (commit ? commit.slice(0, 7) : "—");
+    const pinned = repository && commit && ref === commit ? `[${mdCode(short)}](${repository}/commit/${commit})` : mdCode(short);
+    out.push(`<sub>Receipt ${mdCode(receipt.id || "—")} · ${engine} · commit ${pinned}</sub>`, "");
+    out.push(calculator ? `[Open this calculation in the gitcalculator](${sheetLink(request, calculator)}). Reproduce it:` : "Reproduce it:", "");
+    out.push("```bash", sheetCommand(request), "```", "");
+    return out.join("\n");
+  }
+
+  Object.assign(G, { ENGINE_VERSION, normalize, assess, REGISTRY, solve, outcome, design, sweep, attack, spectrumOf, affineText, slackMonomial, decimalText, phaseMap, substituteParameters, sheet, sheetLink, sheetCommand, githubRepository, pagesUrl });
 })(typeof globalThis !== "undefined" ? globalThis : this);

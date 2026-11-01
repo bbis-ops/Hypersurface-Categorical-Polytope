@@ -4,10 +4,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
-/* Layout: an instrument with five modes. A keypad (problem, presets) beside a
+/* Layout: an instrument with six modes. A keypad (problem, presets) beside a
    display that changes with the mode: Solve prints the tape, Design draws the
-   exponent spectrum, Sweep the phase strip, Attack the counterexample table,
-   History the git timeline. Dark-first, in the repository's ink-teal and brass. */
+   exponent spectrum, Sweep the phase strip, Map the phase diagram in t and u,
+   Attack the counterexample table, History the git timeline. Dark-first, in
+   the repository's ink-teal and brass. */
 :root {
   --bg: #091924; --panel: #0f2532; --panel-2: #143040; --rule: #23414f;
   --ink: #f4efe5; --ink-2: #b9cbd0; --ink-3: #86a0a8;
@@ -99,6 +100,10 @@ sup { font-size: .62em; line-height: 0; }
 .meaning { margin: 0; color: var(--ink-2); max-width: 72ch; }
 .stamp { margin: 0; font: 12px/1.6 var(--mono); color: var(--ink-3); overflow-wrap: anywhere; }
 .stamp b { color: var(--brass-ink); font-weight: 500; }
+.gh { margin-top: 10px; }
+.gh-preview { margin-top: 8px; }
+.gh-preview summary { cursor: pointer; }
+.gh-preview pre { max-height: 320px; overflow: auto; }
 h2 { font: 400 23px/1.2 var(--display); margin: 0 0 4px; text-wrap: balance; }
 h3 { font: 600 14px/1.3 var(--sans); margin: 0 0 8px; }
 .sec-head { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
@@ -144,6 +149,11 @@ figure h3 { margin-bottom: 4px; }
 svg text { font: 11.5px var(--sans); fill: var(--ink-3); }
 svg .lbl { font: 12px var(--sans); fill: var(--ink-2); }
 svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
+.map-figure { position: relative; margin: 0; }
+#map-stage > svg { display: block; max-width: 620px; width: 100%; height: auto; touch-action: manipulation; }
+#map-stage .legend svg { flex: none; }
+.map-figure .hit { cursor: crosshair; }
+.chip-letter { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 4px; font: 600 12px/1 var(--mono); color: var(--ink); border: 1px solid var(--rule); }
 .tip { position: absolute; pointer-events: none; background: var(--panel-2); border: 1px solid var(--rule); border-radius: 6px; padding: 8px 10px; font: 12px/1.5 var(--mono); color: var(--ink); max-width: 320px; box-shadow: 0 6px 18px rgb(0 0 0 / .25); z-index: 2; }
 .verdicts { display: grid; gap: 6px; margin-top: 10px; }
 .verdicts div { font-size: 14px; color: var(--ink-2); }
@@ -180,6 +190,7 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
       <a href="#solve" data-mode="solve"><b>Solve</b><span>exponent, proof, attacks</span></a>
       <a href="#design" data-mode="design"><b>Design</b><span>which γ are possible</span></a>
       <a href="#sweep" data-mode="sweep"><b>Sweep</b><span>phase walls in t</span></a>
+      <a href="#map" data-mode="map"><b>Map</b><span>phase diagram in t and u</span></a>
       <a href="#attack" data-mode="attack"><b>Attack</b><span>break this answer</span></a>
       <a href="#history" data-mode="history"><b>History</b><span>every commit's answer</span></a>
     </nav>
@@ -194,13 +205,17 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
           <textarea id="system" spellcheck="false"></textarea></label>
         <label for="base">Base objective F <small>in x0, x1, …</small>
           <input id="base" spellcheck="false"></label>
-        <label for="perturbation" data-for="solve attack history sweep"><span id="pert-label">Perturbation G</span>
+        <label for="perturbation" data-for="solve attack history sweep map"><span id="pert-label">Perturbation G</span>
           <input id="perturbation" spellcheck="false"></label>
         <label for="target" data-for="design">Target exponent γ <small>optional, such as 3/2</small>
           <input id="target" spellcheck="false" placeholder="3/2"></label>
-        <div class="pair" data-for="sweep">
+        <div class="pair" data-for="sweep map">
           <label for="from">t from <input id="from" spellcheck="false" value="-1"></label>
           <label for="to">t to <input id="to" spellcheck="false" value="1"></label>
+        </div>
+        <div class="pair" data-for="map">
+          <label for="ufrom">u from <input id="ufrom" spellcheck="false" value="-1"></label>
+          <label for="uto">u to <input id="uto" spellcheck="false" value="1"></label>
         </div>
         <label for="observed" data-for="solve">Observed exponent <small>optional, for the inverse check</small>
           <input id="observed" spellcheck="false" placeholder="4/3"></label>
@@ -219,6 +234,14 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
       <dl class="numbers" id="numbers"></dl>
       <p class="meaning" id="meaning"></p>
       <p class="stamp" id="stamp"></p>
+      <div class="actions gh" id="gh-actions">
+        <button type="button" class="quiet" id="gh-copy" title="The answer, the input and every clause of the certificate in GitHub Markdown, with each clause linked to its theorem at this build's commit">Copy proof sheet</button>
+        <button type="button" class="quiet" id="gh-issue" title="Open a GitHub issue with this proof sheet, to discuss or challenge the answer">Open an issue</button>
+        <button type="button" class="quiet" id="gh-tape" title="Record this calculation with the repository's Python and propose it for calculations/, which CI recomputes on every push">Propose for the tape</button>
+        <button type="button" class="quiet" id="gh-download">Download .md</button>
+      </div>
+      <p class="note" id="gh-note" hidden></p>
+      <details class="gh-preview"><summary class="note">Preview the proof sheet</summary><pre class="cmd" id="gh-preview"></pre></details>
     </section>
     <section data-view="solve" class="panel" id="agree-panel" hidden></section>
     <section data-view="solve" aria-labelledby="h-pictures">
@@ -259,6 +282,22 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
     <section data-view="design" aria-labelledby="h-mech">
       <div class="sec-head"><h2 id="h-mech">Mechanisms</h2><p>Each exponent, the slack monomials that produce it, and a perturbation to try. Solve one to see its full certificate.</p></div>
       <div class="scroll"><table><thead><tr><th class="m">γ</th><th class="m">q</th><th>Edge monomials</th><th>Perturbation G</th><th></th></tr></thead><tbody id="d-table"></tbody></table></div>
+    </section>
+
+    <!-- MAP -->
+    <section data-view="map" class="readout" aria-live="polite">
+      <span class="verdict" id="m-verdict">—</span>
+      <div class="headline" id="m-headline">—</div>
+      <p class="meaning" id="m-meaning"></p>
+    </section>
+    <section data-view="map" aria-labelledby="h-map">
+      <div class="sec-head"><h2 id="h-map">Phase map</h2><p>Each cell is an exact certificate at the rational point (t, u) at its centre. The dotted curves are exact zeros of a coefficient a(t, u), traced root by root along scanlines. Click a cell, or a row of the key, to solve that point.</p></div>
+      <figure id="fig-map" class="map-figure"><div id="map-stage"></div><div class="tip" id="map-tip" hidden></div></figure>
+      <div class="scroll"><table><thead><tr><th></th><th>Chamber</th><th class="m">Share</th><th>Example point</th><th></th></tr></thead><tbody id="m-key"></tbody></table></div>
+    </section>
+    <section data-view="map" aria-labelledby="h-maplaws">
+      <div class="sec-head"><h2 id="h-maplaws">Coefficient laws</h2><p>In edge coordinates R = Σ a(t, u)·c^α. Each a(t, u) is exact, from exact transports interpolated in t and u. A chamber can change where a coefficient vanishes, and also where none does: a quadratic form turning positive inside the orthant has a parabolic wall.</p></div>
+      <div class="scroll"><table><thead><tr><th>Monomial</th><th class="m">Weighted degree</th><th>a(t, u)</th></tr></thead><tbody id="m-laws"></tbody></table></div>
     </section>
 
     <!-- SWEEP -->
@@ -308,7 +347,7 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
   const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
   const fmtQ = (text) => { if (text == null) return "—"; const q = E.Q.parse(text); return q.d <= 1000000n ? String(q) : "≈" + q.toNumber().toPrecision(15).replace(/\.?0+$/, ""); };
   const qCell = (text) => `<span title="${esc(text)}">${esc(fmtQ(text))}</span>`;
-  const MODES = { solve: "Solve", design: "Find the spectrum", sweep: "Sweep", attack: "Attack", history: "Replay history" };
+  const MODES = { solve: "Solve", design: "Find the spectrum", sweep: "Sweep", map: "Map", attack: "Attack", history: "Replay history" };
   const SERIES = { backend: "--s1", "exact-faces": "--s1", curved: "--s3", "ambient-axes": "--s4" };
   const SQUARE = "([[-1,0],[0,-1],[1,0],[0,1]], [0,0,1,1])", SIMPLEX = "([[-1,0],[0,-1],[1,1]], [0,0,1])";
   const CUBE = "([[-1,0,0],[0,-1,0],[0,0,-1],[1,0,0],[0,1,0],[0,0,1]], [0,0,0,1,1,1])";
@@ -329,7 +368,14 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
     { title: "Curved channel switch", note: "V.22 turns on with the driver's sign.", request: { system: SQUARE, base: "-(x0**6+x1**6)", perturbation: "-x0**2 + t*x0*x1**2", from: "-1", to: "1" } },
     { title: "Simplex edge race", note: "The quartic edge wins only for positive t.", request: { system: SIMPLEX, base: "-((x0+x1-1)**2 + x0**4)", perturbation: "t*x0 + (1 - x0 - x1)", from: "-1", to: "1" } },
   ];
-  const store = { ledger: null, bundle: null, mode: "solve", preset: { solve: "tilted-simplex", design: 0, sweep: 0, attack: "tilted-simplex", history: "signed-sharp" }, worker: null, ready: false, starting: null, pending: new Map(), seq: 0 };
+  // The same families as MAP_PRESETS in gitcalculator/presets.py.
+  const MAP_PRESETS = [
+    { title: "The signed channel", note: "Where the cross term is positive, the V.22 curved channel takes over from the face law; t = u = 1 is the signed-sharp counterexample.", request: { system: SQUARE, base: "-(x0**6+x1**6)", perturbation: "-x0**2 + t*x0*x1**2 + u*x1**5", from: "-1", to: "1", ufrom: "-1", uto: "1" } },
+    { title: "Two edges", note: "Each edge's sign opens or closes its face: γ = 4/3 through c0, 2 through c1, and no response.", request: { system: SQUARE, base: "-(x0**4 + x1**2)", perturbation: "t*x0 + u*x1", from: "-1", to: "1", ufrom: "-1", uto: "1" } },
+    { title: "A tie and an absorbed cross term", note: "Both edges tie at q* = 1/2; where both coefficients are negative, they absorb the positive cross term.", request: { system: SQUARE, base: "-(x0**2 + x1**4)", perturbation: "t*x0 + u*x1**2 + x0*x1", from: "-1", to: "1", ufrom: "-1", uto: "1" } },
+    { title: "A quadratic form on the orthant", note: "The face {c0,c1} qualifies only where the form is positive inside the orthant: a parabolic wall no single coefficient sees.", request: { system: SQUARE, base: "-(x0**4+x1**4)", perturbation: "t*x0**2 + u*x0*x1 - x1**2", from: "-1", to: "1", ufrom: "-1", uto: "1" } },
+  ];
+  const store = { ledger: null, bundle: null, mode: "solve", preset: { solve: "tilted-simplex", design: 0, sweep: 0, map: 0, attack: "tilted-simplex", history: "signed-sharp" }, worker: null, ready: false, starting: null, pending: new Map(), seq: 0 };
 
   function toast(message) { const t = $("toast"); t.textContent = message; t.hidden = false; clearTimeout(toast.timer); toast.timer = setTimeout(() => { t.hidden = true; }, 2600); }
   function engineStatus(kind, text, canStart) { $("engine-dot").className = "dot " + kind; $("engine-text").textContent = text; $("engine-start").hidden = !canStart; }
@@ -352,21 +398,26 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
     request.perturbation = value("perturbation");
     if (!request.perturbation) throw new Error(store.mode === "sweep" ? "Enter a family G(t) that uses t." : "Enter the perturbation G.");
     if (store.mode === "sweep") { request.from = value("from") || "-1"; request.to = value("to") || "1"; if (!/\bt\b/.test(request.perturbation)) throw new Error("A sweep needs the parameter t in G, for example (t - 1/3)*x0 + x1."); }
+    if (store.mode === "map") {
+      Object.assign(request, { from: value("from") || "-1", to: value("to") || "1", ufrom: value("ufrom") || "-1", uto: value("uto") || "1" });
+      if (!/\bt\b/.test(request.perturbation) || !/\bu\b/.test(request.perturbation)) throw new Error("A map needs both parameters t and u in G, for example t*x0 + u*x1.");
+    }
     if (store.mode === "solve" && value("observed")) { const [p, q] = value("observed").split("/"); const v = q ? Number(p) / Number(q) : Number(p); if (!Number.isFinite(v)) throw new Error("The observed exponent must be a number such as 4/3."); request.observed_exponent = v; }
     return request;
   }
   function fill(request) {
-    for (const id of ["system", "base", "perturbation", "target", "from", "to"]) if (request[id] != null) $(id).value = request[id];
+    for (const id of ["system", "base", "perturbation", "target", "from", "to", "ufrom", "uto"]) if (request[id] != null) $(id).value = request[id];
     if (request.observed != null) $("observed").value = request.observed;
     else if (request.observed_exponent == null) $("observed").value = "";
   }
   const cli = (mode, r) => {
     const q = (v) => "'" + String(v).replace(/'/g, "'\\''") + "'";
-    const cmd = { solve: "calc", design: "design", sweep: "sweep", attack: "attack", history: "history" }[mode];
+    const cmd = { solve: "calc", design: "design", sweep: "sweep", map: "map", attack: "attack", history: "history" }[mode];
     let s = `python -m gitcalculator ${cmd} --system ${q(r.system)} --base ${q(r.base)}`;
     if (mode === "design") return s + (r.target ? ` --target ${q(r.target)}` : "");
     s += ` --perturbation ${q(r.perturbation)}`;
     if (mode === "sweep") s += ` --from ${q(r.from)} --to ${q(r.to)}`;
+    if (mode === "map") s += ` --t-from ${q(r.from)} --t-to ${q(r.to)} --u-from ${q(r.ufrom)} --u-to ${q(r.uto)}`;
     return s;
   };
   function presetChips() {
@@ -383,6 +434,7 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
     };
     if (store.mode === "design") group("Geometries", DESIGN_PRESETS.map((p, i) => [i, p.title, p.note, p.request]));
     else if (store.mode === "sweep") group("Families", SWEEP_PRESETS.map((p, i) => [i, p.title, p.note, p.request]));
+    else if (store.mode === "map") group("Families", MAP_PRESETS.map((p, i) => [i, p.title, p.note, p.request]));
     else for (const [title, names] of SOLVE_GROUPS) group(title, names.filter((n) => store.ledger?.presets?.[n] || PRESET_INPUTS[n]).map((n) => {
       const p = store.ledger?.presets?.[n] || PRESET_INPUTS[n];
       return [n, p.title, p.note, p.request];
@@ -394,14 +446,14 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
     for (const a of document.querySelectorAll(".modes a")) { if (a.dataset.mode === mode) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); }
     for (const el of document.querySelectorAll("[data-view]")) el.hidden = el.dataset.view !== mode;
     for (const el of document.querySelectorAll("[data-for]")) el.hidden = !el.dataset.for.split(" ").includes(mode);
-    $("pert-label").textContent = mode === "sweep" ? "Family G(t), using t" : "Perturbation G";
+    $("pert-label").textContent = mode === "sweep" ? "Family G(t), using t" : mode === "map" ? "Family G(t, u), using t and u" : "Perturbation G";
     $("run").textContent = MODES[mode];
     const preset = store.preset[mode];
     const solveLike = store.ledger?.presets?.[preset] || PRESET_INPUTS[preset] || PRESET_INPUTS["tilted-simplex"];
-    const chosen = mode === "design" ? DESIGN_PRESETS[preset] : mode === "sweep" ? SWEEP_PRESETS[preset] : solveLike;
+    const chosen = mode === "design" ? DESIGN_PRESETS[preset] : mode === "sweep" ? SWEEP_PRESETS[preset] : mode === "map" ? MAP_PRESETS[preset] : solveLike;
     const shared = store.fromLink;
     store.fromLink = null;
-    const keep = shared || (mode !== "design" && mode !== "sweep" && store.lastSolveLike);
+    const keep = shared || (mode !== "design" && mode !== "sweep" && mode !== "map" && store.lastSolveLike);
     fill(keep || chosen.request);
     $("form-note").textContent = shared ? "Opened from a shared link." : keep ? "" : chosen.note;
     presetChips();
@@ -716,6 +768,128 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
   }
 
   // ===== Attack ==================================================================
+  // ===== Map ======================================================================
+  // Exponent chambers take the first three series colors, which pass the palette
+  // validator for every pair in both themes; zero response recedes, refusals are
+  // hatched gray, and every chamber also carries a letter, so color is never alone.
+  const CHAMBER_SLOTS = ["--s1", "--s2", "--s3"];
+  const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  function chamberText(o) {
+    if (o.verdict === "proved" && o.gamma == null) return "Δ(s) = 0 for small s, proved";
+    if (o.verdict === "proved-v22") return `γ = ${o.gamma} by the V.22 curved reduction`;
+    if (o.gamma) return `γ = ${o.gamma}${o.winners ? `, face ${o.winners}` : ""}, ${o.verdict === "unlicensed" ? "not licensed" : "proved"}`;
+    return "no exponent: outside the certificate";
+  }
+  const chamberShort = (o) => (o.verdict === "proved" && o.gamma == null ? "Δ = 0" : o.gamma ? `γ = ${o.gamma}${o.verdict === "proved-v22" ? " (V.22)" : o.verdict === "unlicensed" ? " (open)" : ""}` : "refused");
+  function chamberStyles(outcomes) {
+    let slot = 0;
+    return outcomes.map((o) => {
+      if (o.verdict === "proved" && o.gamma == null) return { fill: "--panel-2", opacity: 1, hatch: false };
+      if (!o.gamma) return { fill: "--muted", opacity: 0.32, hatch: true };
+      const token = CHAMBER_SLOTS[slot++];
+      return token ? { fill: token, opacity: 0.9, hatch: o.verdict === "unlicensed" } : { fill: "--panel-2", opacity: 1, hatch: true };
+    });
+  }
+  function interiorCells(grid, N, count) { // per chamber, the cell farthest from any other chamber (a place for its letter)
+    const dist = new Array(N * N).fill(-1), queue = [];
+    for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
+      const c = grid[j * N + i], edge = i === 0 || j === 0 || i === N - 1 || j === N - 1;
+      const differs = (i > 0 && grid[j * N + i - 1] !== c) || (i < N - 1 && grid[j * N + i + 1] !== c) || (j > 0 && grid[(j - 1) * N + i] !== c) || (j < N - 1 && grid[(j + 1) * N + i] !== c);
+      if (edge || differs) { dist[j * N + i] = 0; queue.push(j * N + i); }
+    }
+    for (let h = 0; h < queue.length; h++) {
+      const at = queue[h], i = at % N, j = (at - i) / N;
+      for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const a = i + di, b = j + dj; if (a < 0 || b < 0 || a >= N || b >= N) continue;
+        const k = b * N + a; if (dist[k] < 0 && grid[k] === grid[at]) { dist[k] = dist[at] + 1; queue.push(k); }
+      }
+    }
+    const best = new Array(count).fill(-1);
+    for (let k = 0; k < N * N; k++) if (best[grid[k]] < 0 || dist[k] > dist[best[grid[k]]]) best[grid[k]] = k;
+    return best.map((k) => (k >= 0 && dist[k] >= 1 ? k : -1)); // a sliver one cell thin gets no letter; the key names it
+  }
+  function renderMap(m, request, elapsed) {
+    const v = $("m-verdict");
+    if (m.status !== "complete") {
+      v.className = "verdict v-refused"; v.textContent = "not applicable"; $("m-headline").textContent = "No phase map"; $("m-meaning").textContent = m.reason;
+      $("map-stage").innerHTML = ""; $("m-key").innerHTML = ""; $("m-laws").innerHTML = ""; return;
+    }
+    const N = m.resolution, total = N * N, styles = chamberStyles(m.outcomes);
+    v.className = "verdict v-proved"; v.textContent = `${m.outcomes.length} chamber${m.outcomes.length === 1 ? "" : "s"}`;
+    $("m-headline").textContent = m.outcomes.map((o, k) => `${LETTERS[k]} ${chamberShort(o)}`).join(" · ");
+    $("m-meaning").textContent = `${N}×${N} = ${total.toLocaleString("en-US")} exact certificates over t ∈ [${m.t[0]}, ${m.t[1]}] and u ∈ [${m.u[0]}, ${m.u[1]}]${elapsed ? `, in ${(elapsed / 1000).toFixed(2)} s` : ""}. ${m.walls.length ? `${m.walls.length} coefficient${m.walls.length === 1 ? "" : "s"} vanish${m.walls.length === 1 ? "es" : ""} inside the window, traced exactly.` : "No coefficient vanishes inside the window."}`;
+    const Q = E.Q, t0 = Q.parse(m.t[0]), t1 = Q.parse(m.t[1]), u0 = Q.parse(m.u[0]), u1 = Q.parse(m.u[1]);
+    const lo = [t0.toNumber(), u0.toNumber()], hi = [t1.toNumber(), u1.toNumber()];
+    const P = 480, L = 58, T = 10, R = 12, W = L + P + R, cs = P / N;
+    const zoom = Math.min(1.9, Math.max(1, W / Math.max(1, $("map-stage").clientWidth || W))); // text keeps its size on a narrow screen
+    const B = 30 + 16 * zoom, H = T + P + B;
+    const fs = (px) => `font-size:${(px * zoom).toFixed(1)}px`;
+    const X = (t) => L + (t - lo[0]) / (hi[0] - lo[0]) * P, Y = (u) => T + P - (u - lo[1]) / (hi[1] - lo[1]) * P;
+    let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Phase map of the family over t and u: ${esc(m.outcomes.map((o, k) => `${LETTERS[k]} ${chamberText(o)}`).join("; "))}">
+      <defs><pattern id="map-hatch" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" stroke="${css("--ink")}" stroke-width="1.3" stroke-opacity=".45"/></pattern></defs>
+      <rect x="${L}" y="${T}" width="${P}" height="${P}" fill="${css("--panel")}"/><g shape-rendering="crispEdges">`;
+    const hatched = [];
+    for (let j = 0; j < N; j++) {
+      const y = T + P - (j + 1) * cs;
+      for (let i = 0; i < N;) {
+        const c = m.grid[j * N + i]; let e = i + 1;
+        while (e < N && m.grid[j * N + e] === c) e++;
+        const st = styles[c];
+        svg += `<rect x="${(L + i * cs).toFixed(2)}" y="${y.toFixed(2)}" width="${((e - i) * cs).toFixed(2)}" height="${cs.toFixed(2)}" fill="${css(st.fill)}" fill-opacity="${st.opacity}"/>`;
+        if (st.hatch) hatched.push(`<rect x="${(L + i * cs).toFixed(2)}" y="${y.toFixed(2)}" width="${((e - i) * cs).toFixed(2)}" height="${cs.toFixed(2)}" fill="url(#map-hatch)"/>`);
+        i = e;
+      }
+    }
+    svg += hatched.join("") + "</g>";
+    const zeroLine = (value, axis) => (value > (axis === "t" ? lo[0] : lo[1]) && value < (axis === "t" ? hi[0] : hi[1])
+      ? (axis === "t" ? `<line x1="${X(0)}" x2="${X(0)}" y1="${T}" y2="${T + P}"` : `<line x1="${L}" x2="${L + P}" y1="${Y(0)}" y2="${Y(0)}"`) + ` stroke="${css("--ink-3")}" stroke-width="1" stroke-dasharray="3 4" stroke-opacity=".7"/>` : "");
+    svg += zeroLine(0, "t") + zeroLine(0, "u");
+    const brass = css("--brass");
+    for (const wall of m.walls) for (const [t, u] of wall.points) svg += `<circle cx="${X(t).toFixed(1)}" cy="${Y(u).toFixed(1)}" r="1.3" fill="${brass}"/>`;
+    const spots = interiorCells(m.grid, N, m.outcomes.length);
+    spots.forEach((k, c) => {
+      if (k < 0 || m.outcomes[c].cells < 4) return;
+      const i = k % N, j = (k - i) / N, x = L + (i + 0.5) * cs, y = T + P - (j + 0.5) * cs;
+      const h = 11 * zoom, cx = Math.min(L + P - h, Math.max(L + h, x)), cy = Math.min(T + P - h, Math.max(T + h, y));
+      svg += `<g><rect x="${cx - h}" y="${cy - h}" width="${2 * h}" height="${2 * h}" rx="4" fill="${css("--panel")}" stroke="${css("--rule")}"/><text x="${cx}" y="${cy + 4.5 * zoom}" text-anchor="middle" class="strong" style="font-weight:600;font-family:var(--mono);${fs(13)}">${LETTERS[c] || "?"}</text></g>`;
+    });
+    svg += `<rect x="${L}" y="${T}" width="${P}" height="${P}" fill="none" stroke="${css("--rule")}"/>`;
+    const ticks = (a, b) => { const out = [[a, null], [b, null]]; if (a.sign() < 0 && b.sign() > 0) out.push([Q.ZERO, null]); return out.map(([q]) => q); };
+    for (const q of ticks(t0, t1)) svg += `<text class="lbl" style="${fs(12)}" x="${X(q.toNumber())}" y="${T + P + 8 + 11 * zoom}" text-anchor="middle">${esc(String(q))}</text>`;
+    for (const q of ticks(u0, u1)) svg += `<text class="lbl" style="${fs(12)}" x="${L - 8}" y="${Y(q.toNumber()) + 4 * zoom}" text-anchor="end">${esc(String(q))}</text>`;
+    svg += `<text x="${L + P / 2}" y="${H - 4}" text-anchor="middle" class="strong" style="${fs(13)}">t</text><text x="${12}" y="${T + P / 2}" text-anchor="middle" class="strong" style="${fs(13)}">u</text>`;
+    svg += `<rect class="hit" x="${L}" y="${T}" width="${P}" height="${P}" fill="transparent"/></svg>`;
+    $("map-stage").innerHTML = svg + `<ul class="legend" style="margin-top:8px"><li><span class="swatch pt" style="background:${brass}"></span>a coefficient a(t, u) vanishes (exact roots)</li><li><span class="swatch" style="background:${css("--ink-3")}"></span>t = 0 and u = 0</li><li><svg width="18" height="12" aria-hidden="true"><rect width="18" height="12" fill="url(#map-hatch)" stroke="${css("--rule")}"/></svg>hatched: not licensed, or no exponent</li></ul>`;
+
+    const cellAt = (event) => {
+      const box = $("map-stage").querySelector("svg").getBoundingClientRect(), sx = W / box.width;
+      const x = (event.clientX - box.left) * sx - L, y = (event.clientY - box.top) * sx - T;
+      if (x < 0 || y < 0 || x >= P || y >= P) return null;
+      const i = Math.min(N - 1, Math.floor(x / cs)), j = Math.min(N - 1, Math.floor((P - y) / cs));
+      const t = t0.add(t1.sub(t0).mul(new Q(BigInt(2 * i + 1), BigInt(2 * N)))), u = u0.add(u1.sub(u0).mul(new Q(BigInt(2 * j + 1), BigInt(2 * N))));
+      return { i, j, t, u, c: m.grid[j * N + i] };
+    };
+    const tip = $("map-tip"), hit = $("map-stage").querySelector(".hit");
+    hit.addEventListener("mousemove", (event) => {
+      const at = cellAt(event); if (!at) { tip.hidden = true; return; }
+      tip.innerHTML = `t = ${esc(String(at.t))}, u = ${esc(String(at.u))}<br><b>${LETTERS[at.c]}</b> ${esc(chamberText(m.outcomes[at.c]))}<br><span style="color:var(--ink-3)">click to solve this point</span>`;
+      tip.hidden = false;
+      const outer = $("fig-map").getBoundingClientRect();
+      tip.style.left = Math.max(8, Math.min(event.clientX - outer.left + 14, outer.width - 260)) + "px"; tip.style.top = (event.clientY - outer.top + 14) + "px";
+    });
+    hit.addEventListener("mouseleave", () => { tip.hidden = true; });
+    const solveAt = (t, u) => openSolve({ system: request.system, base: request.base, perturbation: E.substituteParameters(request.perturbation, String(t), String(u)) });
+    hit.addEventListener("click", (event) => { const at = cellAt(event); if (at) solveAt(at.t, at.u); });
+
+    $("m-key").innerHTML = m.outcomes.map((o, k) => {
+      const st = styles[k];
+      const alpha = st.opacity < 1 ? Math.round(st.opacity * 255).toString(16).padStart(2, "0") : "";
+      return `<tr><td><span class="chip-letter" style="background:${css(st.fill)}${alpha}">${LETTERS[k] || "?"}</span></td><td>${esc(chamberText(o))}${o.status && o.verdict !== "proved" ? `<div class="statement">certificate: ${esc(o.status.replace(/_/g, " "))}</div>` : ""}</td>
+        <td class="num">${(100 * o.cells / total).toFixed(1)}%</td><td class="mono">t = ${esc(o.sample.t)}, u = ${esc(o.sample.u)}</td><td><button type="button" class="link" data-map-solve="${k}">Solve this point</button></td></tr>`;
+    }).join("");
+    for (const b of document.querySelectorAll("[data-map-solve]")) b.addEventListener("click", () => { const o = m.outcomes[Number(b.dataset.mapSolve)]; solveAt(o.sample.t, o.sample.u); });
+    $("m-laws").innerHTML = m.laws.map((l) => `<tr><td class="mono">${esc(l.monomial)}</td><td class="num">${esc(l.degree)}</td><td class="mono">${esc(l.law)}</td></tr>`).join("");
+  }
   function renderAttack(a) {
     const v = $("a-verdict");
     if (a.status !== "complete") { v.className = "verdict v-refused"; v.textContent = "not applicable"; $("a-headline").textContent = "Nothing to attack"; $("a-meaning").textContent = a.reason; $("a-table").innerHTML = ""; return; }
@@ -759,13 +933,21 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
   async function run(event) {
     if (event) event.preventDefault();
     let request; try { request = readForm(); } catch (error) { $("form-note").textContent = error.message; return; }
-    if (store.mode !== "design" && store.mode !== "sweep") store.lastSolveLike = request;
+    if (store.mode !== "design" && store.mode !== "sweep" && store.mode !== "map") store.lastSolveLike = request;
     const known = presetFor(request);
-    for (const chip of document.querySelectorAll(".chip")) chip.setAttribute("aria-pressed", String(chip.dataset.id === (store.mode === "design" || store.mode === "sweep" ? String(store.preset[store.mode]) : known)));
+    const indexed = store.mode === "design" || store.mode === "sweep" || store.mode === "map";
+    for (const chip of document.querySelectorAll(".chip")) chip.setAttribute("aria-pressed", String(chip.dataset.id === (indexed ? String(store.preset[store.mode]) : known)));
     try {
-      if (store.mode === "solve") { const r = E.solve(request, { git: store.ledger?.head, engineBlob: BUILD.engine_blob }); renderReceipt(r); renderAgreement(r, known ? store.ledger.presets[known].receipt : null); }
+      if (store.mode === "solve") { const r = E.solve(request, { git: store.ledger?.head, engineBlob: BUILD.engine_blob }); store.receipt = r; store.known = known; renderReceipt(r); renderAgreement(r, known ? store.ledger.presets[known].receipt : null); $("gh-preview").textContent = proofSheet(r); $("gh-note").hidden = true; }
       else if (store.mode === "design") renderDesign(E.design(request), request);
       else if (store.mode === "sweep") renderSweep(E.sweep(request));
+      else if (store.mode === "map") {
+        $("m-meaning").textContent = "Certifying every cell in exact arithmetic…";
+        await new Promise((resolve) => setTimeout(resolve, 20));
+        const started = performance.now();
+        const m = E.phaseMap({ system: request.system, base: request.base, perturbation: request.perturbation, t_from: request.from, t_to: request.to, u_from: request.ufrom, u_to: request.uto, resolution: 64 });
+        renderMap(m, request, performance.now() - started);
+      }
       else if (store.mode === "attack") renderAttack(E.attack(request));
       else if (store.mode === "history") {
         if (known) renderHistory(store.ledger.presets[known].history, request);
@@ -798,6 +980,7 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
         } else {
           py.globals.set("REQUEST_JSON", JSON.stringify(msg.request));
           const code = msg.type === "calc" ? "import json\\nfrom gitcalculator.receipt import calculate\\njson.dumps(calculate(json.loads(REQUEST_JSON)), ensure_ascii=False)"
+            : msg.type === "tape" ? "import json\\nfrom gitcalculator.receipt import calculate\\nfrom gitcalculator.tape import entry\\nJOB = json.loads(REQUEST_JSON)\\njson.dumps(json.dumps(entry(JOB['name'], calculate(JOB['request'])), indent=2, ensure_ascii=False) + '\\\\n')"
             : "import json\\nfrom pathlib import Path\\nfrom gitcalculator.history import BundleSource, replay\\njson.dumps(replay(json.loads(REQUEST_JSON), BundleSource(BUNDLE, Path('/snapshots'))), ensure_ascii=False)";
           self.postMessage({ type: "result", id: msg.id, result: JSON.parse(py.runPython(code)) });
         }
@@ -823,7 +1006,61 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
     })().catch((error) => { store.starting = null; store.worker?.terminate(); engineStatus("off", `Exact JS engine only: ${error.message}`, false); throw error; });
     return store.starting;
   }
-  const FIELDS = { solve: ["perturbation", "observed"], design: ["target"], sweep: ["perturbation", "from", "to"], attack: ["perturbation"], history: ["perturbation"] };
+  // ===== GitHub: proof sheets, issues and the tape ================================
+  const calculatorUrl = () => location.origin + location.pathname;
+  const shellQ = (v) => "'" + String(v).replace(/'/g, "'\\''") + "'";
+  function proofSheet(receipt) {
+    return E.sheet(receipt, { repository: repoUrl(), ref: store.ledger?.head?.link_ref || undefined, calculator: calculatorUrl(), linkable: store.ledger?.linkable });
+  }
+  function ghNote(html) { const n = $("gh-note"); n.innerHTML = html; n.hidden = !html; }
+  function clipboard(text) { return navigator.clipboard ? navigator.clipboard.writeText(text).then(() => true, () => false) : Promise.resolve(false); }
+  function download(name, text, type) {
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name;
+    document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+  const GITHUB_URL_LIMIT = 8000; // GitHub refuses much longer addresses
+  function blankTab() { const tab = window.open("", "_blank"); if (tab) tab.opener = null; return tab; }
+  function sendTab(tab, url, label) {
+    if (tab && !tab.closed) tab.location.href = url;
+    return ` If no tab opened, <a href="${esc(url)}" target="_blank" rel="noopener">${esc(label)}</a>.`;
+  }
+  async function openIssue() {
+    const r = store.receipt, repo = repoUrl();
+    if (!r || !repo) { ghNote("This build does not know its GitHub repository."); return; }
+    const tab = blankTab();
+    const full = proofSheet(r), title = `gitcalculator: ${r.answer.headline} (${r.answer.verdict})`;
+    let url = `${repo}/issues/new?${new URLSearchParams({ title, body: full })}`;
+    if (url.length > GITHUB_URL_LIMIT) {
+      const lines = full.split("\n"), cut = lines.findIndex((l) => l.startsWith("#### ")), footer = lines.findIndex((l) => l.startsWith("<sub>Receipt"));
+      const brief = [...lines.slice(0, cut), "_The full proof sheet is on the clipboard; paste it below._", "", ...lines.slice(footer)].join("\n");
+      const copied = await clipboard(full);
+      url = `${repo}/issues/new?${new URLSearchParams({ title, body: brief })}`;
+      ghNote((copied ? "The full sheet is too long for a link, so the issue opens with a summary and the full sheet is on your clipboard." : "The full sheet is too long for a link; the issue opens with a summary. Use Copy proof sheet for the rest.") + sendTab(tab, url, "open the issue"));
+    } else ghNote("A new issue opens with the proof sheet as its text." + sendTab(tab, url, "open the issue"));
+  }
+  async function proposeTape() {
+    const r = store.receipt, repo = repoUrl();
+    if (!r || !repo) { ghNote("This build does not know its GitHub repository."); return; }
+    if (store.known) { ghNote(`This calculation is already on the tape as ${docLink(`calculations/${store.known}.json`, `calculations/${store.known}.json`)}.`); return; }
+    const name = (prompt("A name for the recorded calculation: lowercase letters, digits and dashes", "calc-" + r.id.replace(/^gc(js)?-/, "").slice(0, 8)) || "").trim();
+    if (!name) return;
+    if (!/^[a-z0-9][a-z0-9-]{0,63}$/.test(name)) { ghNote("Use lowercase letters, digits and dashes, starting with a letter or digit."); return; }
+    if (store.ledger?.presets?.[name]) { ghNote(`The tape already has an entry named ${esc(name)}; choose another name.`); return; }
+    $("gh-tape").disabled = true;
+    const tab = blankTab();
+    try {
+      ghNote(store.ready ? "Recording with the repository's Python…" : "Starting the repository's Python in this page to record the calculation (about 14 MB, once)…");
+      await startPython();
+      ghNote("Recording with the repository's Python…");
+      const file = await call("tape", { name, request: r.input });
+      const copied = await clipboard(file);
+      const branch = /^[\w./-]+$/.test(store.ledger?.head?.branch || "") && store.ledger.head.branch !== "HEAD" ? store.ledger.head.branch : "main";
+      const url = `${repo}/new/${branch}?${new URLSearchParams({ filename: `calculations/${name}.json`, value: file })}`;
+      ghNote(`GitHub opens <span class="mono">calculations/${esc(name)}.json</span> with the entry recorded here by the repository's Python${copied ? " (it is also on your clipboard)" : ""}. Commit it on a new branch and open a pull request: the workflow's tape check recomputes it and fails if the answer does not reproduce exactly.` + sendTab(tab, url, "open the new file on GitHub"));
+    } catch (error) { if (tab) tab.close(); ghNote(`Could not record: ${esc(error.message)}. From a clone: <code class="cmd">${esc(`python -m gitcalculator tape record ${name} --system ${shellQ(r.input.system)} --base ${shellQ(r.input.base)} --perturbation ${shellQ(r.input.perturbation)}`)}</code>`); }
+    finally { $("gh-tape").disabled = false; }
+  }
+  const FIELDS = { solve: ["perturbation", "observed"], design: ["target"], sweep: ["perturbation", "from", "to"], map: ["perturbation", "from", "to", "ufrom", "uto"], attack: ["perturbation"], history: ["perturbation"] };
   function shareLink() {
     const params = new URLSearchParams();
     for (const id of ["system", "base", ...FIELDS[store.mode]]) if ($(id).value.trim()) params.set(id, $(id).value.trim());
@@ -833,7 +1070,7 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
     const query = new URLSearchParams(location.search);
     if (!query.get("system") || !query.get("base")) return null;
     const request = {};
-    for (const id of ["system", "base", "perturbation", "target", "from", "to", "observed"]) if (query.has(id)) request[id] = query.get(id);
+    for (const id of ["system", "base", "perturbation", "target", "from", "to", "ufrom", "uto", "observed"]) if (query.has(id)) request[id] = query.get(id);
     return request;
   }
   const call = (type, request) => new Promise((resolve, reject) => { const id = ++store.seq; store.pending.set(id, { resolve, reject }); store.worker.postMessage({ type, id, request }); });
@@ -852,6 +1089,16 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
       const show = () => { $("form-note").innerHTML = `Copy this link:<code class="cmd">${esc(link)}</code>`; };
       navigator.clipboard ? navigator.clipboard.writeText(link).then(done, show) : show();
     });
+    $("gh-copy").addEventListener("click", async () => {
+      if (!store.receipt) return;
+      const text = proofSheet(store.receipt);
+      if (await clipboard(text)) { toast("Proof sheet copied: paste it into an issue, a pull request or a discussion"); ghNote(""); }
+      else { $("gh-preview").textContent = text; document.querySelector(".gh-preview").open = true; ghNote("Copy the sheet from the preview below."); }
+    });
+    $("gh-download").addEventListener("click", () => { if (store.receipt) download(`gitcalculator-${store.receipt.id}.md`, proofSheet(store.receipt), "text/markdown"); });
+    $("gh-issue").addEventListener("click", () => { openIssue(); });
+    $("gh-tape").addEventListener("click", () => { proposeTape(); });
+    $("gh-tape").hidden = !live;
     window.addEventListener("hashchange", () => setMode(location.hash.slice(1)));
     setMode(location.hash.slice(1) || "solve");
   }

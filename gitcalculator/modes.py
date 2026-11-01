@@ -377,3 +377,104 @@ def attack(system: str, base: str, perturbation: str, limit: int = 24) -> dict[s
             "summary": {"total": len(results), "changed": len(changed), "unchanged": len(results) - len(changed),
                         "kinds_changed": sorted({r["kind"] for r in changed}),
                         "kinds_stable": sorted({r["kind"] for r in results} - {r["kind"] for r in changed})}}
+
+
+# --- Map: the exact phase diagram of a two-parameter family -------------------------
+
+def _at2(expression: str, t: Fraction | None, u: Fraction | None) -> str:
+    if t is not None:
+        expression = re.sub(r"\bt\b", f"({t.numerator}/{t.denominator})", expression)
+    if u is not None:
+        expression = re.sub(r"\bu\b", f"({u.numerator}/{u.denominator})", expression)
+    return expression
+
+
+def _map_key(o: Mapping[str, Any]) -> str:
+    winners = o["winners"] if o["verdict"] in {"proved", "unlicensed"} and o["gamma"] else ""
+    return f"{o['verdict']}|{o['gamma']}|{winners}"
+
+
+def phase_map(system: str, base: str, perturbation: str, t_range=("-1", "1"), u_range=("-1", "1"),
+              resolution: int = 24) -> dict[str, Any]:
+    """Exact outcomes on a grid of rational (t, u), and each coefficient of R as a polynomial a(t, u)."""
+    t0, t1 = (X.to_fraction(v) for v in t_range)
+    u0, u1 = (X.to_fraction(v) for v in u_range)
+    if not (t0 < t1 and u0 < u1):
+        return {"status": "not_applicable", "reason": "each range needs from < to"}
+    certificate, model = _localize(system, base)
+    if model is None or model.weights is None:
+        return {"status": "not_applicable", "reason": "the phase map needs the exact diagonal principal part (Hypothesis 2)",
+                "links": certificate["links"]}
+    n = model.dimension
+    renamed = re.sub(r"\bu\b", f"x{n + 1}", re.sub(r"\bt\b", f"x{n}", perturbation))
+    degree = X.total_degree(X.parse(renamed, n + 2)) or 0  # bounds the degree in t and in u
+    nodes = lambda lo, hi: [lo + (hi - lo) * Fraction(k, max(1, degree)) for k in range(degree + 1)]
+    tn, un = nodes(t0, t1), nodes(u0, u1)
+    gains = {(a, b): _localize(system, base, _at2(perturbation, t, u))[1].gain for a, t in enumerate(tn) for b, u in enumerate(un)}
+    laws: dict[tuple[int, ...], dict[tuple[int, int], Fraction]] = {}
+    for s in set().union(*gains.values()):
+        in_t = [_interpolate([(t, gains[a, b].get(s, Fraction(0))) for a, t in enumerate(tn)]) for b in range(len(un))]
+        terms = {}
+        for k in set().union(*in_t):
+            for l, c in _interpolate([(u, row.get(k, Fraction(0))) for u, row in zip(un, in_t)]).items():
+                terms[(k, l)] = c
+        if terms:
+            laws[s] = terms
+    N = max(2, min(128, int(resolution)))
+    centre = lambda lo, hi, i: lo + (hi - lo) * Fraction(2 * i + 1, 2 * N)
+    ts, us = [centre(t0, t1, i) for i in range(N)], [centre(u0, u1, j) for j in range(N)]
+    index: dict[str, int] = {}
+    outcomes: list[dict[str, Any]] = []
+    grid: list[int] = []
+    for j in range(N):
+        for i in range(N):
+            o = outcome({"system": system, "base": base, "perturbation": _at2(perturbation, ts[i], us[j])})
+            key = _map_key(o)
+            if key not in index:
+                index[key] = len(outcomes)
+                outcomes.append({"key": key, "verdict": o["verdict"], "gamma": o["gamma"], "q_star": o["q_star"],
+                                 "winners": key.split("|")[2], "status": o["status"], "cells": 0,
+                                 "sample": {"t": X.label(ts[i]), "u": X.label(us[j])}})
+            outcomes[index[key]]["cells"] += 1
+            grid.append(index[key])
+    ordered = sorted(laws, key=lambda s: (X.weighted_degree(s, model.weights), s))
+    return {"status": "complete", "t": [X.label(t0), X.label(t1)], "u": [X.label(u0), X.label(u1)], "resolution": N,
+            "axes": list(model.axes), "grid": grid, "outcomes": outcomes,
+            "laws": [{"monomial": X.monomial_text(s, model.axes), "degree": X.label(X.weighted_degree(s, model.weights)),
+                      "law": X.poly_text(laws[s], ("t", "u")), "terms": {f"{k},{l}": X.label(c) for (k, l), c in laws[s].items()}}
+                     for s in ordered]}
+
+
+def describe_outcome(o: Mapping[str, Any]) -> str:
+    if o["verdict"] == "proved" and o["gamma"] is None:
+        return "Δ(s) = 0 for small s (proved)"
+    if o["verdict"] == "proved-v22":
+        return f"γ = {o['gamma']} by the V.22 curved reduction"
+    if o["gamma"]:
+        faces = f", face {o['winners']}" if o["winners"] else ""
+        return f"γ = {o['gamma']}{faces} ({'proved' if o['verdict'] == 'proved' else 'not licensed'})"
+    return "no exponent (refused)"
+
+
+def render_map(result: Mapping[str, Any], perturbation: str = "") -> str:
+    """The phase map as text: one letter per exact outcome, u upward and t to the right."""
+    if result["status"] != "complete":
+        return f"no phase map: {result['reason']}"
+    N, letters = result["resolution"], "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    symbol = lambda k: letters[k] if k < len(letters) else "?"
+    width = max(len(result["u"][0]), len(result["u"][1]))
+    lines = [f"phase map of G(t, u) = {perturbation}" if perturbation else "phase map",
+             f"t from {result['t'][0]} to {result['t'][1]}, u from {result['u'][0]} to {result['u'][1]}: "
+             f"{N}×{N} exact certificates", ""]
+    for j in reversed(range(N)):
+        label = result["u"][1] if j == N - 1 else result["u"][0] if j == 0 else ""
+        lines.append(f"  {label:>{width}} │ " + "".join(symbol(result["grid"][j * N + i]) for i in range(N)))
+    lines.append(f"  {'':>{width}} └─" + "─" * N)
+    lines.append(f"  {'':>{width}}   {result['t'][0]}{'t'.center(max(1, N - len(result['t'][0]) - len(result['t'][1])))}{result['t'][1]}")
+    lines.append("")
+    total = N * N
+    for k, o in enumerate(result["outcomes"]):
+        lines.append(f"  {symbol(k)}  {describe_outcome(o):<46} {100 * o['cells'] / total:5.1f}%   e.g. t = {o['sample']['t']}, u = {o['sample']['u']}")
+    lines += ["", "  coefficient of each monomial of R, as a polynomial in t and u:"]
+    lines += [f"    {law['monomial']:<12} weighted degree {law['degree']:<6} a(t, u) = {law['law']}" for law in result["laws"]]
+    return "\n".join(lines)

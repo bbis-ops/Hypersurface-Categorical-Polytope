@@ -215,7 +215,7 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
         <label for="cstatement" data-for="conjecture conjecture-family">Statement <small>in words; Markdown with $math$</small>
           <textarea id="cstatement" spellcheck="true"></textarea></label>
         <label for="ccorpus" data-for="conjecture conjecture-family">Test it on
-          <select id="ccorpus"><option value="presets">the 13 canonical presets</option><option value="family">a family G(t) or G(t, u)</option></select></label>
+          <select id="ccorpus"><option value="presets">the canonical presets</option><option value="family">a family G(t) or G(t, u)</option></select></label>
         <label for="system" data-for="solve design sweep map attack history conjecture-family">Polyhedron (A, b) with A·x ≤ b
           <textarea id="system" spellcheck="false"></textarea></label>
         <label for="base" data-for="solve design sweep map attack history conjecture-family">Base objective F <small>in x0, x1, …</small>
@@ -399,7 +399,7 @@ svg .strong { font: 600 12.5px var(--sans); fill: var(--ink); }
   const CUBE = "([[-1,0,0],[0,-1,0],[0,0,-1],[1,0,0],[0,1,0],[0,0,1]], [0,0,0,1,1,1])";
   const SOLVE_GROUPS = [
     ["Worked examples", ["tilted-simplex", "sheared-simplex", "cube-3d", "tied-faces", "active-set"]],
-    ["Counterexamples", ["signed-channel", "signed-sharp", "interior-zero", "cross-term", "tied-maximizers"]],
+    ["Counterexamples", ["signed-channel", "signed-sharp", "interior-zero", "cross-term", "loss-absorption", "tied-maximizers"]],
     ["Boundaries", ["curved-cancellation", "critical-layer", "pyramid-apex"]],
   ];
   const DESIGN_PRESETS = [

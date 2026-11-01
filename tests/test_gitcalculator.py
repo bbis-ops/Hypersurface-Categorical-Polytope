@@ -605,7 +605,12 @@ def test_command_line_tests_a_conjecture():
     out = io.StringIO()
     with redirect_stdout(out):
         assert main(["conjecture", "test", "--rule", "if(isolated, min(face_gamma, curved_gamma), unknown)", "--budget", "quick"]) == 0
-    assert "SURVIVES EVERY TEST" in out.getvalue()
+    assert "REFUTED BY A THEOREM" in out.getvalue()  # Lemma A, at the loss-absorption preset
+    out = io.StringIO()
+    with redirect_stdout(out):
+        assert main(["conjecture", "test", "--rule", "if(isolated and (principal or loss_mixed_q >= 1), min(face_gamma, curved_gamma), unknown)",
+                     "--budget", "quick"]) == 0
+    assert "SURVIVES EVERY TEST" in out.getvalue() and "1 of 9 claims goes beyond" in out.getvalue()
     with pytest.raises(SystemExit):
         main(["conjecture", "test", "--rule", "__import__('os')"])
 

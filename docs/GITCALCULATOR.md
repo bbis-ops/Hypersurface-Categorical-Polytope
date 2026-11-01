@@ -105,7 +105,7 @@ python -m gitcalculator calc --system "([[-1,0],[0,-1],[1,1]], [0,0,1])" --base 
 | `sweep` | The exact phase fan of a family written with the parameter `t`, over `--from` and `--to` |
 | `map` | The phase map of a family written with `t` and `u`: one exact certificate per cell, and each coefficient as a polynomial $a(t,u)$ |
 | `attack` | Generated counterexamples: every mutation of the input, re-certified |
-| `presets` | The thirteen canonical calculations |
+| `presets` | The fourteen canonical calculations |
 | `counter` | Every counter-argument with its claim, refutation and executable witness; exits nonzero if a witness fails |
 | `history` | Replays one input across every code state in git |
 | `conjecture test` / `record` / `verify` | Tests a candidate law on the presets or a family, records it in [`conjectures/`](../conjectures/), and rechecks every recorded verdict |
@@ -450,7 +450,7 @@ and `unknown` (no claim). Its operators are `+ - * / ^`, comparisons, and
 and `max` skip unknown values. `python -m gitcalculator conjecture features`
 prints the list.
 
-A rule is tested on a **corpus**: the thirteen presets by default, or a family
+A rule is tested on a **corpus**: the fourteen presets by default, or a family
 $G_t$ or $G_{t,u}$ on a grid of rational points (`--system`, `--base`,
 `--perturbation`, `--t-from` … `--u-to`, `--points`). Each input gets one
 verdict:
@@ -484,15 +484,16 @@ Lemma 2, V.22, or [Lemma A](FORMAL_LOSS_ABSORPTION.md).
 
 ### How a law gets sharpened
 
-The five recorded conjectures in [`conjectures/`](../conjectures/) trace one
+The six recorded conjectures in [`conjectures/`](../conjectures/) trace one
 line of thought on the presets.
 
 | Conjecture | Rule | Outcome |
 | :--- | :--- | :--- |
 | Ambient axes | `ambient_gamma` | Refuted by theorems: the face law proves $4/3$ on the tilted simplex, and V.22 proves $3$ on signed-sharp |
 | Least positive monomial | `1/(1 - min_positive_q)` | Refuted three times by the V.22 theorem: signed terms and curved channels matter |
-| The fastest channel wins | `min(face_gamma, curved_gamma)` | Agrees with all eight theorems that decide an input. Contradicted at `tied-maximizers`, whose rival maximizer gives $\Delta(s) \ge 10^{-3}$ at $s = 10^{-3}$, witnessed by the point $(1, 0)$ |
-| The fastest channel wins at an isolated maximizer | `if(isolated, min(face_gamma, curved_gamma), unknown)` | Survives every test |
+| The fastest channel wins | `min(face_gamma, curved_gamma)` | Agrees with all eight theorems that decide an input. Contradicted at `tied-maximizers`, whose rival maximizer gives $\Delta(s) \ge 10^{-3}$ at $s = 10^{-3}$, witnessed by the point $(1, 0)$. Refuted by Lemma A at `loss-absorption` |
+| The fastest channel wins at an isolated maximizer | `if(isolated, min(face_gamma, curved_gamma), unknown)` | Refuted by Lemma A at `loss-absorption`: isolation alone does not stop the loss from absorbing the gain |
+| The fastest channel wins where the loss cannot absorb it | `if(isolated and (principal or loss_mixed_q >= 1), min(face_gamma, curved_gamma), unknown)` | Survives. 8 inputs agree with theorems, and `cross-term`, which no theorem decides, is consistent with certified bounds |
 | Positivity on the orthant decides the quadratic form | `if(t > 0 or (u > 0 and u*u > -4*t), 2, none)` | Survives on a $6 \times 6$ grid of the quadratic-form family. 27 inputs agree with theorems, and 9 that the certificate cannot decide are consistent with certified bounds |
 
 The last law reaches past the certificate. The certificate's sufficient tests
@@ -500,12 +501,17 @@ refuse the cells where the form $t c_0^2 + u c_0 c_1 - c_1^2$ is negative on the
 orthant with $u \gt 0$. The conjecture predicts zero response there, and no
 certified bound finds any response.
 
-[Issue #33](https://github.com/bbis-ops/Hypersurface-Categorical-Polytope/issues/33)
-proposed `if(isolated and not principal, face_gamma, unknown)`. On the presets
-it made one claim beyond the theorems, at `cross-term`, which was consistent. On
-$F=-(x_0^4+x_1^4+x_0x_1)$ with $G=x_0x_1$ or $G=x_0x_1^2$, Lemma A now refutes
-it, because the response is zero. The refinement
-`if(isolated and not principal and loss_mixed_q >= 1, face_gamma, unknown)`
+The last three rows come from issues
+[#31](https://github.com/bbis-ops/Hypersurface-Categorical-Polytope/issues/31),
+[#32](https://github.com/bbis-ops/Hypersurface-Categorical-Polytope/issues/32)
+and [#33](https://github.com/bbis-ops/Hypersurface-Categorical-Polytope/issues/33).
+Issue #33 proposed `if(isolated and not principal, face_gamma, unknown)`. On the
+thirteen presets of the time, it made one claim beyond the theorems, at
+`cross-term`, which was consistent. Then $F=-(x_0^4+x_1^4+x_0x_1)$ with
+$G=x_0x_1$ showed a face that qualifies under the diagonal weights while the
+response is zero. That input became Lemma A, the counter-argument
+`loss-absorption`, and the fourteenth preset, which now refutes the rule. The
+refinement `if(isolated and not principal and loss_mixed_q >= 1, face_gamma, unknown)`
 abstains there, and `cross-term` keeps it alive.
 
 ### Recording and sharing

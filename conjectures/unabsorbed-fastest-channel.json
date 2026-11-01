@@ -1,0 +1,261 @@
+{
+  "schema": "gitcalculator.conjecture.v1",
+  "name": "unabsorbed-fastest-channel",
+  "title": "The fastest channel wins where the loss cannot absorb it",
+  "statement": "If $v$ is the only maximizer of $F$ on $P$ (Hypothesis 0), and either the principal part is diagonal (Hypothesis 2) or every mixed monomial of $D$ has weighted degree at least 1, then $\\gamma = \\min(\\gamma_{\\mathrm{face}}, \\gamma_{\\mathrm{V.22}})$. It combines the guard of issue #31 with the refinement found on issue #33, after `loss-absorption` refuted the version with Hypothesis 0 alone.",
+  "rule": "if(isolated and (principal or loss_mixed_q >= 1), min(face_gamma, curved_gamma), unknown)",
+  "corpus": {
+    "kind": "presets"
+  },
+  "budget": "standard",
+  "status": "survives",
+  "counts": {
+    "refuted": 0,
+    "contradicted": 0,
+    "agrees": 8,
+    "consistent": 1,
+    "inconclusive": 0,
+    "untestable": 0,
+    "no claim": 5
+  },
+  "claims": {
+    "made": 9,
+    "decided": 8,
+    "beyond": 1,
+    "beyond_verdicts": {
+      "consistent": 1
+    }
+  },
+  "instances": [
+    {
+      "label": "tilted-simplex",
+      "params": {},
+      "features": {
+        "face_gamma": "4/3",
+        "isolated": "true",
+        "loss_mixed_q": "none",
+        "principal": "true"
+      },
+      "prediction": "4/3",
+      "established": {
+        "gamma": "4/3",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "sheared-simplex",
+      "params": {},
+      "features": {
+        "face_gamma": "4/3",
+        "isolated": "true",
+        "loss_mixed_q": "none",
+        "principal": "true"
+      },
+      "prediction": "4/3",
+      "established": {
+        "gamma": "4/3",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "signed-channel",
+      "params": {},
+      "features": {
+        "curved_gamma": "3",
+        "isolated": "true",
+        "loss_mixed_q": "none",
+        "principal": "true"
+      },
+      "prediction": "3",
+      "established": {
+        "gamma": "3",
+        "by": "V.22"
+      },
+      "verdict": "agrees",
+      "detail": "proved by V.22"
+    },
+    {
+      "label": "signed-sharp",
+      "params": {},
+      "features": {
+        "curved_gamma": "3",
+        "face_gamma": "6",
+        "isolated": "true",
+        "loss_mixed_q": "none",
+        "principal": "true"
+      },
+      "prediction": "3",
+      "established": {
+        "gamma": "3",
+        "by": "V.22"
+      },
+      "verdict": "agrees",
+      "detail": "proved by V.22"
+    },
+    {
+      "label": "curved-cancellation",
+      "params": {},
+      "features": {
+        "curved_gamma": "6",
+        "isolated": "true",
+        "loss_mixed_q": "none",
+        "principal": "true"
+      },
+      "prediction": "6",
+      "established": {
+        "gamma": "6",
+        "by": "V.22"
+      },
+      "verdict": "agrees",
+      "detail": "proved by V.22"
+    },
+    {
+      "label": "interior-zero",
+      "params": {},
+      "features": {
+        "isolated": "true",
+        "loss_mixed_q": "none",
+        "principal": "true"
+      },
+      "prediction": null,
+      "established": null,
+      "verdict": "no claim",
+      "detail": "the rule makes no prediction here"
+    },
+    {
+      "label": "active-set",
+      "params": {},
+      "features": {
+        "face_gamma": "4/3",
+        "isolated": "true",
+        "loss_mixed_q": "none",
+        "principal": "true"
+      },
+      "prediction": "4/3",
+      "established": {
+        "gamma": "4/3",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "tied-faces",
+      "params": {},
+      "features": {
+        "face_gamma": "4/3",
+        "isolated": "true",
+        "loss_mixed_q": "none",
+        "principal": "true"
+      },
+      "prediction": "4/3",
+      "established": {
+        "gamma": "4/3",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    },
+    {
+      "label": "cross-term",
+      "params": {},
+      "features": {
+        "face_gamma": "2",
+        "isolated": "true",
+        "loss_mixed_q": "1",
+        "principal": "false"
+      },
+      "prediction": "2",
+      "established": null,
+      "measured": "2.0",
+      "verdict": "consistent",
+      "detail": "local slopes approach 2.000 (prediction 2.000)"
+    },
+    {
+      "label": "loss-absorption",
+      "params": {},
+      "features": {
+        "face_gamma": "2",
+        "isolated": "true",
+        "loss_mixed_q": "1/2",
+        "principal": "false"
+      },
+      "prediction": null,
+      "established": {
+        "gamma": "none",
+        "by": "Lemma A (absorption by the loss)"
+      },
+      "verdict": "no claim",
+      "detail": "the rule makes no prediction here"
+    },
+    {
+      "label": "tied-maximizers",
+      "params": {},
+      "features": {
+        "face_gamma": "2",
+        "isolated": "false",
+        "loss_mixed_q": "none",
+        "principal": "true"
+      },
+      "prediction": null,
+      "established": null,
+      "verdict": "no claim",
+      "detail": "the rule makes no prediction here"
+    },
+    {
+      "label": "critical-layer",
+      "params": {},
+      "features": {
+        "isolated": "true",
+        "loss_mixed_q": "none",
+        "principal": "true"
+      },
+      "prediction": null,
+      "established": {
+        "gamma": "none",
+        "by": "Lemma 2"
+      },
+      "verdict": "no claim",
+      "detail": "the rule makes no prediction here"
+    },
+    {
+      "label": "pyramid-apex",
+      "params": {},
+      "features": {
+        "isolated": "false",
+        "principal": "false"
+      },
+      "prediction": null,
+      "established": null,
+      "verdict": "no claim",
+      "detail": "the rule makes no prediction here"
+    },
+    {
+      "label": "cube-3d",
+      "params": {},
+      "features": {
+        "face_gamma": "6/5",
+        "isolated": "true",
+        "loss_mixed_q": "none",
+        "principal": "true"
+      },
+      "prediction": "6/5",
+      "established": {
+        "gamma": "6/5",
+        "by": "the face-selection theorem"
+      },
+      "verdict": "agrees",
+      "detail": "proved by the face-selection theorem"
+    }
+  ],
+  "recorded_with": {
+    "commit": "21b8347be8c6c8d06e5c5b29c1d48421b5f4dff1",
+    "short": "21b8347",
+    "code_id": "code-23ad9e729a48",
+    "calculator_id": "calc-d3770f8a5e11"
+  }
+}

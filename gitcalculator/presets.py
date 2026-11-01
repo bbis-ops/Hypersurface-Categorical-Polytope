@@ -53,6 +53,12 @@ PRESETS: dict[str, dict] = {
         "note": "The backend licenses γ = 2 from a homogeneity probe; Hypothesis 2 fails exactly.",
         "request": {"system": SQUARE, "base": "-(x0**2+x0*x1+x1**2)", "perturbation": "x0"},
     },
+    "loss-absorption": {
+        "title": "Gain absorbed by the loss",
+        "note": "Issue #33: the face {c0, c1} qualifies under the diagonal weights, but the loss's mixed term "
+                "absorbs the gain, so Lemma A proves zero response.",
+        "request": {"system": SQUARE, "base": "-(x0**4+x1**4+x0*x1)", "perturbation": "x0*x1"},
+    },
     "tied-maximizers": {
         "title": "Two base maximizers",
         "note": "Hypothesis 0 fails: F is maximal at (0,0) and (1,0).",

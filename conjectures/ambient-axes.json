@@ -10,7 +10,7 @@
   "budget": "standard",
   "status": "refuted",
   "counts": {
-    "refuted": 3,
+    "refuted": 4,
     "contradicted": 1,
     "agrees": 3,
     "consistent": 1,
@@ -19,8 +19,8 @@
     "no claim": 5
   },
   "claims": {
-    "made": 8,
-    "decided": 6,
+    "made": 9,
+    "decided": 7,
     "beyond": 2,
     "beyond_verdicts": {
       "contradicted": 1,
@@ -162,6 +162,26 @@
       "detail": "local slopes approach 2.000 (prediction 2.000)"
     },
     {
+      "label": "loss-absorption",
+      "params": {},
+      "features": {
+        "ambient_gamma": "2"
+      },
+      "prediction": "2",
+      "established": {
+        "gamma": "none",
+        "by": "Lemma A (absorption by the loss)"
+      },
+      "verdict": "refuted",
+      "input": {
+        "system": "([[-1,0],[0,-1],[1,0],[0,1]], [0,0,1,1])",
+        "base": "-(x0**4+x1**4+x0*x1)",
+        "perturbation": "x0*x1",
+        "request_id": "loss-absorption"
+      },
+      "detail": "Lemma A (absorption by the loss) proves zero response"
+    },
+    {
       "label": "tied-maximizers",
       "params": {},
       "features": {
@@ -232,9 +252,9 @@
     }
   ],
   "recorded_with": {
-    "commit": "c2f1e7db9c833a08e2e615488743604567dfa17f",
-    "short": "c2f1e7d",
+    "commit": "21b8347be8c6c8d06e5c5b29c1d48421b5f4dff1",
+    "short": "21b8347",
     "code_id": "code-23ad9e729a48",
-    "calculator_id": "calc-47973d185bc6"
+    "calculator_id": "calc-d3770f8a5e11"
   }
 }
